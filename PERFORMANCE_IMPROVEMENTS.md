@@ -1,6 +1,10 @@
-# Butterchurn Performance Improvements - Phase 1
+# Butterchurn Intelligent Music Visualizer - Performance & Architecture Guide
 
-## What's Been Improved
+## Project Status: Phase 1 Complete ✅, Phase 2 Ready for Implementation
+
+This fork transforms Butterchurn from a random visualizer into an intelligent, music-aware system perfect for streaming applications. Phase 1 performance improvements are complete (25-30% faster). Phase 2 will add equation-based fingerprinting and real-time intelligent preset selection.
+
+## What's Been Improved (Phase 1 Complete)
 
 This fork includes significant performance improvements based on production learnings from the music_autovis project:
 
@@ -22,18 +26,45 @@ This fork includes significant performance improvements based on production lear
 - Better frame pacing
 - **File**: `src/rendering/renderer.js`
 
+### 4. **UMD Build Format Fixed**
+- Changed from ES6 modules to UMD for browser compatibility
+- **File**: `rollup.config.js`
+
+## Architecture Decision: JavaScript Handles All Visualization
+
+**Key Principle**: Keep all visualization logic in JavaScript where Butterchurn lives naturally.
+
+```
+┌─────────────────────────────────────────┐
+│           Backend (Go/Node)              │
+│  - Stream orchestration                  │
+│  - Song selection                        │
+│  - User management                       │
+└────────────┬────────────────────────────┘
+             │ Simple API
+             ↓
+┌─────────────────────────────────────────┐
+│      JavaScript (This Fork)              │
+│  - Butterchurn rendering                 │
+│  - Preset fingerprinting                 │
+│  - Intelligent selection                 │
+│  - Audio analysis                        │
+│  - Completely autonomous                 │
+└─────────────────────────────────────────┘
+```
+
 ## Building the Improved Version
 
 ```bash
-# Install dependencies
-npm install
+# Install dependencies (use legacy-peer-deps for compatibility)
+npm install --legacy-peer-deps
 
 # Build the improved version
 npm run build
 
 # This creates:
 # - dist/butterchurn.js (development build)
-# - dist/butterchurn.min.js (production build)
+# - dist/butterchurn.min.js (production build, UMD format)
 ```
 
 ## Using the Improved Version
@@ -41,15 +72,15 @@ npm run build
 ### In HTML (Local File)
 ```html
 <!-- Use the local improved build -->
-<script src="./butterchurn/dist/butterchurn.js"></script>
+<script src="./butterchurn/dist/butterchurn.min.js"></script>
 
 <!-- Presets can still come from CDN (they're just data) -->
 <script src="https://unpkg.com/butterchurn-presets@2.4.7/lib/butterchurnPresetsMinimal.min.js"></script>
 ```
 
-### In Your Golang Project
+### In Your Streaming Project
 1. Build the improved Butterchurn as shown above
-2. Serve the `dist/butterchurn.js` file from your Go server
+2. Serve the `dist/butterchurn.min.js` file from your server
 3. Use the test HTML as a template for integration
 
 ## Testing the Improvements
@@ -122,6 +153,106 @@ Phase 2 transforms Butterchurn from a random visualizer to an intelligent music-
 - **Live adaptation**: Responds to actual music in real-time
 - **Community friendly**: Database can be shared
 
+## Phase 2 Implementation Guide
+
+### Step 1: Generate Preset Fingerprints (2 days)
+
+Create `generate-fingerprints.js`:
+```javascript
+class PresetFingerprinter {
+  generateContentHash(preset) {
+    // Hash the actual equations (deterministic)
+    const equations = [
+      preset.init_eqs_str,
+      preset.frame_eqs_str,
+      preset.pixel_eqs_str,
+      preset.warp_eqs_str
+    ].join('|');
+
+    return sha256(equations).substring(0, 8);
+  }
+
+  analyzeEquations(preset) {
+    return {
+      energy: this.analyzeEnergy(preset),
+      bass: this.countAudioVars(preset),
+      complexity: this.countActiveElements(preset),
+      fps: this.estimatePerformance(preset)
+    };
+  }
+}
+```
+
+### Step 2: Build Deduplication Database (1 day)
+
+```javascript
+{
+  "presets": {
+    "a3f7b2c9": {  // 8-char content hash
+      "authors": ["Geiss", "Rovastar"],  // All who made this
+      "names": ["original", "remix"],
+      "fingerprint": {
+        "energy": 0.7,
+        "bass": 0.8,
+        "fps": 55
+      }
+    }
+  },
+  "indices": {
+    "high": ["a3f7b2c9", ...],
+    "bass": ["a3f7b2c9", ...],
+    "calm": ["d4e8f1a2", ...]
+  }
+}
+```
+
+### Step 3: Implement Intelligent Selection (3 days)
+
+```javascript
+class IntelligentPresetSelector {
+  selectPreset(audioFeatures) {
+    // Get candidates by audio features
+    const candidates = this.db.indices[
+      audioFeatures.bass > 0.7 ? 'bass' : 'calm'
+    ];
+
+    // Score each candidate
+    const scores = candidates.map(hash => ({
+      hash,
+      score: this.scorePreset(hash, audioFeatures)
+    }));
+
+    // Return best match (8-char hash)
+    return scores.sort((a,b) => b.score - a.score)[0].hash;
+  }
+}
+```
+
+### Step 4: Integration (2 days)
+
+```javascript
+// Autonomous visualization engine
+class VisualizationEngine {
+  async start(audioUrl) {
+    // Load fingerprint database
+    this.db = await fetch('/fingerprints.json');
+
+    // Start audio analysis
+    this.audio.connect(audioUrl);
+
+    // Intelligent selection loop
+    setInterval(() => {
+      const features = this.audio.getFeatures();
+      const bestHash = this.selector.select(features);
+
+      if (this.shouldSwitch(bestHash)) {
+        butterchurn.loadPreset(bestHash);
+      }
+    }, 100);
+  }
+}
+```
+
 ## Implementation Complexity
 
 ### Phase 1 (Completed) ✅
@@ -159,8 +290,8 @@ Phase 2 transforms Butterchurn from a random visualizer to an intelligent music-
 
 To release this improved version:
 
-1. Fork the original Butterchurn repo
-2. Apply these changes
+1. Fork the original Butterchurn repo ✅ (done: geeks-accelerator/butterchurn)
+2. Apply these changes ✅ (Phase 1 complete)
 3. Update version in `package.json` (e.g., `3.0.0-perf.1`)
 4. Publish to npm:
 ```bash
@@ -169,8 +300,92 @@ npm publish --tag performance
 
 5. Others can then use:
 ```bash
-npm install butterchurn@performance
+npm install @geeks-accelerator/butterchurn
 ```
+
+## Why This Approach?
+
+### Equation Fingerprinting Benefits
+1. **No bias** - Analyzes math, not one test song
+2. **Instant** - Process 15,000 presets in seconds
+3. **Deterministic** - Same equations = same hash
+4. **Scalable** - Works with 100,000+ presets
+
+### Content Hash Benefits
+1. **Token efficient** - 8 chars vs 50+
+2. **True deduplication** - Find actual unique presets
+3. **Attribution preserved** - Track all authors
+4. **AI friendly** - Perfect for automation
+
+### Architecture Benefits
+1. **Single language** - All viz in JavaScript
+2. **Butterchurn native** - No cross-language complexity
+3. **Community aligned** - Standard JS ecosystem
+4. **Autonomous** - Runs independently once started
+
+## Production Deployment
+
+### For Streaming
+```javascript
+// Backend just starts/stops
+POST /api/viz/start { audioUrl: "..." }
+
+// JavaScript handles everything else
+engine.start(audioUrl);  // Autonomous from here
+```
+
+### For Web
+```html
+<script src="butterchurn.min.js"></script>
+<script src="fingerprints.json"></script>
+<script>
+  const viz = new IntelligentVisualizer();
+  viz.start(audioElement);
+</script>
+```
+
+## Community Contribution
+
+This fingerprint database can benefit everyone:
+
+1. **Generate once** - Run fingerprinter on all presets
+2. **Share database** - Host on CDN for all
+3. **Contribute improvements** - Better algorithms
+4. **Add presets** - Automatic fingerprinting
+
+## Key Files Modified
+
+### Phase 1 (Complete)
+- `src/audio/audioProcessor.js` - Larger buffer, smoothing
+- `src/visualizer.js` - Direct WebGL rendering
+- `src/rendering/renderer.js` - Frame stabilization
+- `rollup.config.js` - UMD format
+
+### Phase 2 (To Add)
+- `generate-fingerprints.js` - Fingerprint generator
+- `src/intelligentSelector.js` - Smart selection
+- `fingerprints.json` - Preset database
+- `src/presetHasher.js` - Content hashing
+
+## Known Issues
+
+- `setCanvas()` may need WebGL context recreation
+- Some presets may not work with larger buffers (rare)
+- Smoothing factor may need tuning per genre
+
+## Future Roadmap
+
+### Phase 3: Advanced Features
+- Preset preloading (compile shaders ahead)
+- Web Worker audio processing
+- GPU acceleration improvements
+- ML-based scoring
+
+### Phase 4: Community Features
+- Crowdsourced fingerprints
+- Preset rating system
+- Custom fingerprint algorithms
+- Preset creation tools
 
 ## Credits
 
@@ -178,7 +393,21 @@ Performance improvements based on learnings from:
 - music_autovis project (Rust/ProjectM integration)
 - Analysis of 11,000+ MilkDrop presets
 - Production testing with various audio formats
+- Original Butterchurn by jberg
+- Equation fingerprinting concept inspired by content-addressable systems
+
+## Philosophy
+
+> "Analyze the mathematics, not the music. The equations reveal truth."
+
+This fork transforms Butterchurn from a random visualizer to an intelligent system that understands both the mathematics of its presets and the dynamics of music. By fingerprinting equations instead of testing with audio, we achieve unbiased, scalable, deterministic analysis.
 
 ## Issues/Questions
 
 If you encounter any issues with the improved version, the changes are clearly marked with `PHASE 1 IMPROVEMENT` comments in the source code.
+
+For bugs or suggestions, please open an issue on the fork: https://github.com/geeks-accelerator/butterchurn/issues
+
+---
+
+*"The code dances to the music, but the mathematics leads."*
