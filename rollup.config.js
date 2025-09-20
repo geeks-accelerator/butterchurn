@@ -30,7 +30,8 @@ const configs = [
     output: [
       {
         file: isProduction ? 'dist/butterchurn.min.js' : 'dist/butterchurn.js',
-        format: 'es',
+        format: 'umd',
+        name: 'butterchurn',
         sourcemap: true,
       },
     ],
