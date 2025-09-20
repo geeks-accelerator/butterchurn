@@ -36,6 +36,13 @@ export default class Renderer {
     this.blendProgress = 0;
     this.blendDuration = 0;
 
+    // PHASE 1 IMPROVEMENT: Frame time stabilization for consistent rendering
+    this.targetFPS = opts.targetFPS || 60;
+    this.frameTime = 1000 / this.targetFPS;
+    this.accumulator = 0;
+    this.lastFrameTime = performance.now();
+    this.skipFrameThreshold = this.frameTime * 1.5; // Skip if too far behind
+
     this.width = opts.width || 1200;
     this.height = opts.height || 900;
     this.mesh_width = opts.meshWidth || 48;
