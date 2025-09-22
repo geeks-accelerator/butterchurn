@@ -29,7 +29,9 @@
     "test:visual:update": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js --updateSnapshot",
     "test:visual:watch": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js --watch",
     "test:visual:local": "yarn build && yarn test:visual",
-    "test:visual:view": "open test/visual/__image_snapshots__/__diff_output__"
+    "test:visual:view": "open test/visual/__image_snapshots__/__diff_output__",
+    "serve": "npx serve -C -p 8192",
+    "serve:test": "npx serve -C -p 8192 test"
   },
   "repository": {
     "type": "git",

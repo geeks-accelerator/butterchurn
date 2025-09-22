@@ -60,8 +60,8 @@ No installation required - just open your browser and start visualizing!
 
 ### Node.js Development Setup
 ```bash
-# Clone repository
-git clone https://github.com/jberg/butterchurn.git
+# Clone repository (Enhanced Fork)
+git clone https://github.com/geeks-accelerator/butterchurn.git
 cd butterchurn
 
 # Install dependencies (legacy flag required for eel-wasm)
@@ -75,9 +75,34 @@ npm run build
 
 # Run development server with watch mode
 npm run dev
+
+# Start local test server on port 8192
+# (8192 = 2^13, a power of 2 matching audio buffer sizes)
+npm run serve:test
+
+# Then open http://localhost:8192/intelligent-selector-test.html
 ```
 
 ### CDN Installation
+
+#### Enhanced Fork CDN (GitHub Pages)
+```html
+<!-- Core Butterchurn library (Enhanced Fork) -->
+<script src="https://geeks-accelerator.github.io/butterchurn/cdn/butterchurn.min.js"></script>
+
+<!-- Preset collections -->
+<script src="https://geeks-accelerator.github.io/butterchurn/cdn/presets/butterchurnPresets.min.js"></script>
+<script src="https://geeks-accelerator.github.io/butterchurn/cdn/presets/butterchurnPresetsExtra.min.js"></script>
+
+<!-- Fingerprint database for intelligent selection -->
+<script>
+  fetch('https://geeks-accelerator.github.io/butterchurn/cdn/fingerprints.json')
+    .then(r => r.json())
+    .then(db => console.log(`Loaded ${Object.keys(db.presets).length} preset fingerprints`));
+</script>
+```
+
+#### Original NPM CDN
 ```html
 <!-- Core Butterchurn library -->
 <script src="https://unpkg.com/butterchurn@latest/dist/butterchurn.min.js"></script>
@@ -281,6 +306,48 @@ Each preset is analyzed by its mathematical equations to generate:
 4. Run tests: `npm run analyze && npm run test:visual`
 5. Test performance: `npm run build && open test/performance-test.html`
 6. Submit pull request with clear description
+
+### Code Quality Tools
+
+This project enforces code quality through multiple linters and validators:
+
+#### Linting Commands
+```bash
+# Run all code quality checks
+npm run analyze
+
+# Individual linters
+npm run lint:check      # ESLint - JavaScript code style
+npm run typecheck       # TypeScript - Type checking (no emit)
+npm run lint:glsl       # GLSL - Shader code validation
+
+# Auto-fix linting issues
+npm run lint            # ESLint with --fix flag
+
+# Pre-commit check (runs all analyzers)
+npm run precommit
+```
+
+#### Configured Linters
+- **ESLint**: JavaScript/TypeScript code style and best practices
+  - Parser: `@typescript-eslint/parser`
+  - Plugins: `import`, `jsdoc`, `prettier`
+  - Extends: `eslint-config-prettier` for Prettier integration
+
+- **TypeScript**: Static type checking with `tsconfig.json`
+  - Strict mode enabled
+  - No implicit any
+  - ES2020 target with ES modules
+
+- **GLSL Linter**: Custom shader validation (`tools/glsl-lint.js`)
+  - Validates WebGL shader syntax
+  - Checks for common GLSL errors
+  - Ensures shader compatibility
+
+- **Prettier**: Code formatting
+  - Integrated with ESLint
+  - Consistent code style across the project
+  - Auto-formats on lint --fix
 
 ### Visual Regression Testing
 Critical for preventing rendering bugs:
