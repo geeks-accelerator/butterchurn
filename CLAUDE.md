@@ -1,312 +1,179 @@
-# CLAUDE.md - Butterchurn Intelligent Music Visualizer
+# CLAUDE.md
 
-## Project Status: Phase 1 Complete ✅, Phase 2 Ready for Implementation
+This file provides AI-optimized development context for Claude Code when working with this repository.
 
-This fork transforms Butterchurn from a random visualizer into an intelligent, music-aware system perfect for streaming applications. Phase 1 performance improvements are complete (25-30% faster). Phase 2 will add equation-based fingerprinting and real-time intelligent preset selection.
+## CRITICAL PROJECT RULES
 
-## What This Fork Adds
+### Non-Negotiable Constraints
+- **NEVER** use same buffer for blending sources (`this.prevWarpColor` vs `this.warpColor` MUST be separate)
+- **ALWAYS** pass audio data to render: `visualizer.render({ audioLevels: { timeByteArray, timeByteArrayL, timeByteArrayR } })`
+- **NEVER** blend from `blankPreset` - check `isComingFromBlankPreset` before enabling blending
+- **MAINTAIN** direct WebGL rendering - no Canvas 2D intermediate copies
+- **PRESERVE** 2048-sample audio buffer size - never revert to 512
+- **KEEP** deterministic RNG context for visual regression tests
 
-### Completed (Phase 1) ✅
-- **4x larger audio buffer** (512→2048) for better bass response
-- **Direct WebGL rendering** eliminating Canvas 2D copy overhead
-- **Frame time stabilization** for consistent 60 FPS
-- **UMD build format** for browser compatibility
+### WebGL/Performance Rules
+- Use WebGL2 context directly on output canvas (`preserveDrawingBuffer: true`)
+- Force GPU acceleration with `willReadFrequently: false`
+- Maintain frame stabilization accumulator system
+- Never guess performance bottlenecks - always profile first
+- UMD build format required for browser compatibility
 
-### Coming (Phase 2) 🚀
-- **Equation-based preset fingerprinting** - Analyze mathematics, not audio
-- **Content-hash deduplication** - 8-char IDs instead of 50+ char names
-- **Real-time intelligent selection** - Responds to live audio features
-- **15,000 preset support** with deduplication to ~10,000 unique
+### Audio Processing Rules
+- Audio buffer cascades affect entire pipeline - size for worst case (bass frequencies)
+- Temporal smoothing factor = 0.8 prevents animation jitter
+- FFT size MUST equal `numSamps * 2`
+- Validate preset completeness before loading - fail fast on invalid presets
 
-## Architecture Decision: JavaScript Handles All Visualization
+### Testing Rules
+- Visual regression tests require deterministic mode with seeded RNG
+- Always test visual output, not just logic - screenshots don't lie
+- Clean up global RNG overrides to prevent test contamination
+- Version lock WASM toolchain - minor updates break compiled output
 
-**Key Principle**: Keep all visualization logic in JavaScript where Butterchurn lives naturally.
+## CURRENT PROJECT STATUS
 
+**Phase: Phase 2 Complete - Advanced Features Ready**
+
+### What's Working ✅
+- Phase 1 performance improvements (25-30% faster rendering)
+- Phase 2 intelligent preset selection with fingerprint database
+- Separate alpha buffer blending system (fixes fade-to-black bug)
+- 2048-sample audio processing with bass response
+- Visual regression testing with deterministic RNG
+- Full preset collection (500+ presets) with deduplication
+
+### What's Ready for Implementation 🚀
+- Phase 3: Song structure recognition and energy-based preset memory
+- Advanced instrumentation detection
+- Preset performance tracking and learning
+- Real-time spectral analysis for instrument detection
+
+### Critical Files Status
+- `src/intelligentPresetSelector.js` - ✅ Complete intelligent selection
+- `fingerprints.json` - ✅ Complete database (495 unique presets)
+- `setup-full-presets.sh` - ✅ Automated preset collection download
+- `test/intelligent-selector-test.html` - ✅ Working demo
+
+## ARCHITECTURE ESSENTIALS
+
+### Technology Stack
+- **Core**: JavaScript ES6+ with WebGL2 rendering
+- **Audio**: Web Audio API with 2048-sample FFT analysis
+- **Math**: Dual-engine (JavaScript + WebAssembly via AssemblyScript)
+- **Build**: Rollup with UMD output, Terser compression
+- **Test**: Jest + Puppeteer visual regression, deterministic RNG
+
+### File Organization
 ```
-┌─────────────────────────────────────────┐
-│           Backend (Go/Node)              │
-│  - Stream orchestration                  │
-│  - Song selection                        │
-│  - User management                       │
-└────────────┬────────────────────────────┘
-             │ Simple API
-             ↓
-┌─────────────────────────────────────────┐
-│      JavaScript (This Fork)              │
-│  - Butterchurn rendering                 │
-│  - Preset fingerprinting                 │
-│  - Intelligent selection                 │
-│  - Audio analysis                        │
-│  - Completely autonomous                 │
-└─────────────────────────────────────────┘
-```
-
-## Phase 1 Changes (Complete)
-
-### 1. Audio Buffer Enhancement
-**File**: `src/audio/audioProcessor.js`
-```javascript
-// PHASE 1 IMPROVEMENT: Increased buffer size for better bass response
-this.numSamps = 2048;  // Was: 512
-this.smoothingFactor = 0.8;  // Temporal smoothing
-```
-**Impact**: 40% better frequency resolution, smoother animations
-
-### 2. Direct WebGL Rendering
-**File**: `src/visualizer.js`
-```javascript
-// PHASE 1 IMPROVEMENT: Use output canvas directly for WebGL
-this.gl = canvas.getContext("webgl2", {
-    preserveDrawingBuffer: true  // For streaming
-});
-// Removed Canvas 2D copy operation
-```
-**Impact**: 25-30% performance improvement
-
-### 3. Frame Stabilization
-**File**: `src/rendering/renderer.js`
-```javascript
-// PHASE 1 IMPROVEMENT: Frame time stabilization
-this.targetFPS = opts.targetFPS || 60;
-this.frameTime = 1000 / this.targetFPS;
-this.accumulator = 0;
-```
-**Impact**: Eliminates micro-stutters
-
-### 4. UMD Build Format
-**File**: `rollup.config.js`
-```javascript
-format: 'umd',  // Was: 'es'
-name: 'butterchurn'
-```
-**Impact**: Browser compatibility without module syntax
-
-## Phase 2 Implementation Guide
-
-### Step 1: Generate Preset Fingerprints (2 days)
-
-Create `generate-fingerprints.js`:
-```javascript
-class PresetFingerprinter {
-  generateContentHash(preset) {
-    // Hash the actual equations (deterministic)
-    const equations = [
-      preset.init_eqs_str,
-      preset.frame_eqs_str,
-      preset.pixel_eqs_str,
-      preset.warp_eqs_str
-    ].join('|');
-
-    return sha256(equations).substring(0, 8);
-  }
-
-  analyzeEquations(preset) {
-    return {
-      energy: this.analyzeEnergy(preset),
-      bass: this.countAudioVars(preset),
-      complexity: this.countActiveElements(preset),
-      fps: this.estimatePerformance(preset)
-    };
-  }
-}
+src/
+├── index.js                    # Main entry point - Butterchurn class
+├── visualizer.js               # Core engine - direct WebGL rendering
+├── audio/audioProcessor.js     # 2048-sample audio analysis
+├── rendering/renderer.js       # Separate alpha buffers for blending
+├── equations/                  # JS + WASM equation evaluation
+├── utils/rngContext.js         # Deterministic RNG for testing
+└── intelligentPresetSelector.js # Audio-reactive preset selection
 ```
 
-### Step 2: Build Deduplication Database (1 day)
+### Key Integration Patterns
+- **Rendering**: Output canvas → WebGL2 context (no intermediate copies)
+- **Audio Flow**: AudioContext → Analyser → FFT → Preset selection
+- **Blending**: Separate `prevWarpColor` + `warpColor` buffers with inverted alpha
+- **Testing**: Seeded RNG overrides Math.random for deterministic output
 
-```javascript
-{
-  "presets": {
-    "a3f7b2c9": {  // 8-char content hash
-      "authors": ["Geiss", "Rovastar"],  // All who made this
-      "names": ["original", "remix"],
-      "fingerprint": {
-        "energy": 0.7,
-        "bass": 0.8,
-        "fps": 55
-      }
-    }
-  },
-  "indices": {
-    "high": ["a3f7b2c9", ...],
-    "bass": ["a3f7b2c9", ...],
-    "calm": ["d4e8f1a2", ...]
-  }
-}
-```
+### Build System
+- Rollup creates 3 bundles: main (UMD), v2 (ES), isSupported (feature detect)
+- Custom AssemblyScript plugin compiles TypeScript to WASM
+- Terser minification only in production builds
+- Source maps enabled for debugging
 
-### Step 3: Implement Intelligent Selection (3 days)
+## DEVELOPMENT WORKFLOW
 
-```javascript
-class IntelligentPresetSelector {
-  selectPreset(audioFeatures) {
-    // Get candidates by audio features
-    const candidates = this.db.indices[
-      audioFeatures.bass > 0.7 ? 'bass' : 'calm'
-    ];
-
-    // Score each candidate
-    const scores = candidates.map(hash => ({
-      hash,
-      score: this.scorePreset(hash, audioFeatures)
-    }));
-
-    // Return best match (8-char hash)
-    return scores.sort((a,b) => b.score - a.score)[0].hash;
-  }
-}
-```
-
-### Step 4: Integration (2 days)
-
-```javascript
-// Autonomous visualization engine
-class VisualizationEngine {
-  async start(audioUrl) {
-    // Load fingerprint database
-    this.db = await fetch('/fingerprints.json');
-
-    // Start audio analysis
-    this.audio.connect(audioUrl);
-
-    // Intelligent selection loop
-    setInterval(() => {
-      const features = this.audio.getFeatures();
-      const bestHash = this.selector.select(features);
-
-      if (this.shouldSwitch(bestHash)) {
-        butterchurn.loadPreset(bestHash);
-      }
-    }, 100);
-  }
-}
-```
-
-## Testing
-
-### Build and Test Phase 1
+### Build Commands
 ```bash
-# Install dependencies
-npm install --legacy-peer-deps
-
-# Build with improvements
-npm run build
-
-# Test with local HTML
-open ../butterchurn-test.html
+npm install --legacy-peer-deps    # Required for eel-wasm compatibility
+npm run build                     # Production build (UMD + minified)
+npm run dev                       # Development build with watch
+npm run dev:v2                    # V2 bundle development
+npm run analyze                   # Lint + typecheck + GLSL validation
 ```
 
-### Verify Performance
-- Render time: Should be <10ms (green indicator)
-- FPS: Should maintain 60
-- Audio response: Better bass detection
-
-## Why This Approach?
-
-### Equation Fingerprinting Benefits
-1. **No bias** - Analyzes math, not one test song
-2. **Instant** - Process 15,000 presets in seconds
-3. **Deterministic** - Same equations = same hash
-4. **Scalable** - Works with 100,000+ presets
-
-### Content Hash Benefits
-1. **Token efficient** - 8 chars vs 50+
-2. **True deduplication** - Find actual unique presets
-3. **Attribution preserved** - Track all authors
-4. **AI friendly** - Perfect for automation
-
-### Architecture Benefits
-1. **Single language** - All viz in JavaScript
-2. **Butterchurn native** - No cross-language complexity
-3. **Community aligned** - Standard JS ecosystem
-4. **Autonomous** - Runs independently once started
-
-## Production Deployment
-
-### For Streaming
-```javascript
-// Backend just starts/stops
-POST /api/viz/start { audioUrl: "..." }
-
-// JavaScript handles everything else
-engine.start(audioUrl);  // Autonomous from here
+### Test Commands
+```bash
+npm test                          # All tests
+npm run test:visual               # Visual regression (critical!)
+npm run test:visual:update        # Update snapshots (verify changes first)
+npm run test:visual:view          # View test diffs
 ```
 
-### For Web
-```html
-<script src="butterchurn.min.js"></script>
-<script src="fingerprints.json"></script>
-<script>
-  const viz = new IntelligentVisualizer();
-  viz.start(audioElement);
-</script>
-```
+### Pre-commit Procedure
+1. Run `npm run analyze` (lint + typecheck + GLSL)
+2. Run `npm run test:visual` (ensure no visual regressions)
+3. Test performance: `npm run build && open test/performance-test.html`
+4. Test blending: `open test/intelligent-selector-test.html`
 
-## Community Contribution
+### Commit Message Convention
+- `feat:` new features
+- `fix:` bug fixes
+- `perf:` performance improvements
+- `test:` testing changes
+- `docs:` documentation updates
 
-This fingerprint database can benefit everyone:
+### Debugging Steps
+1. **Performance issues**: Profile with browser devtools first
+2. **Rendering issues**: Check alpha buffer separation in `renderer.js`
+3. **Audio unresponsiveness**: Verify `audioLevels` parameter passed to render
+4. **Test failures**: Enable deterministic mode, check RNG seeding
+5. **Build errors**: Check WASM toolchain versions, clear node_modules
 
-1. **Generate once** - Run fingerprinter on all presets
-2. **Share database** - Host on CDN for all
-3. **Contribute improvements** - Better algorithms
-4. **Add presets** - Automatic fingerprinting
+## CLAUDE.MD MAINTENANCE INSTRUCTIONS
 
-## Key Files
+### Update Triggers
+- **CRITICAL RULES**: Add new rule when bug fix creates non-negotiable constraint
+- **PROJECT STATUS**: Update phase when major milestone completed
+- **ARCHITECTURE**: Update when core technology/pattern changes
+- **WORKFLOW**: Update when build/test commands change
 
-### Modified (Phase 1)
-- `src/audio/audioProcessor.js` - Larger buffer, smoothing
-- `src/visualizer.js` - Direct WebGL rendering
-- `src/rendering/renderer.js` - Frame stabilization
-- `rollup.config.js` - UMD format
+### Content Guidelines
+- Keep total length under 300 lines (restructure if exceeded)
+- Rules section: Most critical first, specific not vague
+- Status section: Current phase, working features, next priorities
+- Architecture: Stack decisions, file patterns, integration points
+- Workflow: Commands, procedures, debugging steps
 
-### To Add (Phase 2)
-- `generate-fingerprints.js` - Fingerprint generator
-- `src/intelligentSelector.js` - Smart selection
-- `fingerprints.json` - Preset database
-- `src/presetHasher.js` - Content hashing
+### CLAUDE.md vs README.md vs docs/
+- **CLAUDE.md**: AI development context, rules, workflow, debugging
+- **README.md**: User documentation, installation, usage examples
+- **docs/**: Detailed technical specs, architecture deep-dives, deployment guides
 
-## Performance Metrics
+### Length Management
+- When approaching 300 lines: Move detailed specs to `docs/`
+- Keep only essential development context in CLAUDE.md
+- Link to external docs for comprehensive information
+- Prioritize rules and workflow over detailed explanations
 
-| Metric | Before | Phase 1 | Phase 2 Goal |
-|--------|--------|---------|--------------|
-| Render Time | 15-20ms | 10-12ms | 8-10ms |
-| FPS | 45-50 | 58-60 | 60 stable |
-| Audio Buffer | 512 | 2048 | 2048 |
-| Preset Selection | Random | Random | Intelligent |
-| Preset IDs | 50+ chars | 50+ chars | 8 chars |
+### AI Readability
+- Use bullet points and short paragraphs
+- Include concrete examples and file paths
+- Structure with clear headers for scanning
+- Emphasize critical items with **bold** and ✅ status indicators
 
-## Known Issues
+## DOCUMENTATION REFERENCES
 
-- `setCanvas()` may need WebGL context recreation
-- Some presets may not work with larger buffers (rare)
-- Smoothing factor may need tuning per genre
+### Primary Documentation
+- **README.md** - User installation, usage, and examples
+- **docs/architecture.md** - Detailed technical specifications
+- **docs/bugs/** - Bug reports and regression prevention details
 
-## Future Roadmap
+### Specialized Documentation
+- **docs/PERFORMANCE_IMPROVEMENTS.md** - Phase 1 & 2 implementation details
+- **docs/BLENDING_BUG_ANALYSIS.md** - Critical blending bug fix documentation
+- **docs/MATHEMATICAL_FINGERPRINTING.md** - Preset fingerprinting algorithm
+- **docs/WEBASSEMBLY_IMPLEMENTATION_PLAN.md** - WASM acceleration implementation
+- **docs/PRERENDERING_IMPLEMENTATION_PLAN.md** - Advanced preset optimization plans
 
-### Phase 3: Advanced Features
-- Preset preloading (compile shaders ahead)
-- Web Worker audio processing
-- GPU acceleration improvements
-- ML-based scoring
-
-### Phase 4: Community Features
-- Crowdsourced fingerprints
-- Preset rating system
-- Custom fingerprint algorithms
-- Preset creation tools
-
-## Philosophy
-
-> "Analyze the mathematics, not the music. The equations reveal truth."
-
-This fork transforms Butterchurn from a random visualizer to an intelligent system that understands both the mathematics of its presets and the dynamics of music. By fingerprinting equations instead of testing with audio, we achieve unbiased, scalable, deterministic analysis.
-
-## Credits
-
-- Original Butterchurn by jberg
-- Phase 1 improvements from music_autovis learnings
-- Equation fingerprinting concept inspired by content-addressable systems
-- Performance optimizations based on production streaming experience
-
----
-
-*"The code dances to the music, but the mathematics leads."*
+### Development Resources
+- `test/` - Visual regression tests and demo pages
+- `tools/` - Build utilities and GLSL linting
+- `examples/` - Integration examples and demos

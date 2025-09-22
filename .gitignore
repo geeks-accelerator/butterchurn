@@ -1,3 +1,45 @@
+# Dependencies
 node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Build outputs
 /dist/
+*.min.js.map
+
+# Development tools
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+test-fingerprints*.json
+test/fingerprints*.json
+test/*.mp3
+coverage/
+.nyc_output/
+
+# Deployment
 .netlify
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Downloaded presets (large files)
+presets/full-collection/
+
+# Temporary files
+*.tmp
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
