@@ -7,31 +7,142 @@
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background: #000;
             color: #0f0;
             font-family: 'Courier New', monospace;
+            min-height: 100vh;
         }
-        h1 {
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        /* Main layout grid */
+        .viz-container {
+            display: grid;
+            grid-template-areas:
+                "mode-bar mode-bar"
+                "canvas-area control-sidebar"
+                "analysis-grid analysis-grid";
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Mode control bar */
+        .mode-controls {
+            grid-area: mode-bar;
+            background: #111;
+            border: 1px solid #0f0;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Canvas area */
+        .canvas-area {
+            grid-area: canvas-area;
+            background: #111;
+            border: 1px solid #0f0;
+            padding: 15px;
             text-align: center;
         }
         #canvas {
             border: 1px solid #0f0;
-            display: block;
-            margin: 20px auto;
+            max-width: 100%;
+            height: auto;
+            width: 720px;
+            height: 405px;
         }
+        .audio-bars {
+            display: flex;
+            justify-content: center;
+            margin: 15px auto 0;
+            height: 60px;
+            width: 720px;
+            max-width: 100%;
+        }
+        .bar {
+            flex: 1;
+            background: #0f0;
+            margin: 0 1px;
+            transition: height 0.1s;
+            align-self: flex-end;
+            min-width: 2px;
+            max-width: 8px;
+        }
+
+        /* Control sidebar */
+        .control-sidebar {
+            grid-area: control-sidebar;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Analysis grid */
+        .analysis-grid {
+            grid-area: analysis-grid;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        /* Card styling */
+        .info {
+            background: #111;
+            padding: 12px;
+            border: 1px solid #0f0;
+            border-radius: 4px;
+        }
+        .info h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #0f0;
+        }
+
+        /* Compact controls */
         .controls {
-            text-align: center;
-            margin: 20px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 15px 0;
         }
+        .controls input[type="file"] {
+            grid-column: 1 / -1;
+        }
+
+        /* Emergency controls grid */
+        .emergency-controls {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        /* Buttons */
         button, input[type="file"] {
             background: #0f0;
             color: #000;
             border: none;
-            padding: 10px 20px;
-            margin: 0 10px;
+            padding: 8px 12px;
             font-family: inherit;
             cursor: pointer;
+            font-size: 0.85em;
         }
         button:hover {
             background: #0a0;
@@ -41,296 +152,373 @@
             color: #666;
             cursor: not-allowed;
         }
-        .info {
-            background: #111;
-            padding: 15px;
-            border: 1px solid #0f0;
-            margin: 20px 0;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+
+        /* Preset info layout */
         .preset-info {
-            margin: 10px 0;
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
         }
         .label {
             color: #999;
-            display: inline-block;
-            width: 200px;
+            flex-shrink: 0;
+            margin-right: 10px;
         }
         .value {
             color: #0f0;
+            text-align: right;
+            word-break: break-word;
         }
-        .audio-bars {
-            display: flex;
-            justify-content: center;
-            margin: 20px auto;
-            height: 100px;
-            max-width: 800px;
+
+        /* Scrollable content for tall sections */
+        .scrollable {
+            max-height: 300px;
+            overflow-y: auto;
         }
-        .bar {
-            width: 10px;
-            background: #0f0;
-            margin: 0 2px;
-            transition: height 0.1s;
-            align-self: flex-end;
-        }
+
+        /* Status messages */
         .error {
             color: #f00;
             background: #300;
-            padding: 10px;
-            margin: 10px;
+            padding: 8px;
+            margin: 8px 0;
             border: 1px solid #f00;
+            border-radius: 2px;
+            font-size: 0.85em;
         }
         .success {
             color: #0f0;
             background: #030;
-            padding: 10px;
-            margin: 10px;
+            padding: 8px;
+            margin: 8px 0;
             border: 1px solid #0f0;
+            border-radius: 2px;
+            font-size: 0.85em;
         }
-        #fileInput {
-            margin: 20px auto;
-            display: block;
-            width: auto;
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .viz-container {
+                grid-template-areas:
+                    "mode-bar"
+                    "canvas-area"
+                    "control-sidebar"
+                    "analysis-grid";
+                grid-template-columns: 1fr;
+            }
+            #canvas {
+                width: 600px;
+                height: 338px;
+            }
+            .audio-bars {
+                width: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            .viz-container {
+                gap: 10px;
+            }
+            #canvas {
+                width: 480px;
+                height: 270px;
+            }
+            .audio-bars {
+                height: 40px;
+                width: 480px;
+            }
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            #canvas {
+                width: 360px;
+                height: 203px;
+            }
+            .audio-bars {
+                width: 360px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>🎵 Butterchurn Intelligent Preset Selector</h1>
-    <p style="text-align: center;">Phase 2: Equation-based fingerprinting with real-time intelligent selection</p>
-
-    <div class="info">
-        <h3>📁 Step 1: Load Audio File</h3>
-        <input type="file" id="fileInput" accept="audio/*" />
-        <div id="audioStatus"></div>
+    <div class="header">
+        <h1>🎵 Butterchurn Intelligent Preset Selector</h1>
+        <p>Phase 2: Equation-based fingerprinting with real-time intelligent selection</p>
     </div>
 
-    <div class="info">
-        <h3>🎛️ System Status</h3>
-        <div class="preset-info">
-            <span class="label">Current Preset:</span>
-            <span class="value" id="currentPreset">No audio loaded</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Preset Hash:</span>
-            <span class="value" id="presetHash">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Authors:</span>
-            <span class="value" id="presetAuthors">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Energy Level:</span>
-            <span class="value" id="energyLevel">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Bass Reactivity:</span>
-            <span class="value" id="bassReactivity">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Musical Event:</span>
-            <span class="value" id="musicalEvent">Waiting...</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Next Transition:</span>
-            <span class="value" id="switchTimer">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Presets in Database:</span>
-            <span class="value" id="presetCount">-</span>
+    <div class="viz-container">
+        <!-- Mode control bar -->
+        <div class="mode-controls">
+            <div>
+                <span class="label">Current Preset:</span>
+                <span class="value" id="currentPreset">No audio loaded</span>
+            </div>
+            <div>
+                <span class="label">Presets in Database:</span>
+                <span class="value" id="presetCount">-</span>
+            </div>
+            <div>
+                <button id="autoBtn" disabled>Auto Mode: ON</button>
+                <button id="nextBtn" disabled>Next Preset</button>
+            </div>
         </div>
 
-        <!-- Enhanced Audio Features -->
-        <h3>🎵 Advanced Audio Analysis</h3>
-        <div class="preset-info">
-            <span class="label">Beat Detection:</span>
-            <span class="value" id="beatDetection">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Spectral Centroid:</span>
-            <span class="value" id="spectralCentroid">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Zero Crossing Rate:</span>
-            <span class="value" id="zeroCrossing">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Dynamic Range:</span>
-            <span class="value" id="dynamicRange">-</span>
+        <!-- Canvas area -->
+        <div class="canvas-area">
+            <div class="info">
+                <h3>📁 Audio File</h3>
+                <input type="file" id="fileInput" accept="audio/*" />
+                <div id="audioStatus"></div>
+            </div>
+            <canvas id="canvas" width="720" height="405"></canvas>
+            <div class="audio-bars" id="audioBars"></div>
+            <div class="controls">
+                <button id="playBtn" disabled>Play/Pause</button>
+                <button id="nextBtn" disabled>Next Preset (Manual)</button>
+            </div>
         </div>
 
-        <!-- Selection Logic Transparency -->
-        <h3>🎯 Selection Logic</h3>
-        <div class="preset-info">
-            <span class="label">Target Energy:</span>
-            <span class="value" id="targetEnergy">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Score Calculation:</span>
-            <span class="value" id="scoreCalc">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Top Candidates:</span>
-            <span class="value" id="topCandidates">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Selection Reason:</span>
-            <span class="value" id="selectionReason">-</span>
+        <!-- Control sidebar -->
+        <div class="control-sidebar">
+            <!-- System Status -->
+            <div class="info scrollable">
+                <h3>🎛️ System Status</h3>
+                <div class="preset-info">
+                    <span class="label">Preset Hash:</span>
+                    <span class="value" id="presetHash">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Authors:</span>
+                    <span class="value" id="presetAuthors">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Energy Level:</span>
+                    <span class="value" id="energyLevel">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Bass Reactivity:</span>
+                    <span class="value" id="bassReactivity">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Musical Event:</span>
+                    <span class="value" id="musicalEvent">Waiting...</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Next Transition:</span>
+                    <span class="value" id="switchTimer">-</span>
+                </div>
+            </div>
+
+            <!-- Emergency System -->
+            <div class="info" style="border-color: #FF9500;">
+                <h3>🛡️ Emergency System</h3>
+                <div class="preset-info">
+                    <span class="label">Emergency Mode:</span>
+                    <span class="value" id="emergencyMode">Inactive</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Emergency Presets:</span>
+                    <span class="value" id="emergencyCount">3 available</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Failure Count:</span>
+                    <span class="value" id="failureCount">0</span>
+                </div>
+                <div class="emergency-controls">
+                    <button id="emergencyBtn">Test Emergency Mode</button>
+                    <button id="testMinimalBtn" disabled>Minimal Emergency</button>
+                    <button id="testReactiveBtn" disabled>Reactive Emergency</button>
+                    <button id="testCrowdBtn" disabled>Crowd Pleaser Emergency</button>
+                </div>
+            </div>
+
+            <!-- Blocklist Management -->
+            <div class="info">
+                <h3>🚫 Blocklist Management</h3>
+                <div class="preset-info">
+                    <span class="label">Blocked Presets:</span>
+                    <span class="value" id="blockedCount">0</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Auto-Blocklist:</span>
+                    <span class="value" id="autoBlocklist">Enabled</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Session Failures:</span>
+                    <span class="value" id="sessionFailures">0</span>
+                </div>
+                <div class="emergency-controls">
+                    <button id="showBlocklistBtn">Show Blocklist Manager</button>
+                    <button id="clearBlocklistBtn">Clear All Blocklists</button>
+                </div>
+            </div>
+
+            <!-- Quality Control -->
+            <div class="info">
+                <h3>⚡ Quality Control</h3>
+                <div class="preset-info">
+                    <span class="label">Frame Rate:</span>
+                    <span class="value" id="frameRate">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Render Time:</span>
+                    <span class="value" id="renderTime">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Problematic Presets:</span>
+                    <span class="value" id="problematicCount">0 detected</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Preset Health:</span>
+                    <span class="value" id="presetHealth">✅ Good</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Preset Quality Control -->
-        <h3>⚡ Quality Control</h3>
-        <div class="preset-info">
-            <span class="label">Frame Rate:</span>
-            <span class="value" id="frameRate">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Render Time:</span>
-            <span class="value" id="renderTime">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Problematic Presets:</span>
-            <span class="value" id="problematicCount">0 detected</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Preset Health:</span>
-            <span class="value" id="presetHealth">✅ Good</span>
-        </div>
+        <!-- Analysis grid at bottom -->
+        <div class="analysis-grid">
+            <!-- Audio Analysis Panel -->
+            <div class="info">
+                <h3>📊 Audio Analysis</h3>
+                <div class="preset-info">
+                    <span class="label">Bass Energy:</span>
+                    <span class="value" id="bassEnergy">0.00</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Mid Energy:</span>
+                    <span class="value" id="midEnergy">0.00</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Treble Energy:</span>
+                    <span class="value" id="trebleEnergy">0.00</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Overall Energy:</span>
+                    <span class="value" id="overallEnergy">0.00</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Beat Detection:</span>
+                    <span class="value" id="beatDetect">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Beat Strength:</span>
+                    <span class="value" id="beatDetection">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Spectral Centroid:</span>
+                    <span class="value" id="spectralCentroid">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Zero Crossing Rate:</span>
+                    <span class="value" id="zeroCrossing">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Dynamic Range:</span>
+                    <span class="value" id="dynamicRange">-</span>
+                </div>
+            </div>
 
-        <!-- User Preference Learning -->
-        <h3>🧠 Learning Preferences</h3>
-        <div class="preset-info">
-            <span class="label">Session Duration:</span>
-            <span class="value" id="sessionDuration">0m 0s</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Presets Shown:</span>
-            <span class="value" id="presetsShown">0</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Avg View Time:</span>
-            <span class="value" id="avgViewTime">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Preferred Energy:</span>
-            <span class="value" id="preferredEnergy">Learning...</span>
-        </div>
-    </div>
+            <!-- Frame Analysis Panel -->
+            <div class="info">
+                <h3>🎬 Frame Analysis</h3>
+                <div class="preset-info">
+                    <span class="label">Frame Status:</span>
+                    <span class="value" id="frameStatus">Normal</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Black Frames:</span>
+                    <span class="value" id="blackFrames">0</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Stuck Frames:</span>
+                    <span class="value" id="stuckFrames">0</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Analysis Active:</span>
+                    <span class="value" id="analysisActive">Yes</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Solid Color:</span>
+                    <span class="value" id="solidColor">No</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Frame Hash:</span>
+                    <span class="value" id="frameHash">N/A</span>
+                </div>
+            </div>
 
-    <!-- Device Capabilities Panel -->
-    <div class="info">
-        <h3>📱 Device Capabilities</h3>
-        <div class="preset-info">
-            <span class="label">Device Tier:</span>
-            <span class="value" id="deviceTier">Detecting...</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Memory:</span>
-            <span class="value" id="deviceMemory">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">CPU Cores:</span>
-            <span class="value" id="deviceCores">-</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">GPU:</span>
-            <span class="value" id="deviceGPU">-</span>
-        </div>
-    </div>
+            <!-- Selection Logic Panel -->
+            <div class="info">
+                <h3>🎯 Selection Logic</h3>
+                <div class="preset-info">
+                    <span class="label">Target Energy:</span>
+                    <span class="value" id="targetEnergy">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Score Calculation:</span>
+                    <span class="value" id="scoreCalc">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Top Candidates:</span>
+                    <span class="value" id="topCandidates">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Selection Reason:</span>
+                    <span class="value" id="selectionReason">-</span>
+                </div>
+            </div>
 
-    <!-- Emergency System Panel -->
-    <div class="info" style="border-color: #FF9500;">
-        <h3>🛡️ Emergency System</h3>
-        <div class="preset-info">
-            <span class="label">Emergency Mode:</span>
-            <span class="value" id="emergencyMode">Inactive</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Emergency Presets:</span>
-            <span class="value" id="emergencyCount">3 available</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Failure Count:</span>
-            <span class="value" id="failureCount">0</span>
-        </div>
-        <button id="emergencyBtn" style="margin-top: 10px;">Test Emergency Mode</button>
-    </div>
+            <!-- Preference Learning Panel -->
+            <div class="info">
+                <h3>🧠 Learning Preferences</h3>
+                <div class="preset-info">
+                    <span class="label">Session Duration:</span>
+                    <span class="value" id="sessionDuration">0m 0s</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Presets Shown:</span>
+                    <span class="value" id="presetsShown">0</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Avg View Time:</span>
+                    <span class="value" id="avgViewTime">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Preferred Energy:</span>
+                    <span class="value" id="preferredEnergy">Learning...</span>
+                </div>
+            </div>
 
-    <!-- Blocklist Management Panel -->
-    <div class="info">
-        <h3>🚫 Blocklist Management</h3>
-        <div class="preset-info">
-            <span class="label">Blocked Presets:</span>
-            <span class="value" id="blockedCount">0</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Auto-Blocklist:</span>
-            <span class="value" id="autoBlocklist">Enabled</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Session Failures:</span>
-            <span class="value" id="sessionFailures">0</span>
-        </div>
-        <button id="showBlocklistBtn" style="margin-top: 10px;">Show Blocklist Manager</button>
-        <button id="clearBlocklistBtn" style="margin-top: 10px;">Clear All Blocklists</button>
-    </div>
-
-    <!-- Frame Analysis Panel -->
-    <div class="info">
-        <h3>🎬 Frame Analysis</h3>
-        <div class="preset-info">
-            <span class="label">Frame Status:</span>
-            <span class="value" id="frameStatus">Normal</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Black Frames:</span>
-            <span class="value" id="blackFrames">0</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Stuck Frames:</span>
-            <span class="value" id="stuckFrames">0</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Analysis Active:</span>
-            <span class="value" id="analysisActive">Yes</span>
-        </div>
-    </div>
-
-    <canvas id="canvas" width="800" height="600"></canvas>
-
-    <div class="audio-bars" id="audioBars"></div>
-
-    <div class="controls">
-        <button id="playBtn" disabled>Play/Pause</button>
-        <button id="nextBtn" disabled>Next Preset (Manual)</button>
-        <button id="autoBtn" disabled>Auto Mode: ON</button>
-        <button id="testMinimalBtn" disabled>Test Minimal Emergency</button>
-        <button id="testReactiveBtn" disabled>Test Reactive Emergency</button>
-        <button id="testCrowdBtn" disabled>Test Crowd Pleaser Emergency</button>
-    </div>
-
-    <div class="info">
-        <h3>📊 Audio Analysis</h3>
-        <div class="preset-info">
-            <span class="label">Bass Energy:</span>
-            <span class="value" id="bassEnergy">0.00</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Mid Energy:</span>
-            <span class="value" id="midEnergy">0.00</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Treble Energy:</span>
-            <span class="value" id="trebleEnergy">0.00</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Overall Energy:</span>
-            <span class="value" id="overallEnergy">0.00</span>
-        </div>
-        <div class="preset-info">
-            <span class="label">Beat Detection:</span>
-            <span class="value" id="beatDetect">-</span>
+            <!-- Device Capabilities Panel -->
+            <div class="info">
+                <h3>📱 Device Capabilities</h3>
+                <div class="preset-info">
+                    <span class="label">Device Tier:</span>
+                    <span class="value" id="deviceTier">Detecting...</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Memory:</span>
+                    <span class="value" id="deviceMemory">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">CPU Cores:</span>
+                    <span class="value" id="deviceCores">-</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">GPU:</span>
+                    <span class="value" id="deviceGPU">-</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -390,13 +578,7 @@
         let lastPresetSwitch = Date.now();
         let energyPreferences = [];
 
-        // Create audio bars for visualization
-        const barsContainer = document.getElementById('audioBars');
-        for (let i = 0; i < 32; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'bar';
-            barsContainer.appendChild(bar);
-        }
+        // Audio bars will be created in init() after canvas is ready
 
         // IntelligentPresetSelector is now included in the butterchurn bundle
         // Access it from the butterchurn exports
@@ -443,6 +625,11 @@
                     preference = '🔥 High Energy (> 70%)';
                 }
                 document.getElementById('preferredEnergy').textContent = preference;
+                console.log(`[Preferences] Energy learned: ${preference} (avg: ${avgEnergy.toFixed(2)}, samples: ${energyPreferences.length})`);
+            } else {
+                // Show progress toward learning
+                document.getElementById('preferredEnergy').textContent =
+                    `Learning... (${energyPreferences.length}/5 samples)`;
             }
         }
 
@@ -478,16 +665,112 @@
                     energyPreferences.push(presetData.fingerprint.energy);
                     if (energyPreferences.length > 20) energyPreferences.shift();
                 }
+            } else {
+                // Fallback: Track energy preferences from live audio analysis when no database
+                const currentOverallEnergy = parseFloat(document.getElementById('overallEnergy').textContent) || 0;
+                if (currentOverallEnergy > 0) {
+                    energyPreferences.push(currentOverallEnergy);
+                    if (energyPreferences.length > 20) energyPreferences.shift();
+                }
             }
 
             // Update preference learning displays
             updatePreferenceLearning();
         }
 
+        function detectDeviceCapabilities() {
+            // Memory detection
+            const memory = navigator.deviceMemory || 'Unknown';
+            document.getElementById('deviceMemory').textContent =
+                memory === 'Unknown' ? 'Unknown' : `${memory} GB`;
+
+            // CPU cores detection
+            const cores = navigator.hardwareConcurrency || 'Unknown';
+            document.getElementById('deviceCores').textContent =
+                cores === 'Unknown' ? 'Unknown' : cores.toString();
+
+            // GPU detection
+            detectGPU().then(gpu => {
+                document.getElementById('deviceGPU').textContent = gpu;
+            });
+
+            // Device tier calculation (similar to IntelligentSelector logic)
+            const isMobile = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent);
+            let tier;
+
+            if (isMobile) {
+                tier = '📱 Mobile';
+            } else if (memory >= 8 && cores >= 4) {
+                tier = '🖥️ High-end';
+            } else if (memory <= 4 && cores <= 2) {
+                tier = '💻 Low-end';
+            } else {
+                tier = '🖥️ Mid-range';
+            }
+
+            document.getElementById('deviceTier').textContent = tier;
+
+            console.log(`[Device] Detected: ${tier}, Memory: ${memory}GB, Cores: ${cores}, Mobile: ${isMobile}`);
+        }
+
+        async function detectGPU() {
+            try {
+                // Try to get WebGL context for GPU info
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+                if (!gl) {
+                    return 'WebGL not supported';
+                }
+
+                // Get GPU renderer info
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (debugInfo) {
+                    const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+
+                    // Simplify common GPU names
+                    if (renderer.includes('NVIDIA')) {
+                        return '🔥 NVIDIA ' + renderer.split('NVIDIA')[1].trim();
+                    } else if (renderer.includes('AMD') || renderer.includes('Radeon')) {
+                        return '🔴 AMD ' + renderer.split(/AMD|Radeon/)[1].trim();
+                    } else if (renderer.includes('Intel')) {
+                        return '🔵 Intel ' + renderer.split('Intel')[1].trim();
+                    } else if (renderer.includes('Apple')) {
+                        return '🍎 Apple GPU';
+                    } else {
+                        // Truncate long GPU names
+                        return renderer.length > 30 ? renderer.substring(0, 30) + '...' : renderer;
+                    }
+                } else {
+                    return 'GPU info restricted';
+                }
+            } catch (error) {
+                console.warn('GPU detection failed:', error);
+                return 'Detection failed';
+            }
+        }
+
         async function init() {
             canvas = document.getElementById('canvas');
 
+            // Create audio bars for visualization - more bars that scale with canvas width
+            const barsContainer = document.getElementById('audioBars');
+            const numBars = Math.floor(canvas.width / 6); // One bar every 6 pixels for dense visualization
+            console.log(`Creating ${numBars} audio bars for canvas width ${canvas.width}px`);
+
+            // Clear any existing bars first
+            barsContainer.innerHTML = '';
+
+            for (let i = 0; i < numBars; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                barsContainer.appendChild(bar);
+            }
+
             try {
+                // Detect and display device capabilities
+                detectDeviceCapabilities();
+
                 // Create audio context first - butterchurn needs this
                 if (!audioContext) {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -613,6 +896,11 @@
 
                 showSuccess('✅ Butterchurn initialized. Please select an audio file.');
 
+                // Enable emergency preset test buttons since visualizer is ready
+                document.getElementById('testMinimalBtn').disabled = false;
+                document.getElementById('testReactiveBtn').disabled = false;
+                document.getElementById('testCrowdBtn').disabled = false;
+
             } catch (error) {
                 console.error('Failed to initialize:', error);
                 showError('Failed to initialize: ' + error.message);
@@ -668,6 +956,11 @@
             document.getElementById('playBtn').disabled = false;
             document.getElementById('nextBtn').disabled = false;
             document.getElementById('autoBtn').disabled = false;
+
+            // Enable emergency preset test buttons
+            document.getElementById('testMinimalBtn').disabled = false;
+            document.getElementById('testReactiveBtn').disabled = false;
+            document.getElementById('testCrowdBtn').disabled = false;
 
             // Start animation loop
             if (!animationId) {
@@ -801,15 +1094,30 @@
                 timeByteArrayR: timeByteArray
             };
 
-            // Update bars visualization
+            // Update bars visualization - distribute frequency data across all bars
             const bars = document.querySelectorAll('.bar');
-            const barData = new Uint8Array(bars.length);
-            const barStep = Math.floor(bufferLength / bars.length);
+            if (bars.length > 0) {
+                const barStep = bufferLength / bars.length;
 
-            for (let i = 0; i < bars.length; i++) {
-                const index = i * barStep;
-                const value = dataArray[index] / 255;
-                bars[i].style.height = `${value * 100}px`;
+                for (let i = 0; i < bars.length; i++) {
+                    // Average the frequency data for this bar's range
+                    const startIndex = Math.floor(i * barStep);
+                    const endIndex = Math.floor((i + 1) * barStep);
+                    let sum = 0;
+                    let count = 0;
+
+                    for (let j = startIndex; j < endIndex && j < bufferLength; j++) {
+                        sum += dataArray[j];
+                        count++;
+                    }
+
+                    const avgValue = count > 0 ? sum / count : 0;
+                    const normalizedValue = avgValue / 255;
+
+                    // Scale height to fit container (60px for desktop, 40px for mobile)
+                    const maxHeight = window.innerWidth <= 768 ? 40 : 60;
+                    bars[i].style.height = `${normalizedValue * maxHeight}px`;
+                }
             }
 
             // Check if audio has ended
@@ -829,8 +1137,8 @@
 
             // CRITICAL FIX: Only process audio and render when audio is actually playing
             if (isPlaying && audioElement && !audioElement.paused && !audioElement.ended) {
-                // Update selector with real audio data
-                if (selector) {
+                // Update selector with real audio data (only if auto mode is on)
+                if (selector && autoMode) {
                     const result = selector.update(audioLevels);
 
                     if (result) {
@@ -839,6 +1147,10 @@
                         document.getElementById('trebleEnergy').textContent = treb.toFixed(2);
                         document.getElementById('overallEnergy').textContent =
                             result.features.energy.toFixed(2);
+
+                        // Track energy preferences from live audio (works without fingerprint DB)
+                        energyPreferences.push(result.features.energy);
+                        if (energyPreferences.length > 20) energyPreferences.shift();
                         document.getElementById('beatDetect').textContent =
                             result.features.trend;
 
@@ -896,6 +1208,48 @@
                     // Update performance metrics
                     renderTimes.push(renderTime);
                     if (renderTimes.length > 60) renderTimes.shift();
+
+                    // Perform frame analysis
+                    if (selector && selector.frameAnalyzer && canvas) {
+                        try {
+                            const gl = canvas.getContext('webgl') || canvas.getContext('webgl2');
+                            if (gl) {
+                                // Read pixels from WebGL context
+                                const width = canvas.width;
+                                const height = canvas.height;
+                                const pixels = new Uint8Array(width * height * 4);
+                                gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+                                // Analyze the frame
+                                const analysis = selector.frameAnalyzer.analyzeFrame(pixels, width, height);
+
+                                // Update frame analysis UI
+                                if (analysis) {
+                                    document.getElementById('frameStatus').textContent =
+                                        analysis.isProblematic ? '⚠️ Problematic' : '✅ Normal';
+                                    document.getElementById('blackFrames').textContent =
+                                        analysis.isBlack ? 'Detected!' : '0';
+                                    document.getElementById('stuckFrames').textContent =
+                                        analysis.isStuck ? 'Detected!' : '0';
+                                    document.getElementById('solidColor').textContent =
+                                        analysis.isSolidColor ? 'Yes' : 'No';
+                                    document.getElementById('frameHash').textContent =
+                                        analysis.hash ? analysis.hash.toString(16).substring(0, 8) : 'N/A';
+
+                                    // Update with actual metrics
+                                    if (analysis.metrics) {
+                                        document.getElementById('blackFrames').textContent =
+                                            analysis.metrics.blackPixelRatio > 0.9 ?
+                                            `${(analysis.metrics.blackPixelRatio * 100).toFixed(0)}%` : '0';
+                                        document.getElementById('solidColor').textContent =
+                                            analysis.metrics.colorVariance < 10 ? 'Yes' : 'No';
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Frame analysis error:', e);
+                        }
+                    }
 
                     frameCount++;
                     const now = performance.now();
@@ -969,49 +1323,108 @@
 
         // Emergency preset button handlers
         document.getElementById('emergencyBtn').addEventListener('click', () => {
-            if (selector && selector.emergencyManager) {
-                const emergency = selector.emergencyManager.getEmergencyPreset({
-                    deviceTier: selector.deviceTier || 'mid_range',
+            if (selector) {
+                // Use the selector's enterEmergencyMode method to properly set emergency mode
+                selector.enterEmergencyMode({
+                    reason: 'Manual test',
                     audioLevel: 0.5
                 });
 
-                if (emergency && emergency.preset && visualizer) {
-                    visualizer.loadPreset(emergency.preset, 0.5);
-                    updatePresetInfo('Emergency: ' + emergency.key);
-                    document.getElementById('emergencyMode').textContent = 'Active';
-                    document.getElementById('emergencyMode').style.color = '#FF9500';
-                    showSuccess('Emergency mode activated: ' + emergency.key);
-                }
+                // Update UI to reflect emergency mode
+                document.getElementById('emergencyMode').textContent = 'Active';
+                document.getElementById('emergencyMode').style.color = '#FF9500';
+
+                // Show which preset was selected
+                const currentPreset = selector.currentPreset || 'Unknown';
+                updatePresetInfo('Emergency: ' + currentPreset);
+                showSuccess('Emergency mode activated');
             }
         });
 
         document.getElementById('testMinimalBtn').addEventListener('click', () => {
+            console.log('Test Minimal button clicked');
+            console.log('selector exists:', !!selector);
+            console.log('selector.emergencyManager:', selector?.emergencyManager);
+
             if (selector && selector.emergencyManager) {
                 const preset = selector.emergencyManager.emergencyPresets.minimal;
+                console.log('Minimal preset:', preset);
+
                 if (preset && visualizer) {
+                    // Set emergency mode flag to prevent auto-switching
+                    selector.isEmergencyMode = true;
+                    selector.emergencyStartTime = performance.now();
+
                     visualizer.loadPreset(preset, 0.5);
+                    selector.currentHash = preset.id;
+                    selector.currentPreset = preset.name;
+                    selector.lastSwitch = performance.now();
+
                     updatePresetInfo('Emergency: Minimal');
+                    document.getElementById('emergencyMode').textContent = 'Active';
+                    document.getElementById('emergencyMode').style.color = '#FF9500';
+                    showSuccess('Minimal emergency preset activated');
+                } else {
+                    showError('Preset or visualizer not available');
                 }
+            } else {
+                showError('Emergency manager not available');
             }
         });
 
         document.getElementById('testReactiveBtn').addEventListener('click', () => {
+            console.log('Test Reactive button clicked');
             if (selector && selector.emergencyManager) {
                 const preset = selector.emergencyManager.emergencyPresets.basic_reactive;
+                console.log('Reactive preset:', preset);
+
                 if (preset && visualizer) {
+                    // Set emergency mode flag to prevent auto-switching
+                    selector.isEmergencyMode = true;
+                    selector.emergencyStartTime = performance.now();
+
                     visualizer.loadPreset(preset, 0.5);
+                    selector.currentHash = preset.id;
+                    selector.currentPreset = preset.name;
+                    selector.lastSwitch = performance.now();
+
                     updatePresetInfo('Emergency: Basic Reactive');
+                    document.getElementById('emergencyMode').textContent = 'Active';
+                    document.getElementById('emergencyMode').style.color = '#FF9500';
+                    showSuccess('Basic Reactive emergency preset activated');
+                } else {
+                    showError('Preset or visualizer not available');
                 }
+            } else {
+                showError('Emergency manager not available');
             }
         });
 
         document.getElementById('testCrowdBtn').addEventListener('click', () => {
+            console.log('Test Crowd Pleaser button clicked');
             if (selector && selector.emergencyManager) {
                 const preset = selector.emergencyManager.emergencyPresets.crowd_pleaser;
+                console.log('Crowd Pleaser preset:', preset);
+
                 if (preset && visualizer) {
+                    // Set emergency mode flag to prevent auto-switching
+                    selector.isEmergencyMode = true;
+                    selector.emergencyStartTime = performance.now();
+
                     visualizer.loadPreset(preset, 0.5);
+                    selector.currentHash = preset.id;
+                    selector.currentPreset = preset.name;
+                    selector.lastSwitch = performance.now();
+
                     updatePresetInfo('Emergency: Crowd Pleaser');
+                    document.getElementById('emergencyMode').textContent = 'Active';
+                    document.getElementById('emergencyMode').style.color = '#FF9500';
+                    showSuccess('Crowd Pleaser emergency preset activated');
+                } else {
+                    showError('Preset or visualizer not available');
                 }
+            } else {
+                showError('Emergency manager not available');
             }
         });
 
@@ -1082,6 +1495,15 @@
         document.getElementById('autoBtn').addEventListener('click', () => {
             autoMode = !autoMode;
             document.getElementById('autoBtn').textContent = `Auto Mode: ${autoMode ? 'ON' : 'OFF'}`;
+
+            // Update UI to show auto mode status
+            if (!autoMode) {
+                document.getElementById('switchTimer').textContent = 'Auto switching disabled';
+                document.getElementById('selectionReason').textContent = 'Manual control';
+                showSuccess('Auto mode disabled - use Next button to switch presets');
+            } else {
+                showSuccess('Auto mode enabled - presets will switch automatically');
+            }
         });
 
         // Initialize on load

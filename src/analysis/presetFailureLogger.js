@@ -30,7 +30,7 @@ export class PresetFailureLogger {
    * Initialize with device detection (simplified without WASM)
    */
   async initialize() {
-    if (this.initialized) return;
+    if (this.initialized) {return;}
 
     try {
       this.sessionLog.device = await this.getDeviceFingerprint();
@@ -86,13 +86,13 @@ export class PresetFailureLogger {
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      if (!gl) return 'unknown';
+      if (!gl) {return 'unknown';}
 
       const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-      if (!debugInfo) return 'unknown';
+      if (!debugInfo) {return 'unknown';}
 
       return gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-    } catch {
+    } catch (e) {
       return 'unknown';
     }
   }
@@ -322,12 +322,17 @@ export class PresetFailureLogger {
       return { blocked: true, reason: 'permanent' };
     }
 
+    // If no device info available, only permanent blocklist applies
+    if (!device) {
+      return { blocked: false };
+    }
+
     // Check conditional blocklists
     if (device.tier === 'mobile' && this.blocklist.conditional.mobile.includes(presetHash)) {
       return { blocked: true, reason: 'mobile_incompatible' };
     }
 
-    if (device.memory < 4 && this.blocklist.conditional.low_memory.includes(presetHash)) {
+    if (device.memory && device.memory < 4 && this.blocklist.conditional.low_memory.includes(presetHash)) {
       return { blocked: true, reason: 'insufficient_memory' };
     }
 

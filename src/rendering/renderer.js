@@ -933,56 +933,68 @@ export default class Renderer {
 
     if (this.preset.shapes && this.preset.shapes.length > 0) {
       this.customShapes.forEach((shape, i) => {
-        shape.drawCustomShape(
-          this.blending ? this.blendProgress : 1,
-          globalVars,
-          this.presetEquationRunner,
-          this.preset.shapes[i],
-          this.prevTexture
-        );
+        // Only draw if the preset has a shape definition at this index
+        if (this.preset.shapes[i]) {
+          shape.drawCustomShape(
+            this.blending ? this.blendProgress : 1,
+            globalVars,
+            this.presetEquationRunner,
+            this.preset.shapes[i],
+            this.prevTexture
+          );
+        }
       });
     }
 
     if (this.preset.waves && this.preset.waves.length > 0) {
       this.customWaveforms.forEach((waveform, i) => {
-        waveform.drawCustomWaveform(
-          this.blending ? this.blendProgress : 1,
-          this.audio.timeArrayL,
-          this.audio.timeArrayR,
-          this.audio.freqArrayL,
-          this.audio.freqArrayR,
-          globalVars,
-          this.presetEquationRunner,
-          this.preset.waves[i]
-        );
+        // Only draw if the preset has a wave definition at this index
+        if (this.preset.waves[i]) {
+          waveform.drawCustomWaveform(
+            this.blending ? this.blendProgress : 1,
+            this.audio.timeArrayL,
+            this.audio.timeArrayR,
+            this.audio.freqArrayL,
+            this.audio.freqArrayR,
+            globalVars,
+            this.presetEquationRunner,
+            this.preset.waves[i]
+          );
+        }
       });
     }
 
     if (this.blending) {
       if (this.prevPreset.shapes && this.prevPreset.shapes.length > 0) {
         this.prevCustomShapes.forEach((shape, i) => {
-          shape.drawCustomShape(
-            1.0 - this.blendProgress,
-            prevGlobalVars,
-            this.prevPresetEquationRunner,
-            this.prevPreset.shapes[i],
-            this.prevTexture
-          );
+          // Only draw if the preset has a shape definition at this index
+          if (this.prevPreset.shapes[i]) {
+            shape.drawCustomShape(
+              1.0 - this.blendProgress,
+              prevGlobalVars,
+              this.prevPresetEquationRunner,
+              this.prevPreset.shapes[i],
+              this.prevTexture
+            );
+          }
         });
       }
 
       if (this.prevPreset.waves && this.prevPreset.waves.length > 0) {
         this.prevCustomWaveforms.forEach((waveform, i) => {
-          waveform.drawCustomWaveform(
-            1.0 - this.blendProgress,
-            this.audio.timeArrayL,
-            this.audio.timeArrayR,
-            this.audio.freqArrayL,
-            this.audio.freqArrayR,
-            prevGlobalVars,
-            this.prevPresetEquationRunner,
-            this.prevPreset.waves[i]
-          );
+          // Only draw if the preset has a wave definition at this index
+          if (this.prevPreset.waves[i]) {
+            waveform.drawCustomWaveform(
+              1.0 - this.blendProgress,
+              this.audio.timeArrayL,
+              this.audio.timeArrayR,
+              this.audio.freqArrayL,
+              this.audio.freqArrayR,
+              prevGlobalVars,
+              this.prevPresetEquationRunner,
+              this.prevPreset.waves[i]
+            );
+          }
         });
       }
     }

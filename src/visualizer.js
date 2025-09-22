@@ -297,6 +297,11 @@ export default class Visualizer {
   static overrideDefaultVars(baseValsDefaults, baseVals) {
     const combinedVals = {};
 
+    // If baseVals is null or undefined, just return defaults
+    if (!baseVals) {
+      return { ...baseValsDefaults };
+    }
+
     Object.keys(baseValsDefaults).forEach((key) => {
       if (Object.prototype.hasOwnProperty.call(baseVals, key)) {
         combinedVals[key] = baseVals[key];
@@ -438,6 +443,11 @@ export default class Visualizer {
         preset.baseVals
       );
       for (let i = 0; i < preset.shapes.length; i++) {
+        // Handle both old format (properties at top level) and new format (properties in baseVals)
+        if (!preset.shapes[i].baseVals && preset.shapes[i].enabled !== undefined) {
+          // Old format: move properties into baseVals
+          preset.shapes[i].baseVals = Object.assign({}, preset.shapes[i]);
+        }
         preset.shapes[i].baseVals = Visualizer.overrideDefaultVars(
           this.shapeBaseValsDefaults,
           preset.shapes[i].baseVals
@@ -445,6 +455,11 @@ export default class Visualizer {
       }
 
       for (let i = 0; i < preset.waves.length; i++) {
+        // Handle both old format (properties at top level) and new format (properties in baseVals)
+        if (!preset.waves[i].baseVals && preset.waves[i].enabled !== undefined) {
+          // Old format: move properties into baseVals
+          preset.waves[i].baseVals = Object.assign({}, preset.waves[i]);
+        }
         preset.waves[i].baseVals = Visualizer.overrideDefaultVars(
           this.waveBaseValsDefaults,
           preset.waves[i].baseVals

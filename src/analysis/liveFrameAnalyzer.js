@@ -58,7 +58,7 @@ export class LiveFrameAnalyzer {
     }
 
     // Calculate frame metrics
-    const metrics = this.calculateFrameMetrics(frameData, width, height);
+    const metrics = this.calculateFrameMetrics(frameData);
 
     // Update frame history
     this.updateFrameHistory(metrics);
@@ -122,7 +122,7 @@ export class LiveFrameAnalyzer {
   /**
    * Calculate metrics for a frame
    */
-  calculateFrameMetrics(frameData, width, height) {
+  calculateFrameMetrics(frameData) {
     const metrics = {
       hash: 0,
       brightness: 0,
@@ -142,7 +142,7 @@ export class LiveFrameAnalyzer {
       sumB = 0;
     let blackPixels = 0;
 
-    samples.forEach((pixel, i) => {
+    samples.forEach((pixel) => {
       sumR += pixel.r;
       sumG += pixel.g;
       sumB += pixel.b;
@@ -348,7 +348,7 @@ export class LiveFrameAnalyzer {
     let changes = 0;
     let lastHash = null;
 
-    recent.forEach((frame, i) => {
+    recent.forEach((frame) => {
       analysis.avgBrightness += frame.metrics.brightness;
       analysis.avgBlackRatio += frame.metrics.blackPixelRatio;
 
