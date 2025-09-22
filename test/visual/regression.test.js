@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+
 import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
+
 import { getBrowser, closeBrowser, createPage } from './utils/puppeteer.js';
 import { renderButterchurn } from './utils/renderButterchurn.js';
 import TestServer from './utils/testServer.js';
@@ -47,21 +49,23 @@ describe('Butterchurn Visual Regression Tests', () => {
   ];
 
   const testCases = [
-    ...presetsSeedIndependent.map(preset => ({
+    ...presetsSeedIndependent.map((preset) => ({
       name: preset,
-      seedIndependent: true
+      seedIndependent: true,
     })),
-    ...presetsSeedDependent.map(preset => ({
+    ...presetsSeedDependent.map((preset) => ({
       name: preset,
-      seedIndependent: false
-    }))
+      seedIndependent: false,
+    })),
   ].sort(() => 0.5 - Math.random());
 
   let testAudioData;
   beforeAll(() => {
     const audioFilePath = path.join(process.cwd(), 'test/fixtures/audioAnalysisData.json');
     if (!fs.existsSync(audioFilePath)) {
-      throw new Error(`Audio analysis file not found: ${audioFilePath}\nPlease ensure audioAnalysisData.json is in the test/fixtures directory`);
+      throw new Error(
+        `Audio analysis file not found: ${audioFilePath}\nPlease ensure audioAnalysisData.json is in the test/fixtures directory`
+      );
     }
     testAudioData = JSON.parse(fs.readFileSync(audioFilePath, 'utf8'));
   });
@@ -75,18 +79,38 @@ describe('Butterchurn Visual Regression Tests', () => {
         const audioData = testAudioData.slice(0, FRAMES_TO_RENDER);
         const cleanName = name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
 
-        const screenshot1 = await renderButterchurn(page, serverUrl, width, height, name, audioData, FRAMES_TO_RENDER, SEED1, 'js');
+        const screenshot1 = await renderButterchurn(
+          page,
+          serverUrl,
+          width,
+          height,
+          name,
+          audioData,
+          FRAMES_TO_RENDER,
+          SEED1,
+          'js'
+        );
 
         expect(screenshot1).toMatchImageSnapshot({
           ...imageSnapshotConfig,
-          customSnapshotIdentifier: () => `${cleanName}-${SEED1}`
+          customSnapshotIdentifier: () => `${cleanName}-${SEED1}`,
         });
 
-        const screenshot2 = await renderButterchurn(page, serverUrl, width, height, name, audioData, FRAMES_TO_RENDER, SEED2, 'js');
+        const screenshot2 = await renderButterchurn(
+          page,
+          serverUrl,
+          width,
+          height,
+          name,
+          audioData,
+          FRAMES_TO_RENDER,
+          SEED2,
+          'js'
+        );
 
         expect(screenshot2).toMatchImageSnapshot({
           ...imageSnapshotConfig,
-          customSnapshotIdentifier: () => `${cleanName}-${SEED2}`
+          customSnapshotIdentifier: () => `${cleanName}-${SEED2}`,
         });
 
         // Compare image hashes instead of raw buffers to avoid slow diff generation
@@ -111,18 +135,38 @@ describe('Butterchurn Visual Regression Tests', () => {
         const audioData = testAudioData.slice(0, FRAMES_TO_RENDER);
         const cleanName = name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
 
-        const screenshot1 = await renderButterchurn(page, serverUrl, width, height, name, audioData, FRAMES_TO_RENDER, SEED1, 'wasm');
+        const screenshot1 = await renderButterchurn(
+          page,
+          serverUrl,
+          width,
+          height,
+          name,
+          audioData,
+          FRAMES_TO_RENDER,
+          SEED1,
+          'wasm'
+        );
 
         expect(screenshot1).toMatchImageSnapshot({
           ...imageSnapshotConfig,
-          customSnapshotIdentifier: () => `${cleanName}-${SEED1}_wasm`
+          customSnapshotIdentifier: () => `${cleanName}-${SEED1}_wasm`,
         });
 
-        const screenshot2 = await renderButterchurn(page, serverUrl, width, height, name, audioData, FRAMES_TO_RENDER, SEED2, 'wasm');
+        const screenshot2 = await renderButterchurn(
+          page,
+          serverUrl,
+          width,
+          height,
+          name,
+          audioData,
+          FRAMES_TO_RENDER,
+          SEED2,
+          'wasm'
+        );
 
         expect(screenshot2).toMatchImageSnapshot({
           ...imageSnapshotConfig,
-          customSnapshotIdentifier: () => `${cleanName}-${SEED2}_wasm`
+          customSnapshotIdentifier: () => `${cleanName}-${SEED2}_wasm`,
         });
 
         // Compare image hashes instead of raw buffers to avoid slow diff generation

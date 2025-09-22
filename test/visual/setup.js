@@ -20,5 +20,5 @@ export const imageSnapshotConfig = {
   customSnapshotIdentifier: ({ currentTestName, counter }) => {
     const testName = currentTestName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
     return `${testName}-${counter}`;
-  }
+  },
 };
