@@ -15,6 +15,13 @@
  * these features will be disabled but core functionality will work.
  */
 
+// Import advanced feature modules
+import { frameAnalyzer } from './analysis/liveFrameAnalyzer.js';
+import { presetLogger } from './analysis/presetFailureLogger.js';
+import { emergencyManager } from './presets/emergencyPresetManager.js';
+import { blocklistManager } from './blocklist/blocklistManager.js';
+import config from './config/config.js';
+
 class IntelligentPresetSelector {
     constructor(butterchurn, fingerprintDatabase) {
         this.butterchurn = butterchurn;
@@ -32,11 +39,11 @@ class IntelligentPresetSelector {
         this.maxSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
             config.get('presetSelection.maxSwitchInterval', 30000) : 30000;
 
-        // Initialize analysis systems (may be undefined if modules not loaded)
-        this.frameAnalyzer = typeof frameAnalyzer !== 'undefined' ? frameAnalyzer : null;
-        this.presetLogger = typeof presetLogger !== 'undefined' ? presetLogger : null;
-        this.emergencyManager = typeof emergencyManager !== 'undefined' ? emergencyManager : null;
-        this.blocklistManager = typeof blocklistManager !== 'undefined' ? blocklistManager : null;
+        // Initialize analysis systems from imported modules
+        this.frameAnalyzer = frameAnalyzer || null;
+        this.presetLogger = presetLogger || null;
+        this.emergencyManager = emergencyManager || null;
+        this.blocklistManager = blocklistManager || null;
 
         // Device detection for performance optimization
         this.deviceTier = this.detectDeviceTier();
@@ -71,13 +78,19 @@ class IntelligentPresetSelector {
                 frequencyMatch: 0.25,
                 rhythmMatch: 0.2,
                 dynamicsMatch: 0.15,
-                continuity: 0.1
+                continuity: 0.1,
+                bassMatch: 0.15,
+                performance: 0.1,
+                variety: 0.05
             }) : {
             energyMatch: 0.3,
             frequencyMatch: 0.25,
             rhythmMatch: 0.2,
             dynamicsMatch: 0.15,
-            continuity: 0.1
+            continuity: 0.1,
+            bassMatch: 0.15,
+            performance: 0.1,
+            variety: 0.05
         };
 
         // Recently used presets (avoid repetition)
@@ -750,9 +763,11 @@ class IntelligentPresetSelector {
      */
     isProblematic(hash) {
         // Check blocklist first
-        const blockStatus = this.blocklistManager.isBlocked(hash);
-        if (blockStatus.blocked) {
-            return true;
+        if (this.blocklistManager) {
+            const blockStatus = this.blocklistManager.isBlocked(hash);
+            if (blockStatus && blockStatus.blocked) {
+                return true;
+            }
         }
 
         // Check local problematic list

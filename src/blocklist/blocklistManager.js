@@ -721,7 +721,7 @@ export class BlocklistManager {
    * Import blocklist
    */
   async handleImport(file) {
-    if (!file) return;
+    if (!file) {return;}
 
     try {
       const text = await file.text();

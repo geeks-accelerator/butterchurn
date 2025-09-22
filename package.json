@@ -12,6 +12,7 @@
     "dist/isSupported.min.js"
   ],
   "scripts": {
+    "prebuild": "npm run lint:check",
     "build": "NODE_ENV=production rollup -c",
     "dev": "rollup -c -w",
     "dev-build": "rollup -c",
