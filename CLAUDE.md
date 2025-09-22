@@ -33,15 +33,17 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Phase 2 Complete - Advanced Features Ready**
+**Phase: Phase 2 Complete - Intelligent Selection Active**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
 - Phase 2 intelligent preset selection with fingerprint database
 - Separate alpha buffer blending system (fixes fade-to-black bug)
-- 2048-sample audio processing with bass response
+- 2048-sample audio processing with superior bass response
 - Visual regression testing with deterministic RNG
-- Full preset collection (500+ presets) with deduplication
+- Full preset collection (395+ presets) with deduplication
+- GitHub Pages CDN at https://geeks-accelerator.github.io/butterchurn/cdn/
+- AlaskaButter demo site at https://alaskabutter.com
 
 ### What's Ready for Implementation 🚀
 - Phase 3: Song structure recognition and energy-based preset memory
@@ -51,9 +53,10 @@ This file provides AI-optimized development context for Claude Code when working
 
 ### Critical Files Status
 - `src/intelligentPresetSelector.js` - ✅ Complete intelligent selection
-- `fingerprints.json` - ✅ Complete database (495 unique presets)
+- `fingerprints.json` - ✅ Complete database (395 unique presets)
 - `setup-full-presets.sh` - ✅ Automated preset collection download
 - `test/intelligent-selector-test.html` - ✅ Working demo
+- `docs/cdn/` - ✅ GitHub Pages CDN distribution
 
 ## ARCHITECTURE ESSENTIALS
 
@@ -97,6 +100,8 @@ npm run build                     # Production build (UMD + minified)
 npm run dev                       # Development build with watch
 npm run dev:v2                    # V2 bundle development
 npm run analyze                   # Lint + typecheck + GLSL validation
+npm run build:cdn                 # Build and update CDN files
+npm run deploy:cdn                # Deploy CDN to GitHub Pages
 ```
 
 ### Test Commands
@@ -105,13 +110,16 @@ npm test                          # All tests
 npm run test:visual               # Visual regression (critical!)
 npm run test:visual:update        # Update snapshots (verify changes first)
 npm run test:visual:view          # View test diffs
+npm run serve:test                # Start test server on port 8192
+# Then open http://localhost:8192/intelligent-selector-test.html
 ```
 
 ### Pre-commit Procedure
 1. Run `npm run analyze` (lint + typecheck + GLSL)
 2. Run `npm run test:visual` (ensure no visual regressions)
-3. Test performance: `npm run build && open test/performance-test.html`
-4. Test blending: `open test/intelligent-selector-test.html`
+3. Test performance: `npm run build && npm run serve:test`
+4. Test intelligent selection: http://localhost:8192/intelligent-selector-test.html
+5. Update CDN if needed: `npm run deploy:cdn`
 
 ### Commit Message Convention
 - `feat:` new features
