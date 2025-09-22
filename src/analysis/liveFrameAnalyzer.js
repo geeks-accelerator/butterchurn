@@ -203,9 +203,8 @@ export class LiveFrameAnalyzer {
 
     let hash = FNV_OFFSET_BASIS;
 
-    // Hash each sampled pixel
-    for (let i = 0; i < samples.length; i += 4) {
-      // Sample every 4th pixel for speed
+    // Process each sampled pixel (already sampled in samplePixels)
+    for (let i = 0; i < samples.length; i++) {
       const pixel = samples[i];
 
       // Mix in RGB values
@@ -414,3 +413,5 @@ export class LiveFrameAnalyzer {
 
 // Export singleton for easy use
 export const frameAnalyzer = new LiveFrameAnalyzer();
+
+export default LiveFrameAnalyzer;

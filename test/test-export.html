@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Butterchurn Export</title>
+</head>
+<body>
+    <h1>Testing Butterchurn Exports</h1>
+    <div id="result"></div>
+
+    <script src="../dist/butterchurn.min.js"></script>
+    <script>
+        console.log('Testing butterchurn exports...');
+
+        const result = document.getElementById('result');
+
+        // Check what's available
+        if (typeof butterchurn !== 'undefined') {
+            result.innerHTML += '<p>✅ butterchurn is defined</p>';
+            console.log('butterchurn:', butterchurn);
+
+            // Check for IntelligentPresetSelector
+            if (butterchurn.IntelligentPresetSelector) {
+                result.innerHTML += '<p>✅ butterchurn.IntelligentPresetSelector is available</p>';
+                console.log('IntelligentPresetSelector:', butterchurn.IntelligentPresetSelector);
+            } else {
+                result.innerHTML += '<p>❌ butterchurn.IntelligentPresetSelector is NOT available</p>';
+            }
+
+            // Check for default export
+            if (butterchurn.default) {
+                result.innerHTML += '<p>✅ butterchurn.default is available</p>';
+
+                if (butterchurn.default.IntelligentPresetSelector) {
+                    result.innerHTML += '<p>✅ butterchurn.default.IntelligentPresetSelector is available</p>';
+                } else {
+                    result.innerHTML += '<p>❌ butterchurn.default.IntelligentPresetSelector is NOT available</p>';
+                }
+            } else {
+                result.innerHTML += '<p>❌ butterchurn.default is NOT available</p>';
+            }
+
+            // Try to create an instance
+            try {
+                const Selector = butterchurn.IntelligentPresetSelector ||
+                               butterchurn.default?.IntelligentPresetSelector ||
+                               window.IntelligentPresetSelector;
+
+                if (Selector) {
+                    const selector = new Selector(null, {});
+                    result.innerHTML += '<p>✅ Successfully created IntelligentPresetSelector instance</p>';
+                } else {
+                    result.innerHTML += '<p>❌ Could not find IntelligentPresetSelector constructor</p>';
+                }
+            } catch (e) {
+                result.innerHTML += `<p>❌ Error creating instance: ${e.message}</p>`;
+            }
+
+        } else {
+            result.innerHTML += '<p>❌ butterchurn is NOT defined</p>';
+        }
+    </script>
+</body>
+</html>

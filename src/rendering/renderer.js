@@ -184,14 +184,10 @@ export default class Renderer {
     );
     console.log('[loadPreset] New preset has desc?', preset.desc ? `Yes: ${preset.desc}` : 'No');
 
-    // CRITICAL: Check if we're trying to load a blank/invalid preset
-    // A preset is blank if it's literally the blankPreset object OR has no equations
-    const isNewPresetBlank =
-      preset === this.blankPreset ||
-      (!preset.frame_eqs_str && !preset.pixel_eqs_str && !preset.comp_eqs_str);
-    if (isNewPresetBlank && this.preset !== this.blankPreset) {
-      console.warn('[loadPreset] WARNING: Attempting to load blank/invalid preset, skipping!');
-      return; // Don't load blank presets after initialization
+    // Check if preset is valid - allow explicit blank preset but warn about empty presets
+    const isEmptyPreset = !preset.frame_eqs_str && !preset.pixel_eqs_str && !preset.comp_eqs_str;
+    if (isEmptyPreset && preset !== this.blankPreset) {
+      console.warn('[loadPreset] WARNING: Preset appears to be empty (no equations). Loading anyway...');
     }
 
     this.blendPattern.createBlendPattern();

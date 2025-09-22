@@ -218,6 +218,85 @@
         </div>
     </div>
 
+    <!-- Device Capabilities Panel -->
+    <div class="info">
+        <h3>📱 Device Capabilities</h3>
+        <div class="preset-info">
+            <span class="label">Device Tier:</span>
+            <span class="value" id="deviceTier">Detecting...</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Memory:</span>
+            <span class="value" id="deviceMemory">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">CPU Cores:</span>
+            <span class="value" id="deviceCores">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">GPU:</span>
+            <span class="value" id="deviceGPU">-</span>
+        </div>
+    </div>
+
+    <!-- Emergency System Panel -->
+    <div class="info" style="border-color: #FF9500;">
+        <h3>🛡️ Emergency System</h3>
+        <div class="preset-info">
+            <span class="label">Emergency Mode:</span>
+            <span class="value" id="emergencyMode">Inactive</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Emergency Presets:</span>
+            <span class="value" id="emergencyCount">3 available</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Failure Count:</span>
+            <span class="value" id="failureCount">0</span>
+        </div>
+        <button id="emergencyBtn" style="margin-top: 10px;">Test Emergency Mode</button>
+    </div>
+
+    <!-- Blocklist Management Panel -->
+    <div class="info">
+        <h3>🚫 Blocklist Management</h3>
+        <div class="preset-info">
+            <span class="label">Blocked Presets:</span>
+            <span class="value" id="blockedCount">0</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Auto-Blocklist:</span>
+            <span class="value" id="autoBlocklist">Enabled</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Session Failures:</span>
+            <span class="value" id="sessionFailures">0</span>
+        </div>
+        <button id="showBlocklistBtn" style="margin-top: 10px;">Show Blocklist Manager</button>
+        <button id="clearBlocklistBtn" style="margin-top: 10px;">Clear All Blocklists</button>
+    </div>
+
+    <!-- Frame Analysis Panel -->
+    <div class="info">
+        <h3>🎬 Frame Analysis</h3>
+        <div class="preset-info">
+            <span class="label">Frame Status:</span>
+            <span class="value" id="frameStatus">Normal</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Black Frames:</span>
+            <span class="value" id="blackFrames">0</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Stuck Frames:</span>
+            <span class="value" id="stuckFrames">0</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Analysis Active:</span>
+            <span class="value" id="analysisActive">Yes</span>
+        </div>
+    </div>
+
     <canvas id="canvas" width="800" height="600"></canvas>
 
     <div class="audio-bars" id="audioBars"></div>
@@ -226,6 +305,9 @@
         <button id="playBtn" disabled>Play/Pause</button>
         <button id="nextBtn" disabled>Next Preset (Manual)</button>
         <button id="autoBtn" disabled>Auto Mode: ON</button>
+        <button id="testMinimalBtn" disabled>Test Minimal Emergency</button>
+        <button id="testReactiveBtn" disabled>Test Reactive Emergency</button>
+        <button id="testCrowdBtn" disabled>Test Crowd Pleaser Emergency</button>
     </div>
 
     <div class="info">
@@ -278,8 +360,8 @@
         });
     </script>
 
-    <!-- Load the authoritative IntelligentPresetSelector -->
-    <script src="../src/intelligentPresetSelector.js"></script>
+    <!-- IntelligentPresetSelector is now included in butterchurn bundle -->
+    <!-- <script src="../src/intelligentPresetSelector.js"></script> -->
 
     <script>
         // Main application code
@@ -316,7 +398,11 @@
             barsContainer.appendChild(bar);
         }
 
-        // IntelligentPresetSelector is now loaded from ../src/intelligentPresetSelector.js
+        // IntelligentPresetSelector is now included in the butterchurn bundle
+        // Access it from the butterchurn exports
+        const IntelligentPresetSelector = (typeof butterchurn !== 'undefined' && butterchurn.IntelligentPresetSelector) ||
+                                          (typeof butterchurn !== 'undefined' && butterchurn.default && butterchurn.default.IntelligentPresetSelector) ||
+                                          window.IntelligentPresetSelector;
         // No need for inline implementation - using authoritative version
 
         function showError(message) {
@@ -460,6 +546,11 @@
                 }
 
                 // Initialize selector
+                if (!IntelligentPresetSelector) {
+                    console.error('IntelligentPresetSelector not found! Check if butterchurn bundle is loaded correctly.');
+                    showError('IntelligentPresetSelector not found in bundle');
+                    return;
+                }
                 selector = new IntelligentPresetSelector(visualizer, fingerprintDb || {});
 
                 // Combine all preset packs into one collection
@@ -875,6 +966,84 @@
 
         // Event handlers
         document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        // Emergency preset button handlers
+        document.getElementById('emergencyBtn').addEventListener('click', () => {
+            if (selector && selector.emergencyManager) {
+                const emergency = selector.emergencyManager.getEmergencyPreset({
+                    deviceTier: selector.deviceTier || 'mid_range',
+                    audioLevel: 0.5
+                });
+
+                if (emergency && emergency.preset && visualizer) {
+                    visualizer.loadPreset(emergency.preset, 0.5);
+                    updatePresetInfo('Emergency: ' + emergency.key);
+                    document.getElementById('emergencyMode').textContent = 'Active';
+                    document.getElementById('emergencyMode').style.color = '#FF9500';
+                    showSuccess('Emergency mode activated: ' + emergency.key);
+                }
+            }
+        });
+
+        document.getElementById('testMinimalBtn').addEventListener('click', () => {
+            if (selector && selector.emergencyManager) {
+                const preset = selector.emergencyManager.emergencyPresets.minimal;
+                if (preset && visualizer) {
+                    visualizer.loadPreset(preset, 0.5);
+                    updatePresetInfo('Emergency: Minimal');
+                }
+            }
+        });
+
+        document.getElementById('testReactiveBtn').addEventListener('click', () => {
+            if (selector && selector.emergencyManager) {
+                const preset = selector.emergencyManager.emergencyPresets.basic_reactive;
+                if (preset && visualizer) {
+                    visualizer.loadPreset(preset, 0.5);
+                    updatePresetInfo('Emergency: Basic Reactive');
+                }
+            }
+        });
+
+        document.getElementById('testCrowdBtn').addEventListener('click', () => {
+            if (selector && selector.emergencyManager) {
+                const preset = selector.emergencyManager.emergencyPresets.crowd_pleaser;
+                if (preset && visualizer) {
+                    visualizer.loadPreset(preset, 0.5);
+                    updatePresetInfo('Emergency: Crowd Pleaser');
+                }
+            }
+        });
+
+        // Blocklist management buttons
+        document.getElementById('showBlocklistBtn').addEventListener('click', () => {
+            if (selector && selector.blocklistManager) {
+                // Initialize UI if not already done
+                if (!selector.blocklistManager.uiContainer) {
+                    selector.blocklistManager.initializeUI();
+                }
+                selector.blocklistManager.show();
+            }
+        });
+
+        document.getElementById('clearBlocklistBtn').addEventListener('click', () => {
+            if (confirm('Clear all blocklist data? This cannot be undone.')) {
+                let cleared = 0;
+                const keysToRemove = [];
+
+                for (const key in localStorage) {
+                    if (key.includes('preset-blocklist') || key.includes('preset-failures')) {
+                        keysToRemove.push(key);
+                        cleared++;
+                    }
+                }
+
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+
+                updateBlocklistStats();
+                showSuccess(`Cleared ${cleared} blocklist entries. Reload page to take effect.`);
+            }
+        });
 
         document.getElementById('playBtn').addEventListener('click', async () => {
             if (!audioElement) return;
