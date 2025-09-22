@@ -431,45 +431,51 @@ export default class Visualizer {
   }
 
   async loadPreset(presetMap, blendTime = 0) {
-    const preset = JSON.parse(JSON.stringify(presetMap));
-    preset.baseVals = Visualizer.overrideDefaultVars(
-      this.baseValsDefaults,
-      preset.baseVals
-    );
-    for (let i = 0; i < preset.shapes.length; i++) {
-      preset.shapes[i].baseVals = Visualizer.overrideDefaultVars(
-        this.shapeBaseValsDefaults,
-        preset.shapes[i].baseVals
+    try {
+      const preset = JSON.parse(JSON.stringify(presetMap));
+      preset.baseVals = Visualizer.overrideDefaultVars(
+        this.baseValsDefaults,
+        preset.baseVals
       );
-    }
-
-    for (let i = 0; i < preset.waves.length; i++) {
-      preset.waves[i].baseVals = Visualizer.overrideDefaultVars(
-        this.waveBaseValsDefaults,
-        preset.waves[i].baseVals
-      );
-    }
-
-    const forceJS = preset.useJS && !this.opts.onlyUseWASM;
-
-    if (
-      Object.prototype.hasOwnProperty.call(preset, "init_eqs_eel") &&
-      !forceJS
-    ) {
-      preset.useWASM = true;
-      await this.loadWASMPreset(preset, blendTime);
-    } else if (!this.opts.onlyUseWASM) {
-      if (Object.prototype.hasOwnProperty.call(preset, "init_eqs_str")) {
-        this.loadJSPreset(preset, blendTime);
-      } else {
-        console.warn(
-          "Tried to load a JS preset that doesn't have converted strings"
+      for (let i = 0; i < preset.shapes.length; i++) {
+        preset.shapes[i].baseVals = Visualizer.overrideDefaultVars(
+          this.shapeBaseValsDefaults,
+          preset.shapes[i].baseVals
         );
       }
-    } else {
-      console.warn(
-        "Tried to load a preset that doesn't support WASM with onlyUseWASM on"
-      );
+
+      for (let i = 0; i < preset.waves.length; i++) {
+        preset.waves[i].baseVals = Visualizer.overrideDefaultVars(
+          this.waveBaseValsDefaults,
+          preset.waves[i].baseVals
+        );
+      }
+
+      const forceJS = preset.useJS && !this.opts.onlyUseWASM;
+
+      if (
+        Object.prototype.hasOwnProperty.call(preset, "init_eqs_eel") &&
+        !forceJS
+      ) {
+        preset.useWASM = true;
+        await this.loadWASMPreset(preset, blendTime);
+      } else if (!this.opts.onlyUseWASM) {
+        if (Object.prototype.hasOwnProperty.call(preset, "init_eqs_str")) {
+          this.loadJSPreset(preset, blendTime);
+        } else {
+          console.warn(
+            "Tried to load a JS preset that doesn't have converted strings"
+          );
+        }
+      } else {
+        console.warn(
+          "Tried to load a preset that doesn't support WASM with onlyUseWASM on"
+        );
+      }
+    } catch (error) {
+      console.error("[Visualizer] Error loading preset:", error);
+      // Re-throw to let caller handle it
+      throw error;
     }
   }
 

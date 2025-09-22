@@ -8,8 +8,6 @@
  * All data stored as JSON in localStorage for easy debugging and sharing
  */
 
-import { wasmDetector } from './WASMCapabilityDetector.js';
-
 export class PresetFailureLogger {
   constructor() {
     this.sessionLog = {
@@ -29,7 +27,7 @@ export class PresetFailureLogger {
   }
 
   /**
-   * Initialize with async device detection
+   * Initialize with device detection (simplified without WASM)
    */
   async initialize() {
     if (this.initialized) return;
@@ -55,31 +53,30 @@ export class PresetFailureLogger {
   }
 
   /**
-   * Get device fingerprint for correlation
+   * Get device fingerprint for correlation (JavaScript-only version)
    */
   async getDeviceFingerprint() {
-    try {
-      const capabilities = await wasmDetector.detectCapabilities();
+    // Simple device tier detection without WASM
+    const memory = navigator.deviceMemory || 4;
+    const cores = navigator.hardwareConcurrency || 2;
 
-      return {
-        tier: capabilities.features.tier,
-        memory: capabilities.features.memory,
-        cores: capabilities.features.cores,
-        gpu: this.detectGPUInfo(),
-        browser: navigator.userAgent,
-        timestamp: Date.now(),
-      };
-    } catch (error) {
-      // Fallback if capabilities detection fails
-      return {
-        tier: 'unknown',
-        memory: navigator.deviceMemory || 4,
-        cores: navigator.hardwareConcurrency || 2,
-        gpu: this.detectGPUInfo(),
-        browser: navigator.userAgent,
-        timestamp: Date.now(),
-      };
+    let tier = 'mid_range';
+    if (memory <= 2 || cores <= 2) {
+      tier = 'low_end';
+    } else if (memory >= 8 && cores >= 8) {
+      tier = 'high_end';
+    } else if (/Mobile|Android|iPhone/i.test(navigator.userAgent)) {
+      tier = 'mobile';
     }
+
+    return {
+      tier,
+      memory,
+      cores,
+      gpu: this.detectGPUInfo(),
+      browser: navigator.userAgent,
+      timestamp: Date.now(),
+    };
   }
 
   /**
@@ -101,10 +98,26 @@ export class PresetFailureLogger {
   }
 
   /**
+   * Start auto-save timer
+   */
+  startAutoSave() {
+    if (this.autoSaveTimer) {
+      clearInterval(this.autoSaveTimer);
+    }
+
+    this.autoSaveTimer = setInterval(() => {
+      this.saveToFile();
+    }, this.autoSaveInterval);
+  }
+
+  /**
    * Load aggregate statistics from localStorage
    */
   loadAggregateLog() {
     try {
+      if (typeof localStorage === 'undefined') {
+        return {};
+      }
       const stored = localStorage.getItem('preset-failures-aggregate.json');
       return stored ? JSON.parse(stored) : {};
     } catch (e) {
@@ -118,6 +131,9 @@ export class PresetFailureLogger {
    */
   loadBlocklist() {
     try {
+      if (typeof localStorage === 'undefined') {
+        return this.createEmptyBlocklist();
+      }
       const stored = localStorage.getItem('preset-blocklist-permanent.json');
       if (!stored) {
         return this.createEmptyBlocklist();
@@ -182,7 +198,7 @@ export class PresetFailureLogger {
       reason: reason,
       audio_playing: context.audioLevel > 0.01,
       fps: context.fps,
-      memory: performance.memory?.usedJSHeapSize,
+      memory: (typeof performance !== 'undefined' && performance.memory) ? performance.memory.usedJSHeapSize : undefined,
       frame_data: context.frameData || null,
     });
 
@@ -331,6 +347,9 @@ export class PresetFailureLogger {
    */
   saveToFile() {
     try {
+      if (typeof localStorage === 'undefined') {
+        return;
+      }
       // Session log
       localStorage.setItem(
         `preset-failures-${this.sessionLog.session_id}.json`,
@@ -400,30 +419,34 @@ export class PresetFailureLogger {
         }
       });
 
-      // Update version
-      this.blocklist.version = Math.max(this.blocklist.version, external.version || 1) + 0.1;
+      console.log(
+        `[Blocklist] Imported ${external.permanent.length} permanent blocks, ` +
+          `${external.stats ? external.stats.total_blocked : 'unknown'} total`
+      );
 
       this.saveToFile();
-
-      console.log(`[Blocklist] Imported ${external.permanent.length} permanent blocks`);
-      return { success: true, imported: external.permanent.length };
+      return true;
     } catch (e) {
-      console.error('[Blocklist] Import failed:', e);
-      return { success: false, error: e.message };
+      console.error('[PresetFailureLogger] Failed to import blocklist:', e);
+      return false;
     }
   }
 
   /**
-   * Get failure report for debugging
+   * Get statistics for debugging
    */
-  getFailureReport() {
-    const report = {
+  getStatistics() {
+    return {
       session: {
         id: this.sessionLog.session_id,
-        device: this.sessionLog.device,
+        started: this.sessionLog.started,
         failures: Object.keys(this.sessionLog.failures).length,
-        total_attempts: Object.values(this.sessionLog.failures).reduce(
-          (sum, f) => sum + f.count,
+        device: this.sessionLog.device,
+      },
+      aggregate: {
+        total_presets: Object.keys(this.aggregateLog).length,
+        total_failures: Object.values(this.aggregateLog).reduce(
+          (sum, p) => sum + p.total_failures,
           0
         ),
       },
@@ -433,122 +456,42 @@ export class PresetFailureLogger {
         low_memory: this.blocklist.conditional.low_memory.length,
         integrated_gpu: this.blocklist.conditional.integrated_gpu.length,
       },
-      top_failures: Object.entries(this.aggregateLog)
-        .sort((a, b) => b[1].total_failures - a[1].total_failures)
-        .slice(0, 10)
-        .map(([hash, stats]) => ({
-          preset: hash,
-          failures: stats.total_failures,
-          rate: (stats.failure_rate * 100).toFixed(1) + '%',
-          reasons: Object.entries(stats.failure_reasons)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3)
-            .map(([reason, count]) => `${reason} (${count})`),
-        })),
     };
-
-    return report;
   }
 
   /**
-   * Clean up old session logs (keep last 5)
+   * Clear all logs and blocklists
+   * Note: Caller is responsible for any confirmation UI
    */
-  cleanupOldLogs() {
-    try {
-      const keys = Object.keys(localStorage);
-      const sessionLogs = keys
-        .filter(
-          (k) =>
-            k.startsWith('preset-failures-') &&
-            k !== `preset-failures-${this.sessionLog.session_id}.json`
-        )
-        .map((k) => ({
-          key: k,
-          id: parseInt(k.split('-')[2].replace('.json', '')),
-        }))
-        .sort((a, b) => b.id - a.id);
-
-      // Keep only the 5 most recent session logs
-      if (sessionLogs.length > 5) {
-        sessionLogs.slice(5).forEach((log) => {
-          localStorage.removeItem(log.key);
-          console.log(`[PresetFailureLogger] Cleaned up old log: ${log.key}`);
-        });
-      }
-    } catch (e) {
-      console.warn('[PresetFailureLogger] Cleanup failed:', e);
-    }
-  }
-
-  /**
-   * Start auto-save timer
-   */
-  startAutoSave() {
-    // Prevent double-starting the timer
-    if (this.autoSaveTimer) {
-      return;
+  clearAllLogs() {
+    // Clear localStorage if available
+    if (typeof localStorage !== 'undefined') {
+      Object.keys(localStorage)
+        .filter((key) => key.startsWith('preset-failures-') || key.startsWith('preset-blocklist-'))
+        .forEach((key) => localStorage.removeItem(key));
     }
 
-    this.autoSaveTimer = setInterval(() => {
-      this.saveToFile();
-      this.cleanupOldLogs();
-    }, this.autoSaveInterval);
+    // Reset in-memory data
+    this.sessionLog.failures = {};
+    this.aggregateLog = {};
+    this.blocklist = this.createEmptyBlocklist();
+
+    console.log('[PresetFailureLogger] All logs cleared');
   }
 
   /**
-   * Stop auto-save timer
+   * Clean up on destroy
    */
-  stopAutoSave() {
+  destroy() {
     if (this.autoSaveTimer) {
       clearInterval(this.autoSaveTimer);
       this.autoSaveTimer = null;
     }
-  }
-
-  /**
-   * Export for community sharing
-   */
-  exportForCommunity() {
-    const blocklist = this.exportBlocklist();
-
-    // Add environment info
-    blocklist.environment = {
-      butterchurn_version: '3.0.0',
-      export_date: new Date().toISOString(),
-      total_presets_tested: Object.keys(this.aggregateLog).length,
-      device_tier: this.sessionLog.device.tier,
-    };
-
-    // Create downloadable blob
-    const blob = new Blob([JSON.stringify(blocklist, null, 2)], {
-      type: 'application/json',
-    });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `butterchurn-blocklist-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    return blocklist;
-  }
-
-  /**
-   * Reset session (for testing)
-   */
-  resetSession() {
-    this.stopAutoSave();
-    this.sessionLog = {
-      session_id: Date.now(),
-      device: this.getDeviceFingerprint(),
-      failures: {},
-      started: new Date().toISOString(),
-    };
-    this.startAutoSave();
-    console.log('[PresetFailureLogger] Session reset');
+    this.saveToFile();
   }
 }
 
-// Export singleton
+// Export singleton for easy use
 export const presetLogger = new PresetFailureLogger();
+
+export default PresetFailureLogger;

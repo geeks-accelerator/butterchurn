@@ -9,8 +9,8 @@
  * - Statistics and reporting
  */
 
-import { presetLogger } from './PresetFailureLogger.js';
-import { config } from './Config.js';
+import { presetLogger } from '../analysis/presetFailureLogger.js';
+import { config } from '../config/config.js';
 
 export class BlocklistManager {
   constructor() {
@@ -589,14 +589,14 @@ export class BlocklistManager {
    * Update statistics
    */
   updateStats() {
-    const report = this.logger.getFailureReport();
+    const stats = this.logger.getStatistics();
 
-    this.uiContainer.querySelector('#stat-permanent').textContent = report.blocklist.permanent;
+    this.uiContainer.querySelector('#stat-permanent').textContent = stats.blocklist.permanent;
 
     this.uiContainer.querySelector('#stat-conditional').textContent =
-      report.blocklist.mobile + report.blocklist.low_memory + report.blocklist.integrated_gpu;
+      stats.blocklist.mobile + stats.blocklist.low_memory + stats.blocklist.integrated_gpu;
 
-    this.uiContainer.querySelector('#stat-failures').textContent = report.session.total_attempts;
+    this.uiContainer.querySelector('#stat-failures').textContent = stats.aggregate.total_failures;
 
     // Count sessions
     const sessions = Object.keys(localStorage).filter((k) =>
@@ -706,7 +706,14 @@ export class BlocklistManager {
    * Export blocklist
    */
   exportBlocklist() {
-    const data = this.logger.exportForCommunity();
+    const data = this.logger.exportBlocklist();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `butterchurn-blocklist-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
     alert(`Blocklist exported with ${data.stats.total_blocked} entries`);
   }
 
@@ -719,14 +726,14 @@ export class BlocklistManager {
     try {
       const text = await file.text();
       const data = JSON.parse(text);
-      const result = this.logger.importBlocklist(data);
+      const success = this.logger.importBlocklist(data);
 
-      if (result.success) {
-        alert(`Successfully imported ${result.imported} blocklist entries`);
+      if (success) {
+        alert(`Successfully imported blocklist entries`);
         this.updateStats();
         this.loadPermanentList();
       } else {
-        alert(`Import failed: ${result.error}`);
+        alert(`Import failed`);
       }
     } catch (e) {
       alert(`Failed to import blocklist: ${e.message}`);
@@ -737,15 +744,11 @@ export class BlocklistManager {
    * Clear blocklist
    */
   clearBlocklist() {
-    if (confirm('Clear all blocklist entries? This cannot be undone.')) {
-      this.logger.blocklist.permanent.clear();
-      this.logger.blocklist.conditional.mobile = [];
-      this.logger.blocklist.conditional.low_memory = [];
-      this.logger.blocklist.conditional.integrated_gpu = [];
-      this.logger.blocklist.metadata = {};
-      this.logger.saveToFile();
+    if (confirm('Clear all preset failure logs and blocklists? This cannot be undone.')) {
+      // Use logger's clearAllLogs to properly reset everything
+      this.logger.clearAllLogs();
 
-      alert('Blocklist cleared');
+      alert('All logs and blocklists cleared');
       this.updateStats();
       this.loadPermanentList();
     }
@@ -755,10 +758,10 @@ export class BlocklistManager {
    * Load settings
    */
   loadSettings() {
-    const autoBlocklist = config.get('userPreferences.autoBlocklistEnabled');
-    const failureRate = config.get('presetFailures.autoBlocklist.failureRateThreshold');
-    const failureCount = config.get('presetFailures.autoBlocklist.totalFailuresThreshold');
-    const debugMode = config.get('userPreferences.debugMode');
+    const autoBlocklist = config.get('userPreferences.autoBlocklistEnabled') !== false;
+    const failureRate = config.get('presetFailures.autoBlocklist.failureRateThreshold') || 0.8;
+    const failureCount = config.get('presetFailures.autoBlocklist.totalFailuresThreshold') || 50;
+    const debugMode = config.get('userPreferences.debugMode') || false;
 
     this.uiContainer.querySelector('#auto-blocklist').checked = autoBlocklist;
     this.uiContainer.querySelector('#failure-threshold').value = failureRate * 100;
@@ -858,7 +861,7 @@ export class BlocklistManager {
   }
 
   getStats() {
-    return this.logger.getStats();
+    return this.logger.getStatistics();
   }
 
   // Show UI is actually the show method
@@ -869,3 +872,5 @@ export class BlocklistManager {
 
 // Export singleton
 export const blocklistManager = new BlocklistManager();
+
+export default BlocklistManager;

@@ -3,6 +3,16 @@
  *
  * Selects presets based on real-time audio features using
  * pre-generated fingerprint database with 8-character hashes
+ *
+ * Enhanced with:
+ * - Live frame analysis for problematic preset detection
+ * - Preset failure logging and automatic blocklist management
+ * - Emergency preset fallback system
+ * - Configuration-driven thresholds and behavior
+ *
+ * Note: Advanced features (frame analysis, blocklist, emergency presets)
+ * require importing the respective modules. When used as a standalone script,
+ * these features will be disabled but core functionality will work.
  */
 
 class IntelligentPresetSelector {
@@ -14,35 +24,60 @@ class IntelligentPresetSelector {
         this.currentHash = null;
         this.currentPreset = null;
         this.lastSwitch = 0;
-        this.minSwitchInterval = 5000; // Don't switch too often (5 seconds)
-        this.maxSwitchInterval = 30000; // Force switch after 30 seconds
         this.currentWarmupTime = 0; // Track warmup requirement for current preset
+
+        // Load timing configuration (config is optional - use defaults if not available)
+        this.minSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
+            config.get('presetSelection.minSwitchInterval', 2000) : 2000;
+        this.maxSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
+            config.get('presetSelection.maxSwitchInterval', 30000) : 30000;
+
+        // Initialize analysis systems (may be undefined if modules not loaded)
+        this.frameAnalyzer = typeof frameAnalyzer !== 'undefined' ? frameAnalyzer : null;
+        this.presetLogger = typeof presetLogger !== 'undefined' ? presetLogger : null;
+        this.emergencyManager = typeof emergencyManager !== 'undefined' ? emergencyManager : null;
+        this.blocklistManager = typeof blocklistManager !== 'undefined' ? blocklistManager : null;
+
+        // Device detection for performance optimization
+        this.deviceTier = this.detectDeviceTier();
+        if (this.frameAnalyzer) {
+            this.frameAnalyzer.adjustForDevice(this.deviceTier);
+        }
+
+        // Emergency mode tracking
+        this.isEmergencyMode = false;
+        this.emergencyStartTime = 0
 
         // Direct preset pack support (for testing without fingerprint database)
         this.presetPack = null;
 
-        // Problematic presets that show only a single solid color
-        // These are identified through testing and should be skipped
-        this.problematicPresets = new Set([
-            // Add hashes of presets that consistently show solid color
-            // These will be populated based on testing
-        ])
+        // Problematic presets now managed by PresetFailureLogger
+        this.problematicPresets = new Set();
 
-        // Enable automatic solid color detection
-        this.detectSolidColor = true;
-        this.solidColorChecks = new Map(); // Track detection attempts
+        // Enable automatic problematic detection
+        this.detectProblematic = (typeof config !== 'undefined' && config?.get) ?
+            config.get('userPreferences.skipProblematicPresets', true) : true;
+        this.frameCheckInterval = 100; // Check frame every 100ms
+        this.lastFrameCheck = 0
 
         // Audio history for trend detection
         this.audioHistory = [];
         this.historySize = 30; // Keep 30 frames (~0.5 sec at 60fps)
 
-        // Transition scoring weights
-        this.weights = {
+        // Load scoring weights from config
+        this.weights = (typeof config !== 'undefined' && config?.get) ?
+            config.get('presetSelection.scoringWeights', {
+                energyMatch: 0.3,
+                frequencyMatch: 0.25,
+                rhythmMatch: 0.2,
+                dynamicsMatch: 0.15,
+                continuity: 0.1
+            }) : {
             energyMatch: 0.3,
-            bassMatch: 0.25,
-            continuity: 0.2,
-            performance: 0.15,
-            variety: 0.1
+            frequencyMatch: 0.25,
+            rhythmMatch: 0.2,
+            dynamicsMatch: 0.15,
+            continuity: 0.1
         };
 
         // Recently used presets (avoid repetition)
@@ -78,9 +113,27 @@ class IntelligentPresetSelector {
     }
 
     /**
+     * Detect device tier for optimization
+     */
+    detectDeviceTier() {
+        const memory = navigator.deviceMemory || 4;
+        const cores = navigator.hardwareConcurrency || 2;
+        const isMobile = /Mobile|Android|iPhone/i.test(navigator.userAgent);
+
+        if (isMobile) return 'mobile';
+        if (memory >= 8 && cores >= 4) return 'high_end';
+        if (memory <= 4 && cores <= 2) return 'low_end';
+        return 'mid_range';
+    }
+
+    /**
      * Initialize with fingerprint database
      */
     async initialize() {
+        // Initialize the preset failure logger if available
+        if (this.presetLogger) {
+            await this.presetLogger.initialize();
+        }
         if (typeof this.db === 'string') {
             // Load from URL
             const response = await fetch(this.db);
@@ -96,31 +149,29 @@ class IntelligentPresetSelector {
             }
         }
 
-        // Load previously detected problematic presets from localStorage
-        if (typeof localStorage !== 'undefined') {
-            try {
-                const stored = localStorage.getItem('problematicPresets');
-                if (stored) {
-                    const problematic = JSON.parse(stored);
-                    problematic.forEach(hash => this.problematicPresets.add(hash));
-                    console.log(`Loaded ${problematic.length} previously detected problematic presets`);
-                }
-            } catch (error) {
-                console.error('Error loading problematic presets:', error);
-            }
+        // Load blocklist from PresetFailureLogger if available
+        if (this.presetLogger) {
+            const stats = this.presetLogger.getStatistics();
+            console.log(`[IntelligentSelector] Loaded blocklist with ${stats.blocklist.permanent} permanent blocks`);
         }
     }
 
     /**
      * Update with current audio levels and potentially switch presets
      */
-    update(audioLevels) {
+    update(audioLevels, frameData = null) {
         // Don't update if paused
         if (this.isPaused) {
             return null;
         }
 
         const now = performance.now();
+
+        // Check current frame for problems if we have frame data
+        if (frameData && this.detectProblematic && now - this.lastFrameCheck > this.frameCheckInterval) {
+            this.checkFrameForProblems(frameData);
+            this.lastFrameCheck = now;
+        }
 
         // Add to history
         this.audioHistory.push({
@@ -149,11 +200,33 @@ class IntelligentPresetSelector {
 
         let selectionLogic = null;
         if (shouldSwitch) {
-            // Use fingerprint database selection with transparency
-            const selectionResult = this.selectBestPresetWithLogic(features);
-            if (selectionResult && selectionResult.bestHash !== this.currentHash) {
-                this.switchToPreset(selectionResult.bestHash);
-                selectionLogic = selectionResult.logic;
+            // Check if we're in emergency mode
+            if (this.isEmergencyMode) {
+                const emergencyDuration = now - this.emergencyStartTime;
+                const maxEmergencyTime = (typeof config !== 'undefined' && config?.get) ?
+                    config.get('emergencyPresets.maxEmergencyTime', 10000) : 10000;
+
+                if (emergencyDuration > maxEmergencyTime) {
+                    // Try to exit emergency mode
+                    this.exitEmergencyMode();
+                }
+            }
+
+            if (!this.isEmergencyMode) {
+                // Use fingerprint database selection with transparency
+                const selectionResult = this.selectBestPresetWithLogic(features);
+                if (selectionResult && selectionResult.bestHash !== this.currentHash) {
+                    // Check if preset is blocked
+                    const blockStatus = this.blocklistManager?.isBlocked(selectionResult.bestHash) || { blocked: false };
+                    if (!blockStatus.blocked) {
+                        this.switchToPreset(selectionResult.bestHash);
+                        selectionLogic = selectionResult.logic;
+                    } else {
+                        console.log(`[IntelligentSelector] Preset ${selectionResult.bestHash} is blocked: ${blockStatus.reason}`);
+                        // Try next best preset
+                        this.selectAlternativePreset(features);
+                    }
+                }
             }
         }
 
@@ -161,7 +234,9 @@ class IntelligentPresetSelector {
             currentPreset: this.currentHash,
             features: features,
             nextSwitch: Math.max(0, this.minSwitchInterval - timeSinceSwitch),
-            selectionLogic: selectionLogic
+            selectionLogic: selectionLogic,
+            isEmergencyMode: this.isEmergencyMode,
+            deviceTier: this.deviceTier
         };
     }
 
@@ -482,7 +557,7 @@ class IntelligentPresetSelector {
         // Schedule solid color detection after warmup
         if (this.detectSolidColor && !this.solidColorChecks.has(hash)) {
             setTimeout(() => {
-                this.checkForSolidColor(hash);
+                this.checkForSolidColor(hash, false);
             }, (this.currentWarmupTime + 1) * 1000);
         }
 
@@ -544,21 +619,9 @@ class IntelligentPresetSelector {
         // Schedule solid color detection after warmup
         if (this.detectSolidColor && !this.solidColorChecks.has(presetName)) {
             setTimeout(() => {
-                this.checkForSolidColorPack(presetName);
+                this.checkForSolidColor(presetName, true);
             }, (this.currentWarmupTime + 1) * 1000);
         }
-
-        // Log blending state for debugging
-        setTimeout(() => {
-            if (this.butterchurn && this.butterchurn.renderer) {
-                console.log('Blending state (FIXED):', {
-                    blending: this.butterchurn.renderer.blending,
-                    blendProgress: this.butterchurn.renderer.blendProgress,
-                    blendDuration: this.butterchurn.renderer.blendDuration,
-                    hasFixedAlphaBuffers: !!this.butterchurn.renderer.prevWarpColor
-                });
-            }
-        }, 100);
 
         this.currentPreset = presetName;
         this.lastSwitch = performance.now();
@@ -585,10 +648,133 @@ class IntelligentPresetSelector {
     }
 
     /**
+     * Check current frame for problems using LiveFrameAnalyzer
+     */
+    checkFrameForProblems(frameData) {
+        if (!frameData || !this.currentHash) return;
+
+        const width = this.butterchurn?.canvas?.width || 800;
+        const height = this.butterchurn?.canvas?.height || 600;
+
+        if (!this.frameAnalyzer) return;
+
+        const analysis = this.frameAnalyzer.analyzeFrame(frameData, width, height);
+
+        if (analysis.isProblematic) {
+            const context = {
+                audioLevel: this.audioHistory[this.audioHistory.length - 1]?.energy || 0,
+                fps: this.butterchurn?.fps || 60,
+                frameData: analysis
+            };
+
+            // Log the failure
+            if (this.presetLogger) {
+                this.presetLogger.logFailure(this.currentHash, analysis.reason, context);
+            }
+
+            // Check if we should enter emergency mode
+            if (analysis.confidence > 0.8) {
+                console.warn(`[IntelligentSelector] Detected ${analysis.reason} - entering emergency mode`);
+                this.enterEmergencyMode(context);
+            }
+        }
+    }
+
+    /**
+     * Enter emergency mode with a fallback preset
+     */
+    enterEmergencyMode(context) {
+        if (!this.emergencyManager) {
+            console.warn('[IntelligentSelector] Emergency manager not available');
+            return;
+        }
+
+        const emergency = this.emergencyManager.getEmergencyPreset({
+            deviceTier: this.deviceTier,
+            audioLevel: context.audioLevel || 0
+        });
+
+        if (emergency && emergency.preset) {
+            console.log(`[IntelligentSelector] Switching to emergency preset: ${emergency.key}`);
+            this.isEmergencyMode = true;
+            this.emergencyStartTime = performance.now();
+
+            // Load the emergency preset directly
+            if (this.butterchurn && typeof this.butterchurn.loadPreset === 'function') {
+                this.butterchurn.loadPreset(emergency.preset, 0.5); // Quick 0.5s transition
+                this.currentHash = emergency.preset.id;
+                this.currentPreset = emergency.preset.name;
+                this.lastSwitch = performance.now();
+            }
+        }
+    }
+
+    /**
+     * Exit emergency mode and return to normal selection
+     */
+    exitEmergencyMode() {
+        console.log('[IntelligentSelector] Exiting emergency mode');
+        this.isEmergencyMode = false;
+        this.emergencyStartTime = 0;
+
+        // Force a new preset selection
+        const features = this.calculateAudioFeatures();
+        const bestHash = this.selectBestPreset(features);
+        if (bestHash) {
+            this.switchToPreset(bestHash);
+        }
+    }
+
+    /**
+     * Select an alternative preset when the first choice is blocked
+     */
+    selectAlternativePreset(features) {
+        const candidates = this.getCandidates(features, 50); // Get more candidates
+
+        for (const hash of candidates) {
+            const blockStatus = this.blocklistManager?.isBlocked(hash) || { blocked: false };
+            if (!blockStatus.blocked) {
+                console.log(`[IntelligentSelector] Using alternative preset: ${hash}`);
+                this.switchToPreset(hash);
+                return;
+            }
+        }
+
+        // If all candidates are blocked, use emergency preset
+        console.warn('[IntelligentSelector] All candidates blocked - using emergency preset');
+        this.enterEmergencyMode({ audioLevel: features.energy });
+    }
+
+    /**
      * Check if preset is problematic
      */
     isProblematic(hash) {
+        // Check blocklist first
+        const blockStatus = this.blocklistManager.isBlocked(hash);
+        if (blockStatus.blocked) {
+            return true;
+        }
+
+        // Check local problematic list
         return this.problematicPresets.has(hash);
+    }
+
+    /**
+     * Mark preset as problematic (fingerprint mode)
+     */
+    markProblematic(hash) {
+        this.problematicPresets.add(hash);
+
+        // Also add to failure logger for permanent tracking
+        const context = {
+            audioLevel: this.audioHistory[this.audioHistory.length - 1]?.energy || 0,
+            fps: this.butterchurn?.fps || 60
+        };
+
+        if (this.presetLogger) {
+            this.presetLogger.logFailure(hash, 'solid_color_detected', context);
+        }
+        console.warn(`[IntelligentSelector] Marked preset ${hash} as problematic`);
     }
 
     /**
@@ -884,12 +1070,20 @@ class IntelligentPresetSelector {
      * Get current state for debugging
      */
     getState() {
+        const stats = this.presetLogger?.getStatistics();
+        const frameState = this.frameAnalyzer?.getState();
+
         return {
             currentPreset: this.currentHash,
-            presetName: this.currentPreset?.names[0],
+            presetName: this.db?.presets[this.currentHash]?.names?.[0] || this.currentPreset,
             timeSinceSwitch: performance.now() - this.lastSwitch,
             recentPresets: this.recentPresets,
-            audioHistorySize: this.audioHistory.length
+            audioHistorySize: this.audioHistory.length,
+            isEmergencyMode: this.isEmergencyMode,
+            deviceTier: this.deviceTier,
+            blocklist: stats?.blocklist || {},
+            frameAnalysis: frameState?.lastAnalysis || null,
+            problematicDetected: this.problematicPresets.size
         };
     }
 
@@ -912,9 +1106,10 @@ class IntelligentPresetSelector {
     }
 }
 
-// Export for both ES6, CommonJS, and browser global
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = IntelligentPresetSelector;
-} else if (typeof window !== 'undefined') {
+// Export as ES6 module
+export default IntelligentPresetSelector;
+
+// Also export for browser global if needed
+if (typeof window !== 'undefined') {
     window.IntelligentPresetSelector = IntelligentPresetSelector;
 }
