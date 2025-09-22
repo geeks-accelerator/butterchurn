@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Butterchurn CDN - Enhanced Fork</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #0f0;
+        }
+        h1 {
+            color: #0f0;
+            border-bottom: 2px solid #0f0;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #0af;
+            margin-top: 30px;
+        }
+        a {
+            color: #0af;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        pre {
+            background: #111;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #0f0;
+            overflow-x: auto;
+            color: #0f0;
+        }
+        .file-list {
+            background: #111;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #0f0;
+        }
+        .file-list li {
+            margin: 10px 0;
+            color: #ddd;
+        }
+        .file-size {
+            color: #888;
+            font-size: 0.9em;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+        .badge-new {
+            background: #0f0;
+            color: #000;
+        }
+        .badge-stable {
+            background: #0af;
+            color: #000;
+        }
+        code {
+            background: #222;
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Butterchurn CDN</h1>
+    <p>Enhanced Butterchurn WebGL Music Visualizer - CDN Distribution</p>
+
+    <h2>📦 Available Files</h2>
+    <div class="file-list">
+        <ul>
+            <li>
+                <a href="butterchurn.min.js">butterchurn.min.js</a>
+                <span class="file-size">(~300KB)</span>
+                <span class="badge badge-stable">Core Engine</span>
+                - WebGL visualizer with intelligent preset selection
+            </li>
+            <li>
+                <a href="fingerprints.json">fingerprints.json</a>
+                <span class="file-size">(~376KB)</span>
+                <span class="badge badge-new">Database</span>
+                - Preset fingerprints for intelligent selection
+            </li>
+            <li>
+                <a href="presets/">presets/</a>
+                <span class="file-size">(~5MB total)</span>
+                - Complete preset collection
+                <ul>
+                    <li><code>butterchurnPresets.min.js</code> - Base collection</li>
+                    <li><code>butterchurnPresetsExtra.min.js</code> - Extended collection</li>
+                    <li><code>butterchurnPresetsExtra2.min.js</code> - Additional presets</li>
+                    <li><code>butterchurnPresetsMD1.min.js</code> - Milkdrop 1 classics</li>
+                    <li><code>butterchurnPresetsNonMinimal.min.js</code> - Complex presets</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <h2>🚀 Quick Start</h2>
+    <h3>Basic Usage</h3>
+    <pre>&lt;!-- Core Butterchurn Engine --&gt;
+&lt;script src="https://geeks-accelerator.github.io/butterchurn/cdn/butterchurn.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Preset Collections --&gt;
+&lt;script src="https://geeks-accelerator.github.io/butterchurn/cdn/presets/butterchurnPresets.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://geeks-accelerator.github.io/butterchurn/cdn/presets/butterchurnPresetsExtra.min.js"&gt;&lt;/script&gt;</pre>
+
+    <h3>With Intelligent Selection</h3>
+    <pre>&lt;!-- Load fingerprint database for intelligent preset selection --&gt;
+&lt;script&gt;
+  fetch('https://geeks-accelerator.github.io/butterchurn/cdn/fingerprints.json')
+    .then(response =&gt; response.json())
+    .then(fingerprintDb =&gt; {
+      console.log(`Loaded ${Object.keys(fingerprintDb.presets).length} preset fingerprints`);
+      // Initialize IntelligentPresetSelector with database
+      const selector = new IntelligentPresetSelector(visualizer, fingerprintDb);
+    });
+&lt;/script&gt;</pre>
+
+    <h2>🌟 Features</h2>
+    <ul>
+        <li>✨ <strong>Intelligent Preset Selection</strong> - AI-driven preset switching based on audio analysis</li>
+        <li>🎨 <strong>395+ Presets</strong> - Curated from 5 community collections</li>
+        <li>⚡ <strong>25-30% Faster</strong> - Direct WebGL rendering optimizations</li>
+        <li>🛡️ <strong>Emergency Fallbacks</strong> - Guaranteed visualization with bulletproof presets</li>
+        <li>📊 <strong>Live Frame Analysis</strong> - Real-time problematic preset detection</li>
+        <li>🚫 <strong>Blocklist System</strong> - Automatic filtering of broken presets</li>
+    </ul>
+
+    <h2>📖 Documentation</h2>
+    <ul>
+        <li><a href="https://github.com/geeks-accelerator/butterchurn">GitHub Repository</a> - Source code and examples</li>
+        <li><a href="https://alaskabutter.com">AlaskaButter Demo</a> - Live demonstration</li>
+        <li><a href="../MATHEMATICAL_FINGERPRINTING.html">Mathematical Fingerprinting</a> - Equation analysis algorithms</li>
+        <li><a href="../ADVANCED_FEATURES_IMPLEMENTATION_PLAN.html">Implementation Status</a> - Feature roadmap</li>
+    </ul>
+
+    <h2>🔄 Version Information</h2>
+    <p>
+        <strong>Current Version:</strong> Enhanced Fork v3.0.0-beta.5<br>
+        <strong>Last Updated:</strong> <span id="last-updated">January 2025</span><br>
+        <strong>CDN URL:</strong> <code>https://geeks-accelerator.github.io/butterchurn/cdn/</code>
+    </p>
+
+    <h2>💡 Example Implementation</h2>
+    <pre>&lt;canvas id="canvas" width="800" height="600"&gt;&lt;/canvas&gt;
+
+&lt;script src="https://geeks-accelerator.github.io/butterchurn/cdn/butterchurn.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://geeks-accelerator.github.io/butterchurn/cdn/presets/butterchurnPresets.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  // Initialize visualizer
+  const audioContext = new AudioContext();
+  const canvas = document.getElementById('canvas');
+  const visualizer = butterchurn.createVisualizer(audioContext, canvas, {
+    width: 800,
+    height: 600
+  });
+
+  // Load presets
+  const presets = butterchurnPresets.getPresets();
+  const presetNames = Object.keys(presets);
+
+  // Load first preset
+  visualizer.loadPreset(presets[presetNames[0]], 0);
+
+  // Connect audio and start rendering
+  // ... (audio setup code)
+&lt;/script&gt;</pre>
+
+    <h2>📝 License</h2>
+    <p>MIT License - Free for commercial and non-commercial use</p>
+
+    <script>
+        // Update last modified date
+        document.getElementById('last-updated').textContent = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    </script>
+</body>
+</html>
