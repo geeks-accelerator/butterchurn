@@ -6,9 +6,9 @@ export default class Noise {
     this.randomFn = getRNG().random;
 
     this.anisoExt =
-      this.gl.getExtension("EXT_texture_filter_anisotropic") ||
-      this.gl.getExtension("MOZ_EXT_texture_filter_anisotropic") ||
-      this.gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic");
+      this.gl.getExtension('EXT_texture_filter_anisotropic') ||
+      this.gl.getExtension('MOZ_EXT_texture_filter_anisotropic') ||
+      this.gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
 
     this.noiseTexLQ = this.gl.createTexture();
     this.noiseTexLQLite = this.gl.createTexture();
@@ -35,16 +35,8 @@ export default class Noise {
     this.bindTexture3D(this.noiseTexVolHQ, this.nTexArrVolHQ, 32, 32, 32);
 
     this.noiseTexPointLQ = this.gl.createSampler();
-    gl.samplerParameteri(
-      this.noiseTexPointLQ,
-      gl.TEXTURE_MIN_FILTER,
-      gl.NEAREST_MIPMAP_NEAREST
-    );
-    gl.samplerParameteri(
-      this.noiseTexPointLQ,
-      gl.TEXTURE_MAG_FILTER,
-      gl.NEAREST
-    );
+    gl.samplerParameteri(this.noiseTexPointLQ, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+    gl.samplerParameteri(this.noiseTexPointLQ, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.samplerParameteri(this.noiseTexPointLQ, gl.TEXTURE_WRAP_S, gl.REPEAT);
     gl.samplerParameteri(this.noiseTexPointLQ, gl.TEXTURE_WRAP_T, gl.REPEAT);
   }
@@ -67,35 +59,17 @@ export default class Noise {
 
     this.gl.generateMipmap(this.gl.TEXTURE_2D);
 
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_WRAP_S,
-      this.gl.REPEAT
-    );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_WRAP_T,
-      this.gl.REPEAT
-    );
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
     this.gl.texParameteri(
       this.gl.TEXTURE_2D,
       this.gl.TEXTURE_MIN_FILTER,
       this.gl.LINEAR_MIPMAP_LINEAR
     );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_MAG_FILTER,
-      this.gl.LINEAR
-    );
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
     if (this.anisoExt) {
-      const max = this.gl.getParameter(
-        this.anisoExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT
-      );
-      this.gl.texParameterf(
-        this.gl.TEXTURE_2D,
-        this.anisoExt.TEXTURE_MAX_ANISOTROPY_EXT,
-        max
-      );
+      const max = this.gl.getParameter(this.anisoExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+      this.gl.texParameterf(this.gl.TEXTURE_2D, this.anisoExt.TEXTURE_MAX_ANISOTROPY_EXT, max);
     }
   }
 
@@ -118,40 +92,18 @@ export default class Noise {
 
     this.gl.generateMipmap(this.gl.TEXTURE_3D);
 
-    this.gl.texParameteri(
-      this.gl.TEXTURE_3D,
-      this.gl.TEXTURE_WRAP_S,
-      this.gl.REPEAT
-    );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_3D,
-      this.gl.TEXTURE_WRAP_T,
-      this.gl.REPEAT
-    );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_3D,
-      this.gl.TEXTURE_WRAP_R,
-      this.gl.REPEAT
-    );
+    this.gl.texParameteri(this.gl.TEXTURE_3D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_3D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_3D, this.gl.TEXTURE_WRAP_R, this.gl.REPEAT);
     this.gl.texParameteri(
       this.gl.TEXTURE_3D,
       this.gl.TEXTURE_MIN_FILTER,
       this.gl.LINEAR_MIPMAP_LINEAR
     );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_3D,
-      this.gl.TEXTURE_MAG_FILTER,
-      this.gl.LINEAR
-    );
+    this.gl.texParameteri(this.gl.TEXTURE_3D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
     if (this.anisoExt) {
-      const max = this.gl.getParameter(
-        this.anisoExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT
-      );
-      this.gl.texParameterf(
-        this.gl.TEXTURE_3D,
-        this.anisoExt.TEXTURE_MAX_ANISOTROPY_EXT,
-        max
-      );
+      const max = this.gl.getParameter(this.anisoExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+      this.gl.texParameterf(this.gl.TEXTURE_3D, this.anisoExt.TEXTURE_MAX_ANISOTROPY_EXT, max);
     }
   }
 
@@ -210,13 +162,10 @@ export default class Noise {
               const y2 = [];
               const y3 = [];
               for (let i = 0; i < 4; i++) {
-                y0[i] =
-                  texArr[baseY * 4 + ((baseX - zoom) % noiseSize) * 4 + i];
+                y0[i] = texArr[baseY * 4 + ((baseX - zoom) % noiseSize) * 4 + i];
                 y1[i] = texArr[baseY * 4 + (baseX % noiseSize) * 4 + i];
-                y2[i] =
-                  texArr[baseY * 4 + ((baseX + zoom) % noiseSize) * 4 + i];
-                y3[i] =
-                  texArr[baseY * 4 + ((baseX + zoom * 2) % noiseSize) * 4 + i];
+                y2[i] = texArr[baseY * 4 + ((baseX + zoom) % noiseSize) * 4 + i];
+                y3[i] = texArr[baseY * 4 + ((baseX + zoom * 2) % noiseSize) * 4 + i];
               }
 
               const t = (x % zoom) / zoom;
@@ -224,8 +173,7 @@ export default class Noise {
 
               for (let i = 0; i < 4; i++) {
                 const offset = x * 4 + i;
-                texArr[z * wordsPerSlice * 4 + y * wordsPerLine * 4 + offset] =
-                  result[i];
+                texArr[z * wordsPerSlice * 4 + y * wordsPerLine * 4 + offset] = result[i];
               }
             }
           }
@@ -245,19 +193,10 @@ export default class Noise {
               const y3 = [];
               for (let i = 0; i < 4; i++) {
                 const offset = x * 4 + baseZ * 4 + i;
-                y0[i] =
-                  texArr[
-                    ((baseY - zoom) % noiseSize) * wordsPerLine * 4 + offset
-                  ];
+                y0[i] = texArr[((baseY - zoom) % noiseSize) * wordsPerLine * 4 + offset];
                 y1[i] = texArr[(baseY % noiseSize) * wordsPerLine * 4 + offset];
-                y2[i] =
-                  texArr[
-                    ((baseY + zoom) % noiseSize) * wordsPerLine * 4 + offset
-                  ];
-                y3[i] =
-                  texArr[
-                    ((baseY + zoom * 2) % noiseSize) * wordsPerLine * 4 + offset
-                  ];
+                y2[i] = texArr[((baseY + zoom) % noiseSize) * wordsPerLine * 4 + offset];
+                y3[i] = texArr[((baseY + zoom * 2) % noiseSize) * wordsPerLine * 4 + offset];
               }
 
               const t = (y % zoom) / zoom;
@@ -285,21 +224,10 @@ export default class Noise {
               const y3 = [];
               for (let i = 0; i < 4; i++) {
                 const offset = x * 4 + baseY * 4 + i;
-                y0[i] =
-                  texArr[
-                    ((baseZ - zoom) % noiseSize) * wordsPerSlice * 4 + offset
-                  ];
-                y1[i] =
-                  texArr[(baseZ % noiseSize) * wordsPerSlice * 4 + offset];
-                y2[i] =
-                  texArr[
-                    ((baseZ + zoom) % noiseSize) * wordsPerSlice * 4 + offset
-                  ];
-                y3[i] =
-                  texArr[
-                    ((baseZ + zoom * 2) % noiseSize) * wordsPerSlice * 4 +
-                      offset
-                  ];
+                y0[i] = texArr[((baseZ - zoom) % noiseSize) * wordsPerSlice * 4 + offset];
+                y1[i] = texArr[(baseZ % noiseSize) * wordsPerSlice * 4 + offset];
+                y2[i] = texArr[((baseZ + zoom) % noiseSize) * wordsPerSlice * 4 + offset];
+                y3[i] = texArr[((baseZ + zoom * 2) % noiseSize) * wordsPerSlice * 4 + offset];
               }
 
               const t = (y % zoom) / zoom;
@@ -345,8 +273,7 @@ export default class Noise {
               y0[z] = texArr[baseY * 4 + ((baseX - zoom) % noiseSize) * 4 + z];
               y1[z] = texArr[baseY * 4 + (baseX % noiseSize) * 4 + z];
               y2[z] = texArr[baseY * 4 + ((baseX + zoom) % noiseSize) * 4 + z];
-              y3[z] =
-                texArr[baseY * 4 + ((baseX + zoom * 2) % noiseSize) * 4 + z];
+              y3[z] = texArr[baseY * 4 + ((baseX + zoom * 2) % noiseSize) * 4 + z];
             }
 
             const t = (x % zoom) / zoom;
@@ -369,19 +296,10 @@ export default class Noise {
             const y2 = [];
             const y3 = [];
             for (let z = 0; z < 4; z++) {
-              y0[z] =
-                texArr[
-                  ((baseY - zoom) % noiseSize) * noiseSize * 4 + x * 4 + z
-                ];
+              y0[z] = texArr[((baseY - zoom) % noiseSize) * noiseSize * 4 + x * 4 + z];
               y1[z] = texArr[(baseY % noiseSize) * noiseSize * 4 + x * 4 + z];
-              y2[z] =
-                texArr[
-                  ((baseY + zoom) % noiseSize) * noiseSize * 4 + x * 4 + z
-                ];
-              y3[z] =
-                texArr[
-                  ((baseY + zoom * 2) % noiseSize) * noiseSize * 4 + x * 4 + z
-                ];
+              y2[z] = texArr[((baseY + zoom) % noiseSize) * noiseSize * 4 + x * 4 + z];
+              y3[z] = texArr[((baseY + zoom * 2) % noiseSize) * noiseSize * 4 + x * 4 + z];
             }
 
             const t = (y % zoom) / zoom;

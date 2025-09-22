@@ -38,7 +38,6 @@ export function getRNG() {
   return globalRNG;
 }
 
-
 export function cleanup() {
   if (originalRand) {
     window.rand = originalRand;

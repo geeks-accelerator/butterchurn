@@ -1,4 +1,4 @@
-import FFT from "./fft";
+import FFT from './fft';
 
 export default class AudioProcessor {
   constructor(context) {
@@ -8,7 +8,7 @@ export default class AudioProcessor {
     this.fftSize = this.numSamps * 2;
 
     // PHASE 1 IMPROVEMENT: Add temporal smoothing factor
-    this.smoothingFactor = 0.8;  // Reduces jitter in visualizations
+    this.smoothingFactor = 0.8; // Reduces jitter in visualizations
     this.prevTimeArray = null;
 
     this.fft = new FFT(this.fftSize, 512, true);
@@ -81,8 +81,7 @@ export default class AudioProcessor {
       // Apply smoothing if we have previous data
       if (this.prevTimeArray && this.prevTimeArray[i] !== undefined) {
         this.timeArray[i] = Math.round(
-          this.smoothingFactor * this.prevTimeArray[i] +
-          (1 - this.smoothingFactor) * newValue
+          this.smoothingFactor * this.prevTimeArray[i] + (1 - this.smoothingFactor) * newValue
         );
       } else {
         this.timeArray[i] = newValue;
@@ -92,11 +91,9 @@ export default class AudioProcessor {
       this.timeByteArraySignedR[i] = this.timeByteArrayR[i] - 128;
 
       this.tempTimeArrayL[i] =
-        0.5 *
-        (this.timeByteArraySignedL[i] + this.timeByteArraySignedL[lastIdx]);
+        0.5 * (this.timeByteArraySignedL[i] + this.timeByteArraySignedL[lastIdx]);
       this.tempTimeArrayR[i] =
-        0.5 *
-        (this.timeByteArraySignedR[i] + this.timeByteArraySignedR[lastIdx]);
+        0.5 * (this.timeByteArraySignedR[i] + this.timeByteArraySignedR[lastIdx]);
 
       // Undersampled
       if (i % 2 === 0) {

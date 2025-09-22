@@ -8,12 +8,8 @@ export default class BlendPattern {
     this.aspectx = opts.aspectx;
     this.aspecty = opts.aspecty;
 
-    this.vertInfoA = new Float32Array(
-      (this.mesh_width + 1) * (this.mesh_height + 1)
-    );
-    this.vertInfoC = new Float32Array(
-      (this.mesh_width + 1) * (this.mesh_height + 1)
-    );
+    this.vertInfoA = new Float32Array((this.mesh_width + 1) * (this.mesh_height + 1));
+    this.vertInfoC = new Float32Array((this.mesh_width + 1) * (this.mesh_height + 1));
 
     this.createBlendPattern();
   }
@@ -60,10 +56,7 @@ export default class BlendPattern {
     this.aspectx = opts.aspectx;
     this.aspecty = opts.aspecty;
 
-    if (
-      this.mesh_width !== oldMeshWidth ||
-      this.mesh_height !== oldMeshHeight
-    ) {
+    if (this.mesh_width !== oldMeshWidth || this.mesh_height !== oldMeshHeight) {
       this.vertInfoA = BlendPattern.resizeMatrixValues(
         this.vertInfoA,
         oldMeshWidth,
@@ -161,9 +154,8 @@ export default class BlendPattern {
       this.vertInfoC[0] = this.rng.random();
       this.vertInfoC[this.mesh_width] = this.rng.random();
       this.vertInfoC[this.mesh_height * (this.mesh_width + 1)] = this.rng.random();
-      this.vertInfoC[
-        this.mesh_height * (this.mesh_width + 1) + this.mesh_width
-      ] = this.rng.random();
+      this.vertInfoC[this.mesh_height * (this.mesh_width + 1) + this.mesh_width] =
+        this.rng.random();
       this.genPlasma(0, this.mesh_width, 0, this.mesh_height, 0.25);
 
       let minc = this.vertInfoC[0];

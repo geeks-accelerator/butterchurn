@@ -23,7 +23,7 @@ const baseConfig = {
 };
 
 const configs = [
-  // Main butterchurn bundle
+  // Main butterchurn bundle (v1)
   {
     ...baseConfig,
     input: 'src/index.js',
@@ -39,6 +39,24 @@ const configs = [
       ...baseConfig.plugins,
       ...(isProduction ? [terser()] : []),
     ],
+  },
+  // Butterchurn v2 bundle
+  {
+    ...baseConfig,
+    input: 'src/v2/index.js',
+    output: [
+      {
+        file: isProduction ? 'dist/butterchurn-v2.min.js' : 'dist/butterchurn-v2.js',
+        format: 'es',
+        sourcemap: true,
+        exports: 'named',
+      },
+    ],
+    plugins: [
+      ...baseConfig.plugins,
+      ...(isProduction ? [terser()] : []),
+    ],
+    external: [], // Bundle everything including binaryen
   },
   // isSupported bundle
   {

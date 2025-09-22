@@ -28,7 +28,7 @@ export class SeededRandom {
   next() {
     // xorshift128+ algorithm
     let t = this.state[3];
-    let s = this.state[0];
+    const s = this.state[0];
     this.state[3] = this.state[2];
     this.state[2] = this.state[1];
     this.state[1] = s;
@@ -82,16 +82,16 @@ export function createRNGContext(seed = 1) {
       } else {
         rng.reset(seed);
       }
-    }
+    },
   };
 }
 
 export function createDefaultRNGContext() {
   return {
     random: Math.random,
-    rand: (x) => x < 1 ? Math.random() : Math.random() * Math.floor(x),
+    rand: (x) => (x < 1 ? Math.random() : Math.random() * Math.floor(x)),
     randint: (x) => Math.floor((x < 1 ? Math.random() : Math.random() * Math.floor(x)) + 1),
     getRNG: () => null,
-    reset: () => {}
+    reset: () => {},
   };
 }

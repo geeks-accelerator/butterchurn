@@ -1,23 +1,24 @@
-import AudioLevels from "../audio/audioLevels";
-import blankPreset from "../blankPreset";
-import PresetEquationRunner from "../equations/presetEquationRunner";
-import PresetEquationRunnerWASM from "../equations/presetEquationRunnerWASM";
-import BasicWaveform from "./waves/basicWaveform";
-import CustomWaveform from "./waves/customWaveform";
-import CustomShape from "./shapes/customShape";
-import Border from "./sprites/border";
-import DarkenCenter from "./sprites/darkenCenter";
-import MotionVectors from "./motionVectors/motionVectors";
-import WarpShader from "./shaders/warp";
-import CompShader from "./shaders/comp";
-import OutputShader from "./shaders/output";
-import ResampleShader from "./shaders/resample";
-import BlurShader from "./shaders/blur/blur";
-import Noise from "../noise/noise";
-import ImageTextures from "../image/imageTextures";
-import TitleText from "./text/titleText";
-import BlendPattern from "./blendPattern";
-import Utils from "../utils";
+import AudioLevels from '../audio/audioLevels';
+import blankPreset from '../blankPreset';
+import PresetEquationRunner from '../equations/presetEquationRunner';
+import PresetEquationRunnerWASM from '../equations/presetEquationRunnerWASM';
+import Noise from '../noise/noise';
+import ImageTextures from '../image/imageTextures';
+import Utils from '../utils';
+
+import BasicWaveform from './waves/basicWaveform';
+import CustomWaveform from './waves/customWaveform';
+import CustomShape from './shapes/customShape';
+import Border from './sprites/border';
+import DarkenCenter from './sprites/darkenCenter';
+import MotionVectors from './motionVectors/motionVectors';
+import WarpShader from './shaders/warp';
+import CompShader from './shaders/comp';
+import OutputShader from './shaders/output';
+import ResampleShader from './shaders/resample';
+import BlurShader from './shaders/blur/blur';
+import TitleText from './text/titleText';
+import BlendPattern from './blendPattern';
 
 export default class Renderer {
   constructor(gl, audio, opts) {
@@ -52,10 +53,8 @@ export default class Renderer {
     this.outputFXAA = opts.outputFXAA || false;
     this.texsizeX = this.width * this.pixelRatio * this.textureRatio;
     this.texsizeY = this.height * this.pixelRatio * this.textureRatio;
-    this.aspectx =
-      this.texsizeY > this.texsizeX ? this.texsizeX / this.texsizeY : 1;
-    this.aspecty =
-      this.texsizeX > this.texsizeY ? this.texsizeY / this.texsizeX : 1;
+    this.aspectx = this.texsizeY > this.texsizeX ? this.texsizeX / this.texsizeY : 1;
+    this.aspecty = this.texsizeX > this.texsizeY ? this.texsizeY / this.texsizeX : 1;
     this.invAspectx = 1.0 / this.aspectx;
     this.invAspecty = 1.0 / this.aspecty;
 
@@ -85,9 +84,9 @@ export default class Renderer {
     this.compTexture = this.gl.createTexture();
 
     this.anisoExt =
-      this.gl.getExtension("EXT_texture_filter_anisotropic") ||
-      this.gl.getExtension("MOZ_EXT_texture_filter_anisotropic") ||
-      this.gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic");
+      this.gl.getExtension('EXT_texture_filter_anisotropic') ||
+      this.gl.getExtension('MOZ_EXT_texture_filter_anisotropic') ||
+      this.gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
 
     this.bindFrameBufferTexture(this.prevFrameBuffer, this.prevTexture);
     this.bindFrameBufferTexture(this.targetFrameBuffer, this.targetTexture);
@@ -118,18 +117,10 @@ export default class Renderer {
     this.blurTexture2 = this.blurShader2.blurVerticalTexture;
     this.blurTexture3 = this.blurShader3.blurVerticalTexture;
     this.basicWaveform = new BasicWaveform(gl, params);
-    this.customWaveforms = Utils.range(4).map(
-      (i) => new CustomWaveform(i, gl, params)
-    );
-    this.customShapes = Utils.range(4).map(
-      (i) => new CustomShape(i, gl, params)
-    );
-    this.prevCustomWaveforms = Utils.range(4).map(
-      (i) => new CustomWaveform(i, gl, params)
-    );
-    this.prevCustomShapes = Utils.range(4).map(
-      (i) => new CustomShape(i, gl, params)
-    );
+    this.customWaveforms = Utils.range(4).map((i) => new CustomWaveform(i, gl, params));
+    this.customShapes = Utils.range(4).map((i) => new CustomShape(i, gl, params));
+    this.prevCustomWaveforms = Utils.range(4).map((i) => new CustomWaveform(i, gl, params));
+    this.prevCustomShapes = Utils.range(4).map((i) => new CustomShape(i, gl, params));
     this.darkenCenter = new DarkenCenter(gl, params);
     this.innerBorder = new Border(gl, params);
     this.outerBorder = new Border(gl, params);
@@ -142,12 +133,11 @@ export default class Renderer {
       startTime: -1,
     };
 
-    this.warpUVs = new Float32Array(
-      (this.mesh_width + 1) * (this.mesh_height + 1) * 2
-    );
-    this.warpColor = new Float32Array(
-      (this.mesh_width + 1) * (this.mesh_height + 1) * 4
-    );
+    this.warpUVs = new Float32Array((this.mesh_width + 1) * (this.mesh_height + 1) * 2);
+    this.warpColor = new Float32Array((this.mesh_width + 1) * (this.mesh_height + 1) * 4);
+    // BLENDING FIX: Separate color buffer for previous preset during blending
+    // This fixes the fade-to-black bug where both presets used the same alpha values
+    this.prevWarpColor = new Float32Array((this.mesh_width + 1) * (this.mesh_height + 1) * 4);
 
     this.gl.clearColor(0, 0, 0, 1);
 
@@ -167,16 +157,8 @@ export default class Renderer {
 
     this.preset = blankPreset;
     this.prevPreset = this.preset;
-    this.presetEquationRunner = new PresetEquationRunner(
-      this.preset,
-      globalVars,
-      params
-    );
-    this.prevPresetEquationRunner = new PresetEquationRunner(
-      this.prevPreset,
-      globalVars,
-      params
-    );
+    this.presetEquationRunner = new PresetEquationRunner(this.preset, globalVars, params);
+    this.prevPresetEquationRunner = new PresetEquationRunner(this.prevPreset, globalVars, params);
 
     if (!this.preset.useWASM) {
       this.regVars = this.presetEquationRunner.mdVSRegs;
@@ -196,8 +178,28 @@ export default class Renderer {
   }
 
   loadPreset(preset, blendTime) {
+    console.log(
+      '[loadPreset] Current preset before switch:',
+      this.preset === this.blankPreset ? 'BLANK PRESET' : 'real preset'
+    );
+    console.log('[loadPreset] New preset has desc?', preset.desc ? `Yes: ${preset.desc}` : 'No');
+
+    // CRITICAL: Check if we're trying to load a blank/invalid preset
+    // A preset is blank if it's literally the blankPreset object OR has no equations
+    const isNewPresetBlank =
+      preset === this.blankPreset ||
+      (!preset.frame_eqs_str && !preset.pixel_eqs_str && !preset.comp_eqs_str);
+    if (isNewPresetBlank && this.preset !== this.blankPreset) {
+      console.warn('[loadPreset] WARNING: Attempting to load blank/invalid preset, skipping!');
+      return; // Don't load blank presets after initialization
+    }
+
     this.blendPattern.createBlendPattern();
-    this.blending = true;
+
+    // CRITICAL: Never blend from blank preset - it causes black screen
+    const isComingFromBlankPreset = this.preset === this.blankPreset;
+    const hasValidPreviousPreset = this.presetEquationRunner != null && !isComingFromBlankPreset;
+    this.blending = hasValidPreviousPreset && blendTime > 0;
     this.blendStartTime = this.time;
     this.blendDuration = blendTime;
     this.blendProgress = 0;
@@ -234,24 +236,13 @@ export default class Renderer {
     if (preset.useWASM) {
       this.preset.globalPools.perFrame.old_wave_mode.value = this.prevPreset.baseVals.wave_mode;
       this.preset.baseVals.old_wave_mode = this.prevPreset.baseVals.wave_mode;
-      this.presetEquationRunner = new PresetEquationRunnerWASM(
-        this.preset,
-        globalVars,
-        params
-      );
+      this.presetEquationRunner = new PresetEquationRunnerWASM(this.preset, globalVars, params);
       if (this.preset.pixel_eqs_initialize_array) {
-        this.preset.pixel_eqs_initialize_array(
-          this.mesh_width,
-          this.mesh_height
-        );
+        this.preset.pixel_eqs_initialize_array(this.mesh_width, this.mesh_height);
       }
     } else {
       this.preset.baseVals.old_wave_mode = this.prevPreset.baseVals.wave_mode;
-      this.presetEquationRunner = new PresetEquationRunner(
-        this.preset,
-        globalVars,
-        params
-      );
+      this.presetEquationRunner = new PresetEquationRunner(this.preset, globalVars, params);
       this.regVars = this.presetEquationRunner.mdVSRegs;
     }
 
@@ -276,10 +267,7 @@ export default class Renderer {
     }
 
     if (compText.length !== 0) {
-      this.numBlurPasses = Math.max(
-        this.numBlurPasses,
-        Renderer.getHighestBlur(compText)
-      );
+      this.numBlurPasses = Math.max(this.numBlurPasses, Renderer.getHighestBlur(compText));
     }
   }
 
@@ -299,20 +287,14 @@ export default class Renderer {
     this.textureRatio = opts.textureRatio || this.textureRatio;
     this.texsizeX = width * this.pixelRatio * this.textureRatio;
     this.texsizeY = height * this.pixelRatio * this.textureRatio;
-    this.aspectx =
-      this.texsizeY > this.texsizeX ? this.texsizeX / this.texsizeY : 1;
-    this.aspecty =
-      this.texsizeX > this.texsizeY ? this.texsizeY / this.texsizeX : 1;
+    this.aspectx = this.texsizeY > this.texsizeX ? this.texsizeX / this.texsizeY : 1;
+    this.aspecty = this.texsizeX > this.texsizeY ? this.texsizeY / this.texsizeX : 1;
 
     if (this.texsizeX !== oldTexsizeX || this.texsizeY !== oldTexsizeY) {
       // copy target texture, because we flip prev/target at start of render
       const targetTextureNew = this.gl.createTexture();
       this.bindFrameBufferTexture(this.targetFrameBuffer, targetTextureNew);
-      this.bindFrambufferAndSetViewport(
-        this.targetFrameBuffer,
-        this.texsizeX,
-        this.texsizeY
-      );
+      this.bindFrambufferAndSetViewport(this.targetFrameBuffer, this.texsizeX, this.texsizeY);
 
       this.resampleShader.renderQuadTexture(this.targetTexture);
 
@@ -374,12 +356,10 @@ export default class Renderer {
     this.titleText.updateGlobals(params);
     this.blendPattern.updateGlobals(params);
 
-    this.warpUVs = new Float32Array(
-      (this.mesh_width + 1) * (this.mesh_height + 1) * 2
-    );
-    this.warpColor = new Float32Array(
-      (this.mesh_width + 1) * (this.mesh_height + 1) * 4
-    );
+    this.warpUVs = new Float32Array((this.mesh_width + 1) * (this.mesh_height + 1) * 2);
+    this.warpColor = new Float32Array((this.mesh_width + 1) * (this.mesh_height + 1) * 4);
+    // BLENDING FIX: Re-allocate previous preset color buffer on resize
+    this.prevWarpColor = new Float32Array((this.mesh_width + 1) * (this.mesh_height + 1) * 4);
 
     if (this.preset.pixel_eqs_initialize_array) {
       this.preset.pixel_eqs_initialize_array(this.mesh_width, this.mesh_height);
@@ -402,8 +382,7 @@ export default class Renderer {
     this.time += 1.0 / this.fps;
 
     if (this.blending) {
-      this.blendProgress =
-        (this.time - this.blendStartTime) / this.blendDuration;
+      this.blendProgress = (this.time - this.blendStartTime) / this.blendDuration;
       if (this.blendProgress > 1.0) {
         this.blending = false;
       }
@@ -448,6 +427,11 @@ export default class Renderer {
     let offset = 0;
     let offsetColor = 0;
     if (!presetEquationRunner.preset.useWASM) {
+      // Clear previous preset buffer when not blending (consistency with WASM path)
+      if (!blending) {
+        this.prevWarpColor.fill(0);
+      }
+
       let mdVSVertex = Utils.cloneVars(mdVSFrame);
 
       let warp = mdVSVertex.warp;
@@ -465,9 +449,7 @@ export default class Renderer {
         for (let ix = 0; ix < gridX1; ix++) {
           const x = (ix / gridX) * 2.0 - 1.0;
           const y = (iz / gridZ) * 2.0 - 1.0;
-          const rad = Math.sqrt(
-            x * x * aspectx * aspectx + y * y * aspecty * aspecty
-          );
+          const rad = Math.sqrt(x * x * aspectx * aspectx + y * y * aspecty * aspecty);
 
           if (presetEquationRunner.runVertEQs) {
             let ang;
@@ -520,27 +502,19 @@ export default class Renderer {
             u +=
               warp *
               0.0035 *
-              Math.sin(
-                warpTimeV * 0.333 + warpScaleInv * (x * warpf0 - y * warpf3)
-              );
+              Math.sin(warpTimeV * 0.333 + warpScaleInv * (x * warpf0 - y * warpf3));
             v +=
               warp *
               0.0035 *
-              Math.cos(
-                warpTimeV * 0.375 - warpScaleInv * (x * warpf2 + y * warpf1)
-              );
+              Math.cos(warpTimeV * 0.375 - warpScaleInv * (x * warpf2 + y * warpf1));
             u +=
               warp *
               0.0035 *
-              Math.cos(
-                warpTimeV * 0.753 - warpScaleInv * (x * warpf1 - y * warpf2)
-              );
+              Math.cos(warpTimeV * 0.753 - warpScaleInv * (x * warpf1 - y * warpf2));
             v +=
               warp *
               0.0035 *
-              Math.sin(
-                warpTimeV * 0.825 + warpScaleInv * (x * warpf0 + y * warpf3)
-              );
+              Math.sin(warpTimeV * 0.825 + warpScaleInv * (x * warpf0 + y * warpf3));
           }
 
           const u2 = u - cx;
@@ -575,13 +549,19 @@ export default class Renderer {
             mix2 = Math.clamp(mix2, 0, 1);
 
             this.warpUVs[offset] = this.warpUVs[offset] * mix2 + u * (1 - mix2);
-            this.warpUVs[offset + 1] =
-              this.warpUVs[offset + 1] * mix2 + v * (1 - mix2);
+            this.warpUVs[offset + 1] = this.warpUVs[offset + 1] * mix2 + v * (1 - mix2);
 
+            // BLENDING FIX: Set normal warp color
             this.warpColor[offsetColor + 0] = 1;
             this.warpColor[offsetColor + 1] = 1;
             this.warpColor[offsetColor + 2] = 1;
-            this.warpColor[offsetColor + 3] = mix2;
+            this.warpColor[offsetColor + 3] = 1 - mix2; // NEW preset fades IN (0→1)
+
+            // BLENDING FIX: Store previous preset alpha in separate buffer (NON-WASM fix)
+            this.prevWarpColor[offsetColor + 0] = 1;
+            this.prevWarpColor[offsetColor + 1] = 1;
+            this.prevWarpColor[offsetColor + 2] = 1;
+            this.prevWarpColor[offsetColor + 3] = mix2; // OLD preset fades OUT (1→0)
           }
 
           offset += 2;
@@ -594,11 +574,7 @@ export default class Renderer {
       const varPool = presetEquationRunner.preset.globalPools.perVertex;
 
       Utils.setWasm(varPool, globalVars, presetEquationRunner.globalKeys);
-      Utils.setWasm(
-        varPool,
-        presetEquationRunner.mdVSQAfterFrame,
-        presetEquationRunner.qs
-      );
+      Utils.setWasm(varPool, presetEquationRunner.mdVSQAfterFrame, presetEquationRunner.qs);
 
       varPool.zoom.value = mdVSFrame.zoom;
       varPool.zoomexp.value = mdVSFrame.zoomexp;
@@ -625,6 +601,8 @@ export default class Renderer {
       if (!blending) {
         this.warpUVs = presetEquationRunner.preset.pixel_eqs_get_array();
         this.warpColor.fill(1);
+        // Clear previous preset buffer when not blending
+        this.prevWarpColor.fill(0);
       } else {
         const newWarpUVs = presetEquationRunner.preset.pixel_eqs_get_array();
 
@@ -641,13 +619,19 @@ export default class Renderer {
             mix2 = Math.clamp(mix2, 0, 1);
 
             this.warpUVs[offset] = this.warpUVs[offset] * mix2 + u * (1 - mix2);
-            this.warpUVs[offset + 1] =
-              this.warpUVs[offset + 1] * mix2 + v * (1 - mix2);
+            this.warpUVs[offset + 1] = this.warpUVs[offset + 1] * mix2 + v * (1 - mix2);
 
+            // BLENDING FIX: Set normal warp color
             this.warpColor[offsetColor + 0] = 1;
             this.warpColor[offsetColor + 1] = 1;
             this.warpColor[offsetColor + 2] = 1;
-            this.warpColor[offsetColor + 3] = mix2;
+            this.warpColor[offsetColor + 3] = 1 - mix2; // NEW preset fades IN (0→1)
+
+            // BLENDING FIX: Store previous preset alpha in separate buffer (WASM fix)
+            this.prevWarpColor[offsetColor + 0] = 1;
+            this.prevWarpColor[offsetColor + 1] = 1;
+            this.prevWarpColor[offsetColor + 2] = 1;
+            this.prevWarpColor[offsetColor + 3] = mix2; // OLD preset fades OUT (1→0)
 
             offset += 2;
             offsetColor += 4;
@@ -671,8 +655,7 @@ export default class Renderer {
     mixedFrame.wave_b = mix * mdVSFrame.wave_b + mix2 * mdVSFramePrev.wave_b;
     mixedFrame.wave_x = mix * mdVSFrame.wave_x + mix2 * mdVSFramePrev.wave_x;
     mixedFrame.wave_y = mix * mdVSFrame.wave_y + mix2 * mdVSFramePrev.wave_y;
-    mixedFrame.wave_mystery =
-      mix * mdVSFrame.wave_mystery + mix2 * mdVSFramePrev.wave_mystery;
+    mixedFrame.wave_mystery = mix * mdVSFrame.wave_mystery + mix2 * mdVSFramePrev.wave_mystery;
     mixedFrame.ob_size = mix * mdVSFrame.ob_size + mix2 * mdVSFramePrev.ob_size;
     mixedFrame.ob_r = mix * mdVSFrame.ob_r + mix2 * mdVSFramePrev.ob_r;
     mixedFrame.ob_g = mix * mdVSFrame.ob_g + mix2 * mdVSFramePrev.ob_g;
@@ -692,33 +675,22 @@ export default class Renderer {
     mixedFrame.mv_g = mix * mdVSFrame.mv_g + mix2 * mdVSFramePrev.mv_g;
     mixedFrame.mv_b = mix * mdVSFrame.mv_b + mix2 * mdVSFramePrev.mv_b;
     mixedFrame.mv_a = mix * mdVSFrame.mv_a + mix2 * mdVSFramePrev.mv_a;
-    mixedFrame.echo_zoom =
-      mix * mdVSFrame.echo_zoom + mix2 * mdVSFramePrev.echo_zoom;
-    mixedFrame.echo_alpha =
-      mix * mdVSFrame.echo_alpha + mix2 * mdVSFramePrev.echo_alpha;
-    mixedFrame.echo_orient =
-      mix * mdVSFrame.echo_orient + mix2 * mdVSFramePrev.echo_orient;
-    mixedFrame.wave_dots =
-      mix < snapPoint ? mdVSFramePrev.wave_dots : mdVSFrame.wave_dots;
-    mixedFrame.wave_thick =
-      mix < snapPoint ? mdVSFramePrev.wave_thick : mdVSFrame.wave_thick;
-    mixedFrame.additivewave =
-      mix < snapPoint ? mdVSFramePrev.additivewave : mdVSFrame.additivewave;
+    mixedFrame.echo_zoom = mix * mdVSFrame.echo_zoom + mix2 * mdVSFramePrev.echo_zoom;
+    mixedFrame.echo_alpha = mix * mdVSFrame.echo_alpha + mix2 * mdVSFramePrev.echo_alpha;
+    mixedFrame.echo_orient = mix * mdVSFrame.echo_orient + mix2 * mdVSFramePrev.echo_orient;
+    mixedFrame.wave_dots = mix < snapPoint ? mdVSFramePrev.wave_dots : mdVSFrame.wave_dots;
+    mixedFrame.wave_thick = mix < snapPoint ? mdVSFramePrev.wave_thick : mdVSFrame.wave_thick;
+    mixedFrame.additivewave = mix < snapPoint ? mdVSFramePrev.additivewave : mdVSFrame.additivewave;
     mixedFrame.wave_brighten =
       mix < snapPoint ? mdVSFramePrev.wave_brighten : mdVSFrame.wave_brighten;
     mixedFrame.darken_center =
       mix < snapPoint ? mdVSFramePrev.darken_center : mdVSFrame.darken_center;
-    mixedFrame.gammaadj =
-      mix < snapPoint ? mdVSFramePrev.gammaadj : mdVSFrame.gammaadj;
+    mixedFrame.gammaadj = mix < snapPoint ? mdVSFramePrev.gammaadj : mdVSFrame.gammaadj;
     mixedFrame.wrap = mix < snapPoint ? mdVSFramePrev.wrap : mdVSFrame.wrap;
-    mixedFrame.invert =
-      mix < snapPoint ? mdVSFramePrev.invert : mdVSFrame.invert;
-    mixedFrame.brighten =
-      mix < snapPoint ? mdVSFramePrev.brighten : mdVSFrame.brighten;
-    mixedFrame.darken =
-      mix < snapPoint ? mdVSFramePrev.darken : mdVSFrame.darken;
-    mixedFrame.solarize =
-      mix < snapPoint ? mdVSFramePrev.brighten : mdVSFrame.solarize;
+    mixedFrame.invert = mix < snapPoint ? mdVSFramePrev.invert : mdVSFrame.invert;
+    mixedFrame.brighten = mix < snapPoint ? mdVSFramePrev.brighten : mdVSFrame.brighten;
+    mixedFrame.darken = mix < snapPoint ? mdVSFramePrev.darken : mdVSFrame.darken;
+    mixedFrame.solarize = mix < snapPoint ? mdVSFramePrev.brighten : mdVSFrame.solarize;
     mixedFrame.b1n = mix * mdVSFrame.b1n + mix2 * mdVSFramePrev.b1n;
     mixedFrame.b2n = mix * mdVSFrame.b2n + mix2 * mdVSFramePrev.b2n;
     mixedFrame.b3n = mix * mdVSFrame.b3n + mix2 * mdVSFramePrev.b3n;
@@ -788,35 +760,17 @@ export default class Renderer {
 
     this.gl.generateMipmap(this.gl.TEXTURE_2D);
 
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_WRAP_S,
-      this.gl.CLAMP_TO_EDGE
-    );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_WRAP_T,
-      this.gl.CLAMP_TO_EDGE
-    );
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
     this.gl.texParameteri(
       this.gl.TEXTURE_2D,
       this.gl.TEXTURE_MIN_FILTER,
       this.gl.LINEAR_MIPMAP_LINEAR
     );
-    this.gl.texParameteri(
-      this.gl.TEXTURE_2D,
-      this.gl.TEXTURE_MAG_FILTER,
-      this.gl.LINEAR
-    );
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
     if (this.anisoExt) {
-      const max = this.gl.getParameter(
-        this.anisoExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT
-      );
-      this.gl.texParameterf(
-        this.gl.TEXTURE_2D,
-        this.anisoExt.TEXTURE_MAX_ANISOTROPY_EXT,
-        max
-      );
+      const max = this.gl.getParameter(this.anisoExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+      this.gl.texParameterf(this.gl.TEXTURE_2D, this.anisoExt.TEXTURE_MAX_ANISOTROPY_EXT, max);
     }
 
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, targetFrameBuffer);
@@ -874,12 +828,7 @@ export default class Renderer {
 
     const mdVSFrame = this.presetEquationRunner.runFrameEquations(globalVars);
 
-    this.runPixelEquations(
-      this.presetEquationRunner,
-      mdVSFrame,
-      globalVars,
-      false
-    );
+    this.runPixelEquations(this.presetEquationRunner, mdVSFrame, globalVars, false);
 
     if (!this.preset.useWASM) {
       Object.assign(this.regVars, Utils.pick(this.mdVSVertex, this.regs));
@@ -888,9 +837,7 @@ export default class Renderer {
 
     let mdVSFrameMixed;
     if (this.blending) {
-      this.prevMDVSFrame = this.prevPresetEquationRunner.runFrameEquations(
-        prevGlobalVars
-      );
+      this.prevMDVSFrame = this.prevPresetEquationRunner.runFrameEquations(prevGlobalVars);
       this.runPixelEquations(
         this.prevPresetEquationRunner,
         this.prevMDVSFrame,
@@ -918,11 +865,7 @@ export default class Renderer {
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.prevTexture);
     this.gl.generateMipmap(this.gl.TEXTURE_2D);
 
-    this.bindFrambufferAndSetViewport(
-      this.targetFrameBuffer,
-      this.texsizeX,
-      this.texsizeY
-    );
+    this.bindFrambufferAndSetViewport(this.targetFrameBuffer, this.texsizeX, this.texsizeY);
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
     this.gl.enable(this.gl.BLEND);
@@ -931,7 +874,7 @@ export default class Renderer {
 
     const { blurMins, blurMaxs } = Renderer.getBlurValues(mdVSFrameMixed);
 
-    if (!this.blending) {
+    if (!this.blending || !this.prevPresetEquationRunner) {
       this.warpShader.renderQuadTexture(
         false,
         this.prevTexture,
@@ -957,7 +900,7 @@ export default class Renderer {
         this.prevMDVSFrame,
         this.prevPresetEquationRunner.mdVSQAfterFrame,
         this.warpUVs,
-        this.warpColor
+        this.prevWarpColor // Use separate alpha buffer for previous preset
       );
 
       this.warpShader.renderQuadTexture(
@@ -976,37 +919,18 @@ export default class Renderer {
     }
 
     if (this.numBlurPasses > 0) {
-      this.blurShader1.renderBlurTexture(
-        this.targetTexture,
-        mdVSFrame,
-        blurMins,
-        blurMaxs
-      );
+      this.blurShader1.renderBlurTexture(this.targetTexture, mdVSFrame, blurMins, blurMaxs);
 
       if (this.numBlurPasses > 1) {
-        this.blurShader2.renderBlurTexture(
-          this.blurTexture1,
-          mdVSFrame,
-          blurMins,
-          blurMaxs
-        );
+        this.blurShader2.renderBlurTexture(this.blurTexture1, mdVSFrame, blurMins, blurMaxs);
 
         if (this.numBlurPasses > 2) {
-          this.blurShader3.renderBlurTexture(
-            this.blurTexture2,
-            mdVSFrame,
-            blurMins,
-            blurMaxs
-          );
+          this.blurShader3.renderBlurTexture(this.blurTexture2, mdVSFrame, blurMins, blurMaxs);
         }
       }
 
       // rebind target texture framebuffer
-      this.bindFrambufferAndSetViewport(
-        this.targetFrameBuffer,
-        this.texsizeX,
-        this.texsizeY
-      );
+      this.bindFrambufferAndSetViewport(this.targetFrameBuffer, this.texsizeX, this.texsizeY);
     }
 
     this.motionVectors.drawMotionVectors(mdVSFrameMixed, this.warpUVs);
@@ -1091,15 +1015,10 @@ export default class Renderer {
       mdVSFrameMixed.ib_b,
       mdVSFrameMixed.ib_a,
     ];
-    this.innerBorder.drawBorder(
-      innerColor,
-      mdVSFrameMixed.ib_size,
-      mdVSFrameMixed.ob_size
-    );
+    this.innerBorder.drawBorder(innerColor, mdVSFrameMixed.ib_size, mdVSFrameMixed.ob_size);
 
     if (this.supertext.startTime >= 0) {
-      const progress =
-        (this.time - this.supertext.startTime) / this.supertext.duration;
+      const progress = (this.time - this.supertext.startTime) / this.supertext.duration;
       if (progress >= 1) {
         this.titleText.renderTitle(progress, true, globalVars);
       }
@@ -1115,11 +1034,7 @@ export default class Renderer {
 
   renderToScreen() {
     if (this.outputFXAA) {
-      this.bindFrambufferAndSetViewport(
-        this.compFrameBuffer,
-        this.texsizeX,
-        this.texsizeY
-      );
+      this.bindFrambufferAndSetViewport(this.compFrameBuffer, this.texsizeX, this.texsizeY);
     } else {
       this.bindFrambufferAndSetViewport(null, this.width, this.height);
     }
@@ -1131,7 +1046,7 @@ export default class Renderer {
 
     const { blurMins, blurMaxs } = Renderer.getBlurValues(this.mdVSFrameMixed);
 
-    if (!this.blending) {
+    if (!this.blending || !this.prevPresetEquationRunner) {
       this.compShader.renderQuadTexture(
         false,
         this.targetTexture,
@@ -1155,7 +1070,7 @@ export default class Renderer {
         blurMaxs,
         this.prevMDVSFrame,
         this.prevPresetEquationRunner.mdVSQAfterFrame,
-        this.warpColor
+        this.prevWarpColor // Use separate alpha buffer for previous preset
       );
 
       this.compShader.renderQuadTexture(
@@ -1173,8 +1088,7 @@ export default class Renderer {
     }
 
     if (this.supertext.startTime >= 0) {
-      const progress =
-        (this.time - this.supertext.startTime) / this.supertext.duration;
+      const progress = (this.time - this.supertext.startTime) / this.supertext.duration;
       this.titleText.renderTitle(progress, false, this.globalVars);
 
       if (progress >= 1) {
@@ -1234,15 +1148,13 @@ export default class Renderer {
     // flip data
     Array.from({ length: this.texsizeY }, (val, i) =>
       data.slice(i * this.texsizeX * 4, (i + 1) * this.texsizeX * 4)
-    ).forEach((val, i) =>
-      data.set(val, (this.texsizeY - i - 1) * this.texsizeX * 4)
-    );
+    ).forEach((val, i) => data.set(val, (this.texsizeY - i - 1) * this.texsizeX * 4));
 
-    const canvas = document.createElement("canvas");
+    const canvas = document.createElement('canvas');
     canvas.width = this.texsizeX;
     canvas.height = this.texsizeY;
 
-    const context = canvas.getContext("2d", { willReadFrequently: false });
+    const context = canvas.getContext('2d', { willReadFrequently: false });
     const imageData = context.createImageData(this.texsizeX, this.texsizeY);
     imageData.data.set(data);
     context.putImageData(imageData, 0, 0);
@@ -1267,11 +1179,11 @@ export default class Renderer {
       data
     );
 
-    const canvas = document.createElement("canvas");
+    const canvas = document.createElement('canvas');
     canvas.width = this.texsizeX;
     canvas.height = this.texsizeY;
 
-    const context = canvas.getContext("2d", { willReadFrequently: false });
+    const context = canvas.getContext('2d', { willReadFrequently: false });
     const imageData = context.createImageData(this.texsizeX, this.texsizeY);
     imageData.data.set(data);
     context.putImageData(imageData, 0, 0);
