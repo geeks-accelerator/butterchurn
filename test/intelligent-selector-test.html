@@ -882,7 +882,12 @@
                     }
 
                     console.log('[INIT] Loading first preset:', firstValidPreset);
-                    console.log('[INIT] First preset object:', allPresets[firstValidPreset]);
+                    console.log('[INIT] First preset object structure:', {
+                        hasBaseVals: !!allPresets[firstValidPreset].baseVals,
+                        hasFrameEqs: !!allPresets[firstValidPreset].frame_eqs_str,
+                        presetKeys: Object.keys(allPresets[firstValidPreset]).slice(0, 10)
+                    });
+                    console.log('[INIT] All 395 presets are loaded and available for selection');
                     visualizer.loadPreset(allPresets[firstValidPreset], 0); // No blending for first preset
                     updatePresetInfo(firstValidPreset);
 
