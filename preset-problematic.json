@@ -1,0 +1,23 @@
+{
+  "problematic_presets": {
+    "description": "Presets that consistently show only a single solid color",
+    "presets": [
+    ],
+    "notes": {
+      "identification": "These presets were identified through manual testing",
+      "reasons": [
+        "Some presets require specific audio levels to initialize",
+        "Some have broken equations that compile but don't render",
+        "Some depend on features not available in WebGL implementation"
+      ],
+      "testing": "To identify problematic presets, look for those that remain black even after warmup period"
+    }
+  },
+  "audio_dependent_presets": {
+    "description": "Presets that only show visuals with audio input above threshold",
+    "presets": [
+    ],
+    "min_audio_level": 0.1,
+    "notes": "These presets need actual music playing, not silence"
+  }
+}

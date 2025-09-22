@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Preset Structure</title>
+    <style>
+        body { font-family: monospace; background: #000; color: #0f0; padding: 20px; }
+        pre { border: 1px solid #0f0; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Debug V1 Preset Structure</h1>
+    <div id="output"></div>
+
+    <!-- Load preset packs -->
+    <script src="../presets/full-collection/butterchurnPresetsMinimal.min.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(msg) {
+            const pre = document.createElement('pre');
+            pre.textContent = msg;
+            output.appendChild(pre);
+        }
+
+        // Check what butterchurnPresetsMinimal is
+        const minimal = window.butterchurnPresetsMinimal;
+        log('butterchurnPresetsMinimal type: ' + typeof minimal);
+        log('Is function? ' + (typeof minimal === 'function'));
+
+        if (typeof minimal === 'function') {
+            // Try to instantiate it
+            try {
+                const instance = new minimal();
+                log('\nCreated instance successfully!');
+                log('Instance type: ' + typeof instance);
+                log('Instance constructor: ' + instance.constructor.name);
+
+                // Check all properties
+                const keys = Object.keys(instance);
+                log('Instance has ' + keys.length + ' keys');
+
+                // Check for methods on instance
+                log('\nChecking for methods on instance...');
+                for (let prop in instance) {
+                    if (typeof instance[prop] === 'function') {
+                        log('Found method: ' + prop);
+                    }
+                }
+
+                // Check prototype and its chain
+                log('\nChecking prototype chain...');
+                let proto = instance;
+                let level = 0;
+                while (proto && level < 5) {
+                    proto = Object.getPrototypeOf(proto);
+                    if (proto) {
+                        const protoKeys = Object.getOwnPropertyNames(proto);
+                        log('Level ' + level + ' prototype has ' + protoKeys.length + ' properties');
+
+                        // Show functions
+                        const funcs = protoKeys.filter(k => typeof proto[k] === 'function');
+                        if (funcs.length > 0) {
+                            log('Functions at level ' + level + ': ' + funcs.join(', '));
+                        }
+                    }
+                    level++;
+                }
+
+                // Check static properties on the constructor
+                log('\nChecking constructor static properties...');
+                const staticKeys = Object.keys(minimal);
+                log('Constructor has ' + staticKeys.length + ' static keys');
+                if (staticKeys.length > 0) {
+                    log('Static keys: ' + staticKeys.slice(0, 10).join(', '));
+                }
+
+            } catch (e) {
+                log('Error instantiating: ' + e.message);
+                log('Stack: ' + e.stack);
+            }
+        }
+
+        // Check if presets are stored directly on the constructor
+        log('\n--- Checking if presets are stored on constructor ---');
+
+        // Try common patterns
+        const possiblePaths = [
+            minimal.presets,
+            minimal.default,
+            minimal.getPresets,
+            window.butterchurnPresetsMinimal,
+            window.butterchurnPresetsMinimal?.default,
+            window.butterchurnPresetsMinimal?.presets
+        ];
+
+        for (let i = 0; i < possiblePaths.length; i++) {
+            const path = possiblePaths[i];
+            if (path) {
+                log('Path ' + i + ' exists: type=' + typeof path);
+                if (typeof path === 'object') {
+                    const pathKeys = Object.keys(path);
+                    log('  Has ' + pathKeys.length + ' keys');
+                    if (pathKeys.length > 0) {
+                        log('  First key: ' + pathKeys[0]);
+                    }
+                } else if (typeof path === 'function') {
+                    log('  It\'s a function, trying to call it...');
+                    try {
+                        const result = path();
+                        log('  Result type: ' + typeof result);
+                        if (result && typeof result === 'object') {
+                            log('  Result has ' + Object.keys(result).length + ' keys');
+                        }
+                    } catch (e) {
+                        log('  Error calling: ' + e.message);
+                    }
+                }
+            }
+        }
+
+        // Try iterating over all properties
+        log('\n--- All enumerable properties on minimal ---');
+        let count = 0;
+        for (let key in minimal) {
+            log('Property: ' + key + ' (type: ' + typeof minimal[key] + ')');
+            count++;
+            if (count >= 10) break; // Limit output
+        }
+    </script>
+</body>
+</html>

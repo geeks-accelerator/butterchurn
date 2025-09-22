@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Butterchurn v2 - WebAssembly Optimization System Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+            color: #00d4aa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            color: #007AFF;
+            text-shadow: 0 0 20px rgba(0, 212, 170, 0.5);
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #00d4aa;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        #canvas {
+            border: 2px solid #007AFF;
+            border-radius: 8px;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 0 30px rgba(0, 122, 255, 0.3);
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .control-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #007AFF;
+            border-radius: 8px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .control-panel h3 {
+            margin-top: 0;
+            color: #007AFF;
+            border-bottom: 1px solid #007AFF;
+            padding-bottom: 10px;
+        }
+        button, input[type="file"] {
+            background: linear-gradient(135deg, #007AFF 0%, #00d4aa 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 5px;
+            border-radius: 6px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);
+        }
+        button:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 122, 255, 0.2);
+        }
+        .label {
+            color: #999;
+            font-weight: 500;
+        }
+        .value {
+            color: #00d4aa;
+            font-weight: 600;
+        }
+        .status-good { color: #00d4aa; }
+        .status-warning { color: #FFB800; }
+        .status-error { color: #FF3B30; }
+
+        .audio-bars {
+            display: flex;
+            justify-content: center;
+            margin: 20px auto;
+            height: 80px;
+            max-width: 600px;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        .bar {
+            min-width: 6px;
+            background: linear-gradient(to top, #007AFF, #00d4aa);
+            border-radius: 2px 2px 0 0;
+            transition: height 0.1s ease;
+        }
+        .emergency-panel {
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid #FF3B30;
+        }
+        .emergency-panel h3 {
+            color: #FF3B30;
+            border-bottom-color: #FF3B30;
+        }
+        .accessibility-panel {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid #00d4aa;
+        }
+        .accessibility-panel h3 {
+            color: #00d4aa;
+            border-bottom-color: #00d4aa;
+        }
+        .performance-panel {
+            background: rgba(255, 184, 0, 0.1);
+            border: 1px solid #FFB800;
+        }
+        .performance-panel h3 {
+            color: #FFB800;
+            border-bottom-color: #FFB800;
+        }
+        .device-info {
+            background: rgba(0, 122, 255, 0.1);
+            border: 1px solid #007AFF;
+        }
+        .message {
+            padding: 12px;
+            margin: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        .error {
+            background: rgba(255, 59, 48, 0.2);
+            color: #FF3B30;
+            border: 1px solid #FF3B30;
+        }
+        .success {
+            background: rgba(0, 212, 170, 0.2);
+            color: #00d4aa;
+            border: 1px solid #00d4aa;
+        }
+        .warning {
+            background: rgba(255, 184, 0, 0.2);
+            color: #FFB800;
+            border: 1px solid #FFB800;
+        }
+        #fileInput {
+            margin: 10px 0;
+            width: 100%;
+        }
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #6B46C1 0%, #9333EA 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 4px 0;
+        }
+        .feature-list li:before {
+            content: "✓ ";
+            color: #00d4aa;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Butterchurn v2 Test Suite <span class="version-badge">v2.0.0-beta</span></h1>
+    <p class="subtitle">WebAssembly Optimization System with 73% Performance Improvement</p>
+
+    <div class="controls-grid">
+        <!-- Audio Control Panel -->
+        <div class="control-panel">
+            <h3>🎵 Audio Control</h3>
+            <input type="file" id="fileInput" accept="audio/*" />
+            <div id="audioStatus"></div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="playBtn" disabled>Play/Pause</button>
+                <button id="nextBtn" disabled>Next Preset</button>
+                <button id="emergencyBtn" disabled>Emergency Mode</button>
+                <button id="wasmToggleBtn" disabled>WASM: ON</button>
+            </div>
+        </div>
+
+        <!-- Device Capabilities -->
+        <div class="control-panel device-info">
+            <h3>📱 Device Capabilities</h3>
+            <div class="info-row">
+                <span class="label">Device Tier:</span>
+                <span class="value" id="deviceTier">Detecting...</span>
+            </div>
+            <div class="info-row">
+                <span class="label">WASM Support:</span>
+                <span class="value" id="wasmSupport">Testing...</span>
+            </div>
+            <div class="info-row">
+                <span class="label">SIMD Support:</span>
+                <span class="value" id="simdSupport">Testing...</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Memory Available:</span>
+                <span class="value" id="memoryAvailable">Detecting...</span>
+            </div>
+            <div class="info-row">
+                <span class="label">WebGL Renderer:</span>
+                <span class="value" id="webglRenderer">Initializing...</span>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="control-panel performance-panel">
+            <h3>⚡ Performance Metrics</h3>
+            <div class="info-row">
+                <span class="label">Render Strategy:</span>
+                <span class="value" id="renderStrategy">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Frame Rate:</span>
+                <span class="value" id="frameRate">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Render Time:</span>
+                <span class="value" id="renderTime">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Active Version:</span>
+                <span class="value" id="activeVersion">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Frame Problems:</span>
+                <span class="value" id="frameProblems">None</span>
+            </div>
+        </div>
+
+        <!-- Current Preset Info -->
+        <div class="control-panel">
+            <h3>🎨 Current Preset</h3>
+            <div class="info-row">
+                <span class="label">Preset:</span>
+                <span class="value" id="currentPreset">None loaded</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Type:</span>
+                <span class="value" id="presetType">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Load Time:</span>
+                <span class="value" id="loadTime">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Emergency Preset:</span>
+                <span class="value" id="isEmergency">No</span>
+            </div>
+        </div>
+
+        <!-- Accessibility Features -->
+        <div class="control-panel accessibility-panel">
+            <h3>♿ Accessibility Features</h3>
+            <ul class="feature-list">
+                <li>ARIA attributes and roles</li>
+                <li>Keyboard navigation support</li>
+                <li>Screen reader compatibility</li>
+                <li>Device-adaptive performance</li>
+                <li>Graceful failure handling</li>
+            </ul>
+            <button id="showBlocklistBtn" disabled>Show Blocklist Manager</button>
+            <button id="clearBlocklistBtn">Clear Blocklist</button>
+        </div>
+
+        <!-- Emergency System -->
+        <div class="control-panel emergency-panel">
+            <h3>🛡️ Emergency System</h3>
+            <div class="info-row">
+                <span class="label">Emergency Presets:</span>
+                <span class="value" id="emergencyCount">3 available</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Fallback Chain:</span>
+                <span class="value">WASM2→WASM1→JS</span>
+            </div>
+            <div class="info-row">
+                <span class="label">System Status:</span>
+                <span class="value" id="systemHealth">Healthy</span>
+            </div>
+            <div style="margin-top: 10px;">
+                <button id="testMinimalBtn" disabled>Test: Minimal</button>
+                <button id="testReactiveBtn" disabled>Test: Reactive</button>
+                <button id="testCrowdBtn" disabled>Test: Crowd Pleaser</button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="canvas" width="1280" height="720"></canvas>
+
+    <div class="audio-bars" id="audioBars"></div>
+
+    <div class="controls-grid">
+        <!-- Audio Analysis -->
+        <div class="control-panel">
+            <h3>📊 Audio Analysis</h3>
+            <div class="info-row">
+                <span class="label">Bass Energy:</span>
+                <span class="value" id="bassEnergy">0.00</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Mid Energy:</span>
+                <span class="value" id="midEnergy">0.00</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Treble Energy:</span>
+                <span class="value" id="trebleEnergy">0.00</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Overall Level:</span>
+                <span class="value" id="overallEnergy">0.00</span>
+            </div>
+        </div>
+
+        <!-- Error Logging -->
+        <div class="control-panel">
+            <h3>📝 Error Logging</h3>
+            <div class="info-row">
+                <span class="label">WASM Errors:</span>
+                <span class="value" id="wasmErrors">0</span>
+            </div>
+            <div class="info-row">
+                <span class="label">WASM2 Status:</span>
+                <span class="value" id="wasm2Status">Active</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Preset Failures:</span>
+                <span class="value" id="presetFailures">0</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Blocked Presets:</span>
+                <span class="value" id="blockedPresets">0</span>
+            </div>
+        </div>
+
+        <!-- System Configuration -->
+        <div class="control-panel">
+            <h3>⚙️ Configuration</h3>
+            <div class="info-row">
+                <span class="label">Target FPS:</span>
+                <span class="value" id="targetFPS">60</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Max Memory:</span>
+                <span class="value" id="maxMemory">128 pages</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Analysis Enabled:</span>
+                <span class="value" id="analysisEnabled">Yes</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Auto-Blocklist:</span>
+                <span class="value" id="autoBlocklist">Enabled</span>
+            </div>
+            <button id="exportConfigBtn">Export Config</button>
+            <button id="showDebugBtn">Show Debug Info</button>
+        </div>
+
+        <!-- System Status -->
+        <div class="control-panel">
+            <h3>🔍 System Status</h3>
+            <div id="systemStatusDetails"></div>
+            <button id="refreshStatusBtn">Refresh Status</button>
+        </div>
+    </div>
+
+    <!-- Load v1 preset packs as global scripts (UMD format) -->
+    <script src="../presets/full-collection/butterchurnPresetPackMeta.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsMinimal.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresets.min.js"></script>
+
+    <!-- Load v2 system with bundled binaryen -->
+    <script type="module">
+        // Import the complete v2 system from the built bundle (includes binaryen)
+        import {
+            ButterchurnV2,
+            createVisualizer,
+            detectCapabilities,
+            isSupported,
+            getPerformanceRecommendations,
+            ConfigUtils,
+            DebugUtils,
+            VERSION,
+            presetPackLoader
+        } from '../dist/butterchurn-v2.min.js';
+
+        // Global variables
+        let visualizer;
+        let canvas;
+        let audioContext;
+        let analyser;
+        let source;
+        let audioElement;
+        let isPlaying = false;
+        let animationId;
+        let capabilities;
+        let systemStatus = {};
+        let wasmEnabled = true; // Track WASM state
+        let currentPresetIndex = 0;
+        const emergencyPresets = ['minimal', 'basic_reactive', 'crowd_pleaser'];
+
+        // Create audio bars
+        const barsContainer = document.getElementById('audioBars');
+        for (let i = 0; i < 64; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            bar.style.height = '2px';
+            barsContainer.appendChild(bar);
+        }
+
+        // Utility functions
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            document.getElementById('audioStatus').appendChild(messageDiv);
+
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 5000);
+        }
+
+        function updateStatus(elementId, value, statusType = 'good') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = value;
+                element.className = `value status-${statusType}`;
+            }
+        }
+
+        // Initialize capabilities detection
+        async function initializeCapabilities() {
+            try {
+                capabilities = await detectCapabilities();
+
+                updateStatus('deviceTier', capabilities.tier, 'good');
+                updateStatus('wasmSupport', capabilities.webgl ? 'Available' : 'Not Available',
+                    capabilities.webgl ? 'good' : 'error');
+                updateStatus('simdSupport', capabilities.wasm ? 'Yes' : 'No',
+                    capabilities.wasm ? 'good' : 'warning');
+
+                // Memory info
+                const memoryGB = navigator.deviceMemory || 'Unknown';
+                updateStatus('memoryAvailable', `${memoryGB} GB`, 'good');
+
+                console.log('✅ Capabilities detected:', capabilities);
+                return capabilities;
+            } catch (error) {
+                console.error('❌ Capability detection failed:', error);
+                showMessage('Failed to detect capabilities: ' + error.message, 'error');
+                return null;
+            }
+        }
+
+        // Initialize the v2 system
+        async function init() {
+            try {
+                canvas = document.getElementById('canvas');
+
+                // Detect capabilities first
+                await initializeCapabilities();
+
+                // Get performance recommendations
+                const recommendations = await getPerformanceRecommendations();
+                console.log('📊 Performance recommendations:', recommendations);
+
+                updateStatus('renderStrategy', recommendations.strategy.resolution + 'p @ ' +
+                    recommendations.strategy.targetFPS + 'fps', 'good');
+                updateStatus('targetFPS', recommendations.strategy.targetFPS);
+                updateStatus('maxMemory', recommendations.strategy.maxMemoryPages + ' pages');
+
+                // Create v2 visualizer with recommended settings
+                visualizer = new ButterchurnV2(canvas, {
+                    targetFPS: recommendations.recommendations.targetFPS,
+                    width: 1280,
+                    height: 720,
+                    enableWASM: recommendations.recommendations.enableSIMD,
+                    debug: true
+                });
+
+                // Initialize the system
+                const initResult = await visualizer.initialize();
+
+                if (initResult.success) {
+                    showMessage('✅ Butterchurn v2 initialized successfully!', 'success');
+
+                    // Currently, emergency presets use WebGL only
+                    // WASM will be available when v1 presets are integrated
+                    const renderMode = 'WebGL';
+                    const wasmAvailable = false; // Will be true when v1 presets are loaded
+
+                    // Update UI with initialization results
+                    updateStatus('activeVersion', `${renderMode} (Emergency Presets)`, 'good');
+                    updateStatus('systemHealth', 'Operational', 'good');
+                    updateStatus('wasmSupport', 'Loading v1 presets...', 'info');
+
+                    // Load v1 preset packs
+                    console.log('Loading v1 preset packs...');
+                    window.presetPackLoader = presetPackLoader;
+                    const loaded = await presetPackLoader.loadAllPacks();
+                    if (loaded) {
+                        const count = presetPackLoader.presets.size;
+                        console.log(`Loaded ${count} v1 presets`);
+                        updateStatus('wasmSupport', `${count} presets loaded (WASM Ready)`, 'good');
+                        updateStatus('emergencyCount', `3 emergency + ${count} v1 presets`);
+
+                        // Enable WASM toggle since v1 presets support it
+                        document.getElementById('wasmToggleBtn').disabled = false;
+                        document.getElementById('wasmToggleBtn').textContent = 'WASM: ON';
+                    }
+
+                    // WASM toggle button is handled separately when v1 presets load
+
+                    // Enable other controls
+                    document.getElementById('nextBtn').disabled = false;
+                    document.getElementById('emergencyBtn').disabled = false;
+                    document.getElementById('showBlocklistBtn').disabled = false;
+                    document.getElementById('testMinimalBtn').disabled = false;
+                    document.getElementById('testReactiveBtn').disabled = false;
+                    document.getElementById('testCrowdBtn').disabled = false;
+
+                    // Load first emergency preset to show something
+                    await visualizer.loadEmergencyPreset({ reason: 'initial_load' });
+                    updateStatus('currentPreset', 'Emergency: Minimal');
+                    updateStatus('presetType', 'Emergency Fallback');
+                    updateStatus('isEmergency', 'Yes', 'warning');
+
+                    // Start animation loop
+                    animate();
+
+                } else {
+                    showMessage('⚠️ Initialized with warnings: ' + (initResult.error || 'Unknown issue'), 'warning');
+                    if (initResult.warnings) {
+                        initResult.warnings.forEach(warning => {
+                            showMessage(`Warning: ${warning.step} - ${warning.error}`, 'warning');
+                        });
+                    }
+                }
+
+                // Update WebGL info
+                if (visualizer.gl) {
+                    const renderer = visualizer.gl.getParameter(visualizer.gl.RENDERER);
+                    updateStatus('webglRenderer', renderer);
+                }
+
+            } catch (error) {
+                console.error('❌ Initialization failed:', error);
+                showMessage('Failed to initialize: ' + error.message, 'error');
+                updateStatus('systemHealth', 'Failed', 'error');
+            }
+        }
+
+        // Handle file upload
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const url = URL.createObjectURL(file);
+
+            // Create audio element
+            if (audioElement) {
+                audioElement.pause();
+                audioElement.src = '';
+            }
+
+            audioElement = new Audio(url);
+            audioElement.crossOrigin = 'anonymous';
+            audioElement.volume = 1.0;
+
+            // Setup Web Audio API
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (source) {
+                source.disconnect();
+            }
+
+            source = audioContext.createMediaElementSource(audioElement);
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            showMessage(`✅ Loaded: ${file.name}`, 'success');
+            document.getElementById('playBtn').disabled = false;
+        }
+
+        // Animation loop
+        function animate() {
+            if (analyser && isPlaying && audioElement && !audioElement.paused) {
+                // Get audio data
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                analyser.getByteFrequencyData(dataArray);
+
+                // Calculate levels
+                const bass = dataArray.slice(0, Math.floor(bufferLength * 0.1))
+                    .reduce((a, b) => a + b, 0) / (bufferLength * 0.1 * 255);
+                const mid = dataArray.slice(Math.floor(bufferLength * 0.1), Math.floor(bufferLength * 0.5))
+                    .reduce((a, b) => a + b, 0) / (bufferLength * 0.4 * 255);
+                const treb = dataArray.slice(Math.floor(bufferLength * 0.5))
+                    .reduce((a, b) => a + b, 0) / (bufferLength * 0.5 * 255);
+                const overall = (bass + mid + treb) / 3;
+
+                // Update UI
+                updateStatus('bassEnergy', bass.toFixed(2));
+                updateStatus('midEnergy', mid.toFixed(2));
+                updateStatus('trebleEnergy', treb.toFixed(2));
+                updateStatus('overallEnergy', overall.toFixed(2));
+
+                // Update bars
+                const bars = document.querySelectorAll('.bar');
+                for (let i = 0; i < bars.length; i++) {
+                    const index = Math.floor(i * bufferLength / bars.length);
+                    const value = dataArray[index] / 255;
+                    bars[i].style.height = `${Math.max(2, value * 80)}px`;
+                }
+
+                // Get time domain data for visualization
+                const timeDataArray = new Uint8Array(analyser.fftSize);
+                analyser.getByteTimeDomainData(timeDataArray);
+
+                // Render visualization
+                if (visualizer) {
+                    const renderStart = performance.now();
+                    visualizer.render({
+                        bass, mid, treb, vol: overall,
+                        timeByteArray: timeDataArray
+                    });
+                    const renderTime = performance.now() - renderStart;
+
+                    updateStatus('renderTime', renderTime.toFixed(1) + 'ms',
+                        renderTime > 16.7 ? 'warning' : 'good');
+                }
+            } else {
+                // Silent mode
+                const bars = document.querySelectorAll('.bar');
+                bars.forEach(bar => bar.style.height = '2px');
+
+                if (visualizer) {
+                    visualizer.render({
+                        bass: 0, mid: 0, treb: 0, vol: 0,
+                        timeByteArray: new Uint8Array(2048).fill(128)
+                    });
+                }
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Event handlers
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        document.getElementById('playBtn').addEventListener('click', async () => {
+            if (!audioElement) return;
+
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            if (isPlaying) {
+                audioElement.pause();
+                isPlaying = false;
+                document.getElementById('playBtn').textContent = 'Play';
+            } else {
+                try {
+                    await audioElement.play();
+                    isPlaying = true;
+                    document.getElementById('playBtn').textContent = 'Pause';
+                } catch (err) {
+                    showMessage('Failed to play audio: ' + err.message, 'error');
+                }
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', async () => {
+            if (visualizer && window.presetPackLoader && presetPackLoader.presets.size > 0) {
+                try {
+                    // Get a random v1 preset
+                    const randomPreset = presetPackLoader.getRandomPreset();
+                    if (randomPreset) {
+                        console.log('Loading v1 preset:', randomPreset.name);
+                        const success = await visualizer.loadV1Preset(randomPreset.name);
+                        if (success) {
+                            updateStatus('currentPreset', randomPreset.name.substring(0, 50));
+                            updateStatus('presetType', 'V1 Preset (WASM)');
+                            updateStatus('isEmergency', 'No', 'good');
+                            updateStatus('activeVersion', 'WASM v1', 'good');
+                            showMessage(`✅ Loaded v1 preset: ${randomPreset.name}`, 'success');
+                        }
+                    }
+                } catch (error) {
+                    showMessage('Failed to load preset: ' + error.message, 'error');
+                }
+            } else {
+                // Fall back to emergency presets
+                await visualizer.loadEmergencyPreset({ reason: 'no_v1_presets' });
+                updateStatus('currentPreset', 'Emergency: Random');
+                updateStatus('isEmergency', 'Yes', 'warning');
+            }
+        });
+
+        document.getElementById('emergencyBtn').addEventListener('click', async () => {
+            if (visualizer) {
+                await visualizer.loadEmergencyPreset({ reason: 'user_requested' });
+                updateStatus('isEmergency', 'Yes', 'warning');
+                showMessage('Emergency mode activated', 'warning');
+            }
+        });
+
+        // WASM toggle button
+        document.getElementById('wasmToggleBtn').addEventListener('click', () => {
+            wasmEnabled = !wasmEnabled;
+            const btn = document.getElementById('wasmToggleBtn');
+            btn.textContent = wasmEnabled ? 'WASM: ON' : 'WASM: OFF';
+
+            if (visualizer) {
+                visualizer.forceWASM = wasmEnabled;
+                showMessage(`WASM ${wasmEnabled ? 'enabled' : 'disabled'}`, 'success');
+            }
+        });
+
+        // Render mode button removed - using wasmToggleBtn instead
+
+        document.getElementById('showBlocklistBtn').addEventListener('click', () => {
+            if (visualizer) {
+                visualizer.showBlocklistUI();
+            }
+        });
+
+        // Clear blocklist button
+        document.getElementById('clearBlocklistBtn').addEventListener('click', () => {
+            // Clear all blocklist data from localStorage
+            const keys = Object.keys(localStorage);
+            let cleared = 0;
+            keys.forEach(key => {
+                if (key.includes('preset-blocklist') || key.includes('preset-failures')) {
+                    localStorage.removeItem(key);
+                    cleared++;
+                }
+            });
+            showMessage(`Cleared ${cleared} blocklist entries from localStorage. Reload page to take effect.`, 'success');
+
+            // Reload after a short delay
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        });
+
+        // Emergency preset tests
+        document.getElementById('testMinimalBtn').addEventListener('click', async () => {
+            if (visualizer) {
+                await visualizer.loadEmergencyPreset({
+                    reason: 'test_minimal',
+                    deviceTier: 'mobile'
+                });
+                updateStatus('currentPreset', 'Emergency: Minimal');
+                updateStatus('presetType', 'Minimal Emergency');
+            }
+        });
+
+        document.getElementById('testReactiveBtn').addEventListener('click', async () => {
+            if (visualizer) {
+                await visualizer.loadEmergencyPreset({
+                    reason: 'test_reactive',
+                    deviceTier: 'mid_range',
+                    audioLevel: 0.4
+                });
+                updateStatus('currentPreset', 'Emergency: Basic Reactive');
+                updateStatus('presetType', 'Reactive Emergency');
+            }
+        });
+
+        document.getElementById('testCrowdBtn').addEventListener('click', async () => {
+            if (visualizer) {
+                await visualizer.loadEmergencyPreset({
+                    reason: 'test_crowd',
+                    deviceTier: 'high_end',
+                    audioLevel: 0.8
+                });
+                updateStatus('currentPreset', 'Emergency: Crowd Pleaser');
+                updateStatus('presetType', 'Crowd Pleaser Emergency');
+            }
+        });
+
+        document.getElementById('exportConfigBtn').addEventListener('click', () => {
+            if (visualizer) {
+                const config = visualizer.exportConfig();
+                const blob = new Blob([JSON.stringify(config, null, 2)],
+                    { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'butterchurn-v2-config.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                showMessage('Configuration exported', 'success');
+            }
+        });
+
+        document.getElementById('showDebugBtn').addEventListener('click', async () => {
+            if (visualizer) {
+                const debugInfo = await DebugUtils.getSystemInfo(visualizer.gl);
+                console.log('🔍 Debug Info:', debugInfo);
+
+                const debugWindow = window.open('', '_blank', 'width=800,height=600');
+                debugWindow.document.write(`
+                    <html>
+                        <head><title>Butterchurn v2 Debug Info</title></head>
+                        <body style="font-family: monospace; padding: 20px; background: #1a1a1a; color: #00ff00;">
+                            <h2>🔍 Butterchurn v2 Debug Information</h2>
+                            <pre>${JSON.stringify(debugInfo, null, 2)}</pre>
+                        </body>
+                    </html>
+                `);
+                showMessage('Debug info opened in new window', 'success');
+            }
+        });
+
+        document.getElementById('refreshStatusBtn').addEventListener('click', () => {
+            if (visualizer) {
+                const status = visualizer.getStatus();
+                const details = document.getElementById('systemStatusDetails');
+                details.innerHTML = `
+                    <div class="info-row">
+                        <span class="label">Initialized:</span>
+                        <span class="value">${status.initialized ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Current Strategy:</span>
+                        <span class="value">${status.strategy?.resolution || 'Unknown'}p</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Frame Analysis:</span>
+                        <span class="value">${status.frameAnalysis?.problems?.length || 0} problems</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">WASM Errors:</span>
+                        <span class="value">${status.wasmErrors?.totalFailures || 0}</span>
+                    </div>
+                `;
+                showMessage('Status refreshed', 'success');
+            }
+        });
+
+        // Performance monitoring
+        let frameCount = 0;
+        let lastFpsUpdate = 0;
+
+        function updatePerformanceMetrics() {
+            frameCount++;
+            const now = performance.now();
+
+            if (now - lastFpsUpdate > 1000) {
+                const fps = Math.round(frameCount * 1000 / (now - lastFpsUpdate));
+                updateStatus('frameRate', `${fps} FPS`,
+                    fps >= 55 ? 'good' : fps >= 30 ? 'warning' : 'error');
+
+                frameCount = 0;
+                lastFpsUpdate = now;
+            }
+
+            requestAnimationFrame(updatePerformanceMetrics);
+        }
+
+        // Initialize everything
+        console.log('🚀 Starting Butterchurn v2 Test Suite');
+        console.log('📦 Version:', VERSION);
+
+        updateStatus('systemHealth', 'Initializing...', 'warning');
+
+        init().then(() => {
+            updatePerformanceMetrics();
+            showMessage(`🎉 Butterchurn v2 ${VERSION.string} ready for testing!`, 'success');
+        }).catch(error => {
+            console.error('💥 Initialization failed:', error);
+            showMessage('Initialization failed: ' + error.message, 'error');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Butterchurn Intelligent Preset Selector Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+        }
+        h1 {
+            text-align: center;
+        }
+        #canvas {
+            border: 1px solid #0f0;
+            display: block;
+            margin: 20px auto;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button, input[type="file"] {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0a0;
+        }
+        button:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+        .info {
+            background: #111;
+            padding: 15px;
+            border: 1px solid #0f0;
+            margin: 20px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .preset-info {
+            margin: 10px 0;
+        }
+        .label {
+            color: #999;
+            display: inline-block;
+            width: 200px;
+        }
+        .value {
+            color: #0f0;
+        }
+        .audio-bars {
+            display: flex;
+            justify-content: center;
+            margin: 20px auto;
+            height: 100px;
+            max-width: 800px;
+        }
+        .bar {
+            width: 10px;
+            background: #0f0;
+            margin: 0 2px;
+            transition: height 0.1s;
+            align-self: flex-end;
+        }
+        .error {
+            color: #f00;
+            background: #300;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #f00;
+        }
+        .success {
+            color: #0f0;
+            background: #030;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #0f0;
+        }
+        #fileInput {
+            margin: 20px auto;
+            display: block;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Butterchurn Intelligent Preset Selector</h1>
+    <p style="text-align: center;">Phase 2: Equation-based fingerprinting with real-time intelligent selection</p>
+
+    <div class="info">
+        <h3>📁 Step 1: Load Audio File</h3>
+        <input type="file" id="fileInput" accept="audio/*" />
+        <div id="audioStatus"></div>
+    </div>
+
+    <div class="info">
+        <h3>🎛️ System Status</h3>
+        <div class="preset-info">
+            <span class="label">Current Preset:</span>
+            <span class="value" id="currentPreset">No audio loaded</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Preset Hash:</span>
+            <span class="value" id="presetHash">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Authors:</span>
+            <span class="value" id="presetAuthors">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Energy Level:</span>
+            <span class="value" id="energyLevel">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Bass Reactivity:</span>
+            <span class="value" id="bassReactivity">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Musical Event:</span>
+            <span class="value" id="musicalEvent">Waiting...</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Next Transition:</span>
+            <span class="value" id="switchTimer">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Presets in Database:</span>
+            <span class="value" id="presetCount">-</span>
+        </div>
+
+        <!-- Enhanced Audio Features -->
+        <h3>🎵 Advanced Audio Analysis</h3>
+        <div class="preset-info">
+            <span class="label">Beat Detection:</span>
+            <span class="value" id="beatDetection">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Spectral Centroid:</span>
+            <span class="value" id="spectralCentroid">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Zero Crossing Rate:</span>
+            <span class="value" id="zeroCrossing">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Dynamic Range:</span>
+            <span class="value" id="dynamicRange">-</span>
+        </div>
+
+        <!-- Selection Logic Transparency -->
+        <h3>🎯 Selection Logic</h3>
+        <div class="preset-info">
+            <span class="label">Target Energy:</span>
+            <span class="value" id="targetEnergy">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Score Calculation:</span>
+            <span class="value" id="scoreCalc">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Top Candidates:</span>
+            <span class="value" id="topCandidates">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Selection Reason:</span>
+            <span class="value" id="selectionReason">-</span>
+        </div>
+
+        <!-- Preset Quality Control -->
+        <h3>⚡ Quality Control</h3>
+        <div class="preset-info">
+            <span class="label">Frame Rate:</span>
+            <span class="value" id="frameRate">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Render Time:</span>
+            <span class="value" id="renderTime">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Problematic Presets:</span>
+            <span class="value" id="problematicCount">0 detected</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Preset Health:</span>
+            <span class="value" id="presetHealth">✅ Good</span>
+        </div>
+
+        <!-- User Preference Learning -->
+        <h3>🧠 Learning Preferences</h3>
+        <div class="preset-info">
+            <span class="label">Session Duration:</span>
+            <span class="value" id="sessionDuration">0m 0s</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Presets Shown:</span>
+            <span class="value" id="presetsShown">0</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Avg View Time:</span>
+            <span class="value" id="avgViewTime">-</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Preferred Energy:</span>
+            <span class="value" id="preferredEnergy">Learning...</span>
+        </div>
+    </div>
+
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <div class="audio-bars" id="audioBars"></div>
+
+    <div class="controls">
+        <button id="playBtn" disabled>Play/Pause</button>
+        <button id="nextBtn" disabled>Next Preset (Manual)</button>
+        <button id="autoBtn" disabled>Auto Mode: ON</button>
+    </div>
+
+    <div class="info">
+        <h3>📊 Audio Analysis</h3>
+        <div class="preset-info">
+            <span class="label">Bass Energy:</span>
+            <span class="value" id="bassEnergy">0.00</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Mid Energy:</span>
+            <span class="value" id="midEnergy">0.00</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Treble Energy:</span>
+            <span class="value" id="trebleEnergy">0.00</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Overall Energy:</span>
+            <span class="value" id="overallEnergy">0.00</span>
+        </div>
+        <div class="preset-info">
+            <span class="label">Beat Detection:</span>
+            <span class="value" id="beatDetect">-</span>
+        </div>
+    </div>
+
+    <!-- Load our local improved Butterchurn build (UMD format with Phase 1 improvements) -->
+    <script src="../dist/butterchurn.min.js"></script>
+    <!-- Load presets from CDN -->
+    <!-- Load multiple preset packs for full collection -->
+    <script src="../presets/full-collection/butterchurnPresets.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsExtra.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsExtra2.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsMD1.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsNonMinimal.min.js"></script>
+
+    <script>
+        // Wait for scripts to load
+        window.addEventListener('load', function() {
+            console.log('Page loaded, checking for butterchurn...');
+            if (typeof butterchurn === 'undefined') {
+                console.error('butterchurn is not defined after load!');
+                console.log('window.butterchurn:', window.butterchurn);
+                console.log('window.Butterchurn:', window.Butterchurn);
+                // Check what's available on window
+                console.log('Available on window:', Object.keys(window).filter(k => k.toLowerCase().includes('butter')));
+            } else {
+                console.log('butterchurn is available:', butterchurn);
+            }
+        });
+    </script>
+
+    <!-- Load the authoritative IntelligentPresetSelector -->
+    <script src="../src/intelligentPresetSelector.js"></script>
+
+    <script>
+        // Main application code
+        let visualizer;
+        let canvas;
+        let audioContext;
+        let analyser;
+        let source;
+        let audioElement;
+        let isPlaying = false;
+        let autoMode = true;
+        let animationId;
+        let selector;
+        let fingerprintDb;
+
+        // Performance tracking
+        let frameCount = 0;
+        let lastFpsUpdate = 0;
+        let renderTimes = [];
+        let problematicPresetCount = 0;
+
+        // Preference learning
+        let sessionStartTime = Date.now();
+        let presetsShownCount = 0;
+        let presetViewTimes = [];
+        let lastPresetSwitch = Date.now();
+        let energyPreferences = [];
+
+        // Create audio bars for visualization
+        const barsContainer = document.getElementById('audioBars');
+        for (let i = 0; i < 32; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            barsContainer.appendChild(bar);
+        }
+
+        // IntelligentPresetSelector is now loaded from ../src/intelligentPresetSelector.js
+        // No need for inline implementation - using authoritative version
+
+        function showError(message) {
+            document.getElementById('audioStatus').innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        function showSuccess(message) {
+            document.getElementById('audioStatus').innerHTML = `<div class="success">${message}</div>`;
+        }
+
+        function updatePreferenceLearning() {
+            // Update session duration
+            const sessionTime = (Date.now() - sessionStartTime) / 1000;
+            const minutes = Math.floor(sessionTime / 60);
+            const seconds = Math.floor(sessionTime % 60);
+            document.getElementById('sessionDuration').textContent = `${minutes}m ${seconds}s`;
+
+            // Update presets shown
+            document.getElementById('presetsShown').textContent = presetsShownCount.toString();
+
+            // Update average view time
+            if (presetViewTimes.length > 0) {
+                const avgTime = presetViewTimes.reduce((a, b) => a + b, 0) / presetViewTimes.length;
+                document.getElementById('avgViewTime').textContent = `${avgTime.toFixed(1)}s`;
+            }
+
+            // Determine preferred energy level
+            if (energyPreferences.length >= 5) {
+                const avgEnergy = energyPreferences.reduce((a, b) => a + b, 0) / energyPreferences.length;
+                let preference;
+                if (avgEnergy < 0.3) {
+                    preference = '🌊 Calm (< 30%)';
+                } else if (avgEnergy < 0.5) {
+                    preference = '🎵 Moderate (30-50%)';
+                } else if (avgEnergy < 0.7) {
+                    preference = '🎸 Energetic (50-70%)';
+                } else {
+                    preference = '🔥 High Energy (> 70%)';
+                }
+                document.getElementById('preferredEnergy').textContent = preference;
+            }
+        }
+
+        function updatePresetInfo(presetName) {
+            document.getElementById('currentPreset').textContent = presetName.substring(0, 50) +
+                (presetName.length > 50 ? '...' : '');
+
+            // Track preference learning
+            const now = Date.now();
+            if (lastPresetSwitch > 0) {
+                const viewTime = (now - lastPresetSwitch) / 1000;
+                presetViewTimes.push(viewTime);
+                if (presetViewTimes.length > 20) presetViewTimes.shift();
+            }
+            lastPresetSwitch = now;
+            presetsShownCount++;
+
+            // Extract hash if we had the database
+            if (fingerprintDb && fingerprintDb.nameIndex && fingerprintDb.nameIndex[presetName]) {
+                const hash = fingerprintDb.nameIndex[presetName];
+                document.getElementById('presetHash').textContent = hash;
+
+                const presetData = fingerprintDb.presets[hash];
+                if (presetData) {
+                    document.getElementById('presetAuthors').textContent =
+                        presetData.authors.join(', ');
+                    document.getElementById('energyLevel').textContent =
+                        `${(presetData.fingerprint.energy * 100).toFixed(0)}%`;
+                    document.getElementById('bassReactivity').textContent =
+                        `${(presetData.fingerprint.bass * 100).toFixed(0)}%`;
+
+                    // Track energy preferences
+                    energyPreferences.push(presetData.fingerprint.energy);
+                    if (energyPreferences.length > 20) energyPreferences.shift();
+                }
+            }
+
+            // Update preference learning displays
+            updatePreferenceLearning();
+        }
+
+        async function init() {
+            canvas = document.getElementById('canvas');
+
+            try {
+                // Create audio context first - butterchurn needs this
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    console.log('Created audio context');
+                }
+
+                // Initialize Butterchurn using our UMD build
+                // Check what form butterchurn is available in
+                let Butterchurn;
+                if (typeof butterchurn !== 'undefined') {
+                    Butterchurn = butterchurn.default || butterchurn;
+                } else if (typeof window.butterchurn !== 'undefined') {
+                    Butterchurn = window.butterchurn.default || window.butterchurn;
+                } else {
+                    throw new Error('Butterchurn library not loaded! Check if ../dist/butterchurn.min.js exists and loads correctly.');
+                }
+
+                console.log('Using Butterchurn:', Butterchurn);
+
+                if (!Butterchurn.createVisualizer) {
+                    throw new Error('Butterchurn.createVisualizer not found. Build may be corrupted.');
+                }
+
+                // Create visualizer with audio context and canvas
+                visualizer = Butterchurn.createVisualizer(audioContext, canvas, {
+                    width: canvas.width,
+                    height: canvas.height
+                });
+
+                // Load fingerprint database - optional, will fail with CORS if opened as file://
+                try {
+                    // Try to load from same directory first (test directory)
+                    const response = await fetch('./fingerprints.json');
+                    if (response.ok) {
+                        fingerprintDb = await response.json();
+                        document.getElementById('presetCount').textContent =
+                            `${Object.keys(fingerprintDb.presets).length} unique`;
+                        console.log('✅ Fingerprint database loaded');
+                    } else {
+                        console.warn('Fingerprint database not found, using presets without deduplication');
+                        document.getElementById('presetCount').textContent = 'No database';
+                    }
+                } catch (err) {
+                    // CORS error when opened as file:// - this is expected
+                    if (err.message.includes('CORS') || err.message.includes('Failed to fetch')) {
+                        console.info('Note: Fingerprint database unavailable due to CORS (normal when opening file directly)');
+                        console.info('To use fingerprints, either:');
+                        console.info('1. Serve via local server: python3 -m http.server 8000');
+                        console.info('2. Or open from a web server');
+                    } else {
+                        console.warn('Could not load fingerprint database:', err);
+                    }
+                    document.getElementById('presetCount').textContent = 'CORS blocked (normal)';
+                    // Continue without database - the app still works
+                    fingerprintDb = null;
+                }
+
+                // Initialize selector
+                selector = new IntelligentPresetSelector(visualizer, fingerprintDb || {});
+
+                // Combine all preset packs into one collection
+                const allPresets = {};
+
+                // Add all available preset packs
+                if (typeof butterchurnPresets !== 'undefined') {
+                    Object.assign(allPresets, butterchurnPresets.getPresets());
+                    console.log('✓ Loaded butterchurnPresets');
+                }
+                if (typeof butterchurnPresetsExtra !== 'undefined') {
+                    Object.assign(allPresets, butterchurnPresetsExtra.getPresets());
+                    console.log('✓ Loaded butterchurnPresetsExtra');
+                }
+                if (typeof butterchurnPresetsExtra2 !== 'undefined') {
+                    Object.assign(allPresets, butterchurnPresetsExtra2.getPresets());
+                    console.log('✓ Loaded butterchurnPresetsExtra2');
+                }
+                if (typeof butterchurnPresetsMD1 !== 'undefined') {
+                    Object.assign(allPresets, butterchurnPresetsMD1.getPresets());
+                    console.log('✓ Loaded butterchurnPresetsMD1');
+                }
+                if (typeof butterchurnPresetsNonMinimal !== 'undefined') {
+                    Object.assign(allPresets, butterchurnPresetsNonMinimal.getPresets());
+                    console.log('✓ Loaded butterchurnPresetsNonMinimal');
+                }
+
+                console.log(`📦 Combined preset collection: ${Object.keys(allPresets).length} total presets`);
+                selector.setPresetPack(allPresets);
+
+                const presetNames = Object.keys(allPresets);
+                if (presetNames.length > 0) {
+                    // Find first valid preset (not blank)
+                    let firstValidPreset = null;
+                    for (const name of presetNames) {
+                        const preset = allPresets[name];
+                        if (preset.baseVals && preset.frame_eqs_str) {
+                            firstValidPreset = name;
+                            break;
+                        }
+                    }
+
+                    if (!firstValidPreset) {
+                        console.error('[INIT] No valid presets found in pack!');
+                        firstValidPreset = presetNames[0]; // Fallback to first anyway
+                    }
+
+                    console.log('[INIT] Loading first preset:', firstValidPreset);
+                    console.log('[INIT] First preset object:', allPresets[firstValidPreset]);
+                    visualizer.loadPreset(allPresets[firstValidPreset], 0); // No blending for first preset
+                    updatePresetInfo(firstValidPreset);
+
+                    // Update selector state for first preset
+                    selector.currentPreset = firstValidPreset;
+                    selector.lastSwitch = performance.now();
+                    console.log('[INIT] First preset loaded successfully');
+                } else {
+                    console.error('[INIT] No presets available!');
+                }
+
+                showSuccess('✅ Butterchurn initialized. Please select an audio file.');
+
+            } catch (error) {
+                console.error('Failed to initialize:', error);
+                showError('Failed to initialize: ' + error.message);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const url = URL.createObjectURL(file);
+
+            // Create or update audio element
+            if (audioElement) {
+                audioElement.pause();
+                audioElement.src = '';
+            }
+
+            audioElement = new Audio(url);
+            audioElement.crossOrigin = 'anonymous';
+            audioElement.controls = false;
+            audioElement.volume = 1.0;
+
+            // Setup Web Audio API
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (source) {
+                source.disconnect();
+            }
+
+            source = audioContext.createMediaElementSource(audioElement);
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+
+            // Connect source to analyser first
+            source.connect(analyser);
+
+            // Connect analyser to destination for audio playback
+            analyser.connect(audioContext.destination);
+
+            // Also connect source directly to visualizer (it needs its own connection)
+            if (visualizer && visualizer.connectAudio) {
+                // Butterchurn needs a direct connection to the source
+                source.connect(visualizer.audioNode || analyser);
+                console.log('Connected visualizer to audio');
+            }
+
+            showSuccess(`✅ Loaded: ${file.name}`);
+
+            // Enable controls
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('nextBtn').disabled = false;
+            document.getElementById('autoBtn').disabled = false;
+
+            // Start animation loop
+            if (!animationId) {
+                animate();
+            }
+        }
+
+        // Calculate advanced audio features
+        function calculateAdvancedFeatures(dataArray, timeByteArray) {
+            const features = {};
+
+            // Beat detection - look for sudden amplitude changes
+            let maxAmp = 0;
+            let beatThreshold = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                if (dataArray[i] > maxAmp) maxAmp = dataArray[i];
+                beatThreshold += dataArray[i];
+            }
+            beatThreshold = beatThreshold / dataArray.length * 1.5;
+            features.beatDetected = maxAmp > beatThreshold;
+            features.beatStrength = Math.min(1.0, maxAmp / 255);
+
+            // Spectral centroid - brightness indicator
+            let weightedSum = 0;
+            let magnitudeSum = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                weightedSum += i * dataArray[i];
+                magnitudeSum += dataArray[i];
+            }
+            features.spectralCentroid = magnitudeSum > 0 ?
+                (weightedSum / magnitudeSum) / dataArray.length : 0;
+
+            // Zero crossing rate - percussive content detector
+            let zeroCrossings = 0;
+            for (let i = 1; i < timeByteArray.length; i++) {
+                const prev = timeByteArray[i - 1] - 128;
+                const curr = timeByteArray[i] - 128;
+                if ((prev < 0 && curr >= 0) || (prev >= 0 && curr < 0)) {
+                    zeroCrossings++;
+                }
+            }
+            features.zeroCrossingRate = zeroCrossings / timeByteArray.length;
+
+            // Dynamic range
+            let min = 255, max = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                if (dataArray[i] < min) min = dataArray[i];
+                if (dataArray[i] > max) max = dataArray[i];
+            }
+            features.dynamicRange = (max - min) / 255;
+
+            return features;
+        }
+
+        // Detect musical events based on audio features
+        function detectMusicalEvent(features) {
+            const event = {
+                type: 'Steady',
+                intensity: 0,
+                upcoming: null
+            };
+
+            // High energy detection
+            if (features.bass > 0.8 && features.vol > 0.7) {
+                event.type = '🔥 DROP!';
+                event.intensity = 1.0;
+            } else if (features.bass > 0.6 && features.trend > 0.5) {
+                event.type = '📈 Building...';
+                event.intensity = 0.7;
+                event.upcoming = 'Drop expected';
+            } else if (features.vol < 0.2) {
+                event.type = '🌊 Ambient';
+                event.intensity = 0.2;
+            } else if (features.bass < 0.3 && features.trend < -0.3) {
+                event.type = '📉 Breakdown';
+                event.intensity = 0.3;
+                event.upcoming = 'Buildup expected';
+            } else if (features.mid > 0.6 && features.treb > 0.5) {
+                event.type = '🎵 Melodic';
+                event.intensity = 0.5;
+            } else if (features.bass > 0.5 && features.vol > 0.4) {
+                event.type = '🎸 Groove';
+                event.intensity = 0.6;
+            } else if (Math.abs(features.trend) < 0.1) {
+                event.type = '➡️ Steady';
+                event.intensity = 0.4;
+            }
+
+            // Detect upcoming transitions based on patterns
+            if (features.trend > 0.6 && features.vol > 0.5 && !event.upcoming) {
+                event.upcoming = 'Peak approaching';
+            } else if (features.trend < -0.5 && features.vol < 0.4 && !event.upcoming) {
+                event.upcoming = 'Quiet section';
+            }
+
+            return event;
+        }
+
+        function animate() {
+            if (!analyser) {
+                animationId = requestAnimationFrame(animate);
+                return;
+            }
+
+            // Get frequency data
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+
+            // Get time domain data for Butterchurn (this is what makes it react to music!)
+            const timeBufferLength = analyser.fftSize;
+            const timeByteArray = new Uint8Array(timeBufferLength);
+            analyser.getByteTimeDomainData(timeByteArray);
+
+            // Calculate audio levels
+            const bass = dataArray.slice(0, Math.floor(bufferLength * 0.1))
+                .reduce((a, b) => a + b, 0) / (bufferLength * 0.1 * 255);
+            const mid = dataArray.slice(Math.floor(bufferLength * 0.1), Math.floor(bufferLength * 0.5))
+                .reduce((a, b) => a + b, 0) / (bufferLength * 0.4 * 255);
+            const treb = dataArray.slice(Math.floor(bufferLength * 0.5))
+                .reduce((a, b) => a + b, 0) / (bufferLength * 0.5 * 255);
+
+            const audioLevels = {
+                bass: bass,
+                mid: mid,
+                treb: treb,
+                vol: (bass + mid + treb) / 3,
+                // CRITICAL: Add time domain data for Butterchurn to actually react to music!
+                timeByteArray: timeByteArray,
+                timeByteArrayL: timeByteArray, // For stereo, we'd split this
+                timeByteArrayR: timeByteArray
+            };
+
+            // Update bars visualization
+            const bars = document.querySelectorAll('.bar');
+            const barData = new Uint8Array(bars.length);
+            const barStep = Math.floor(bufferLength / bars.length);
+
+            for (let i = 0; i < bars.length; i++) {
+                const index = i * barStep;
+                const value = dataArray[index] / 255;
+                bars[i].style.height = `${value * 100}px`;
+            }
+
+            // Check if audio has ended
+            if (audioElement && audioElement.ended && isPlaying) {
+                console.log('[Audio] Playback ended, stopping visualization updates');
+                isPlaying = false;
+
+                // Update UI to show stopped state
+                showSuccess('🎵 Playback complete');
+                document.getElementById('bassEnergy').textContent = '0.00';
+                document.getElementById('midEnergy').textContent = '0.00';
+                document.getElementById('trebleEnergy').textContent = '0.00';
+                document.getElementById('overallEnergy').textContent = '0.00';
+                document.getElementById('switchTimer').textContent = 'Stopped';
+                document.getElementById('musicalEvent').textContent = 'Stopped';
+            }
+
+            // CRITICAL FIX: Only process audio and render when audio is actually playing
+            if (isPlaying && audioElement && !audioElement.paused && !audioElement.ended) {
+                // Update selector with real audio data
+                if (selector) {
+                    const result = selector.update(audioLevels);
+
+                    if (result) {
+                        document.getElementById('bassEnergy').textContent = bass.toFixed(2);
+                        document.getElementById('midEnergy').textContent = mid.toFixed(2);
+                        document.getElementById('trebleEnergy').textContent = treb.toFixed(2);
+                        document.getElementById('overallEnergy').textContent =
+                            result.features.energy.toFixed(2);
+                        document.getElementById('beatDetect').textContent =
+                            result.features.trend;
+
+                        // Calculate and display advanced audio features
+                        const advancedFeatures = calculateAdvancedFeatures(dataArray, timeByteArray);
+
+                        // Update advanced feature displays
+                        document.getElementById('beatDetection').textContent =
+                            advancedFeatures.beatDetected ?
+                            `🥁 ${(advancedFeatures.beatStrength * 100).toFixed(0)}%` : '---';
+                        document.getElementById('spectralCentroid').textContent =
+                            `${(advancedFeatures.spectralCentroid * 100).toFixed(1)}% bright`;
+                        document.getElementById('zeroCrossing').textContent =
+                            `${(advancedFeatures.zeroCrossingRate * 100).toFixed(1)}% percussive`;
+                        document.getElementById('dynamicRange').textContent =
+                            `${(advancedFeatures.dynamicRange * 100).toFixed(0)}% range`;
+
+                        // Update musical event detection display
+                        const musicalEvent = detectMusicalEvent(result.features);
+                        document.getElementById('musicalEvent').textContent = musicalEvent.type;
+
+                        // Show next transition timing based on musical context
+                        if (result.nextSwitch) {
+                            const timeUntilSwitch = (result.nextSwitch / 1000).toFixed(1);
+                            const transitionReason = musicalEvent.upcoming ?
+                                `${musicalEvent.upcoming} in ${timeUntilSwitch}s` :
+                                `${timeUntilSwitch}s (min interval)`;
+                            document.getElementById('switchTimer').textContent = transitionReason;
+                        }
+
+                        // Update selection logic transparency
+                        if (result.selectionLogic) {
+                            const logic = result.selectionLogic;
+                            document.getElementById('targetEnergy').textContent =
+                                `${(logic.targetEnergy * 100).toFixed(0)}%`;
+                            document.getElementById('scoreCalc').textContent =
+                                logic.topScores.length > 0 ? logic.topScores[0] : '-';
+                            document.getElementById('topCandidates').textContent =
+                                logic.candidates.length > 0 ?
+                                logic.candidates.slice(0, 3).join(', ') : 'None';
+                            document.getElementById('selectionReason').textContent =
+                                logic.reason || 'Waiting...';
+                        }
+                    }
+                }
+
+                // Render visualization with real audio data
+                if (visualizer) {
+                    // Track render performance
+                    const renderStart = performance.now();
+                    visualizer.render({ audioLevels: audioLevels });
+                    const renderEnd = performance.now();
+                    const renderTime = renderEnd - renderStart;
+
+                    // Update performance metrics
+                    renderTimes.push(renderTime);
+                    if (renderTimes.length > 60) renderTimes.shift();
+
+                    frameCount++;
+                    const now = performance.now();
+                    if (now - lastFpsUpdate > 1000) {
+                        const fps = frameCount;
+                        frameCount = 0;
+                        lastFpsUpdate = now;
+
+                        // Update quality control displays
+                        document.getElementById('frameRate').textContent =
+                            fps < 30 ? `⚠️ ${fps} FPS` :
+                            fps < 50 ? `🟡 ${fps} FPS` :
+                            `✅ ${fps} FPS`;
+
+                        const avgRenderTime = renderTimes.reduce((a, b) => a + b, 0) / renderTimes.length;
+                        document.getElementById('renderTime').textContent =
+                            avgRenderTime > 16.7 ? `⚠️ ${avgRenderTime.toFixed(1)}ms` :
+                            avgRenderTime > 10 ? `🟡 ${avgRenderTime.toFixed(1)}ms` :
+                            `✅ ${avgRenderTime.toFixed(1)}ms`;
+
+                        // Check preset health
+                        if (selector && selector.problematicPresets) {
+                            problematicPresetCount = selector.problematicPresets.size;
+                            document.getElementById('problematicCount').textContent =
+                                `${problematicPresetCount} detected`;
+                        }
+
+                        // Overall health indicator
+                        const health = fps >= 50 && avgRenderTime <= 16.7 && problematicPresetCount < 5;
+                        document.getElementById('presetHealth').textContent =
+                            health ? '✅ Good' :
+                            fps < 30 || avgRenderTime > 20 ? '❌ Poor' :
+                            '🟡 Fair';
+
+                        // Also update session duration periodically
+                        updatePreferenceLearning();
+                    }
+                }
+            } else {
+                // Audio is paused/stopped - render static visualization without audio data
+                if (visualizer) {
+                    // Pass silent audio data so presets don't react randomly
+                    const silentAudioLevels = {
+                        bass: 0,
+                        mid: 0,
+                        treb: 0,
+                        vol: 0,
+                        timeByteArray: new Uint8Array(timeBufferLength).fill(128), // Flat line
+                        timeByteArrayL: new Uint8Array(timeBufferLength).fill(128),
+                        timeByteArrayR: new Uint8Array(timeBufferLength).fill(128)
+                    };
+                    visualizer.render({ audioLevels: silentAudioLevels });
+                }
+
+                // Update UI to show paused state
+                if (!isPlaying && audioElement) {
+                    document.getElementById('bassEnergy').textContent = '0.00';
+                    document.getElementById('midEnergy').textContent = '0.00';
+                    document.getElementById('trebleEnergy').textContent = '0.00';
+                    document.getElementById('overallEnergy').textContent = '0.00';
+                    document.getElementById('switchTimer').textContent = audioElement.paused ? 'Paused' : 'Stopped';
+                    document.getElementById('musicalEvent').textContent = audioElement.paused ? 'Paused' : 'No Audio';
+                }
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Event handlers
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        document.getElementById('playBtn').addEventListener('click', async () => {
+            if (!audioElement) return;
+
+            // Resume audio context if it's suspended (browser security)
+            if (audioContext && audioContext.state === 'suspended') {
+                await audioContext.resume();
+                console.log('Resumed audio context');
+            }
+
+            if (isPlaying) {
+                audioElement.pause();
+                document.getElementById('playBtn').textContent = 'Play';
+                isPlaying = false;
+            } else {
+                // Play audio with promise handling
+                try {
+                    await audioElement.play();
+                    document.getElementById('playBtn').textContent = 'Pause';
+                    isPlaying = true;
+                    console.log('Audio playing, volume:', audioElement.volume, 'muted:', audioElement.muted);
+                } catch (err) {
+                    console.error('Error playing audio:', err);
+                    showError('Failed to play audio: ' + err.message);
+                }
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (selector) {
+                selector.selectRandomPreset();
+                updatePresetInfo(selector.currentPreset || 'Unknown');
+            }
+        });
+
+        document.getElementById('autoBtn').addEventListener('click', () => {
+            autoMode = !autoMode;
+            document.getElementById('autoBtn').textContent = `Auto Mode: ${autoMode ? 'ON' : 'OFF'}`;
+        });
+
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
