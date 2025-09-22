@@ -7,7 +7,6 @@
 ## 📚 Related Documentation
 
 - **[MATHEMATICAL_FINGERPRINTING.md](MATHEMATICAL_FINGERPRINTING.md)** - Pure JavaScript equation analysis algorithms (no WASM required)
-- **[PRERENDERING_IMPLEMENTATION_PLAN.md](PRERENDERING_IMPLEMENTATION_PLAN.md)** - WebAssembly-based prerendering approach (deprecated in favor of JavaScript)
 - **[../CLAUDE.md](../CLAUDE.md)** - Main project documentation and architecture overview
 
 ## 🎯 Implementation Status (January 2025)
