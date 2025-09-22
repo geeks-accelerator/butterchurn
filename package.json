@@ -22,6 +22,8 @@
     "typecheck": "tsc --noEmit",
     "analyze": "npm run lint:check && npm run typecheck && npm run lint:glsl",
     "precommit": "npm run analyze",
+    "build:cdn": "npm run build && cp dist/butterchurn.min.js docs/cdn/ && cp test/fingerprints.json docs/cdn/ && cp presets/full-collection/*.min.js docs/cdn/presets/",
+    "deploy:cdn": "npm run build:cdn && git add docs/cdn && git commit -m 'chore: Update CDN build' && git push",
     "test": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs",
     "test:visual": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js",
     "test:visual:update": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js --updateSnapshot",
