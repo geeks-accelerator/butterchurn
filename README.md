@@ -2,6 +2,8 @@
 
 [![Butterchurn Preview](preview.png)](https://butterchurnviz.com)
 
+🎵 **[Live Demo: AlaskaButter.com](https://alaskabutter.com)** - Experience intelligent music visualization in your browser!
+
 ## PROJECT OVERVIEW
 
 Butterchurn is an intelligent WebGL implementation of the Milkdrop Visualizer with advanced audio-reactive preset selection. This fork transforms the original random preset system into an intelligent music-aware visualization engine.
@@ -42,6 +44,19 @@ if (isButterchurnSupported()) {
   // Show fallback or upgrade message
 }
 ```
+
+## LIVE DEMO
+
+### 🌐 AlaskaButter.com - Try It Now!
+
+Experience Butterchurn's intelligent music visualization at **[alaskabutter.com](https://alaskabutter.com)**:
+
+- 🎵 **Load any audio file** or use the built-in demo song
+- 🤖 **AI-driven preset selection** that matches your music's energy
+- 📱 **Works on any device** - desktop, laptop, tablet, or mobile
+- 🧪 **Advanced test interface** at [alaskabutter.com/test.html](https://alaskabutter.com/test.html)
+
+No installation required - just open your browser and start visualizing!
 
 ### Node.js Development Setup
 ```bash
