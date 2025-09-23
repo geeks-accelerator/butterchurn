@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2025-09-21T01:38:20.632Z",
+  "generated": "2025-09-23T17:40:17.543Z",
   "presets": {
     "48247653": {
       "hash": "48247653",
@@ -21,7 +21,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/AdamFX Mashup 2 Martin - reflections on black tile + Raron N Flexi .json"
+        "converted/AdamFX Mashup 2 Martin - reflections on black tile + Raron N Flexi .json"
       ]
     },
     "52523304": {
@@ -47,8 +47,8 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + stahlregen - jelly strike.json",
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - color strike.json"
+        "converted/flexi + stahlregen - jelly strike.json",
+        "converted/flexi - color strike.json"
       ]
     },
     "54085443": {
@@ -70,7 +70,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Aderrasi 2_1.json"
+        "converted/Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Aderrasi 2_1.json"
       ]
     },
     "71645646": {
@@ -94,7 +94,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin + stahlregen - martin in da mash 12.json"
+        "converted/martin + stahlregen - martin in da mash 12.json"
       ]
     },
     "74006924": {
@@ -118,7 +118,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix02b.json"
+        "converted/Eo.S. - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix02b.json"
       ]
     },
     "75491764": {
@@ -140,7 +140,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ORB - Planetary Alignment Acid Burn.json"
+        "converted/ORB - Planetary Alignment Acid Burn.json"
       ]
     },
     "82251439": {
@@ -164,7 +164,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss + Rovastar - Notions Of Tonality 2.json"
+        "converted/Geiss + Rovastar - Notions Of Tonality 2.json"
       ]
     },
     "87796543": {
@@ -188,7 +188,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss + Flexi + Martin - disconnected.json"
+        "converted/Geiss + Flexi + Martin - disconnected.json"
       ]
     },
     "91141994": {
@@ -212,7 +212,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (417).json"
+        "converted/$$$ Royal - Mashup (417).json"
       ]
     },
     "92769260": {
@@ -236,7 +236,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Idiot - Marphets Surreal Dream (Hypnotic Spiral Mix).json"
+        "converted/Idiot - Marphets Surreal Dream (Hypnotic Spiral Mix).json"
       ]
     },
     "00fc6736": {
@@ -258,7 +258,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (157).json"
+        "converted/$$$ Royal - Mashup (157).json"
       ]
     },
     "885431c6": {
@@ -280,7 +280,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (160).json"
+        "converted/$$$ Royal - Mashup (160).json"
       ]
     },
     "240a19e1": {
@@ -304,7 +304,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (177).json"
+        "converted/$$$ Royal - Mashup (177).json"
       ]
     },
     "2c2849f2": {
@@ -326,7 +326,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (197).json"
+        "converted/$$$ Royal - Mashup (197).json"
       ]
     },
     "291f1302": {
@@ -348,7 +348,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (220).json"
+        "converted/$$$ Royal - Mashup (220).json"
       ]
     },
     "3988893a": {
@@ -370,7 +370,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (253).json"
+        "converted/$$$ Royal - Mashup (253).json"
       ]
     },
     "af4d4fe9": {
@@ -394,7 +394,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (273).json"
+        "converted/$$$ Royal - Mashup (273).json"
       ]
     },
     "e7a2e1cd": {
@@ -418,7 +418,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (307).json"
+        "converted/$$$ Royal - Mashup (307).json"
       ]
     },
     "a5b461c0": {
@@ -443,7 +443,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (326).json"
+        "converted/$$$ Royal - Mashup (326).json"
       ]
     },
     "f47b8cf1": {
@@ -469,8 +469,8 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (337).json",
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (441).json"
+        "converted/$$$ Royal - Mashup (337).json",
+        "converted/$$$ Royal - Mashup (441).json"
       ]
     },
     "fcff5f09": {
@@ -494,7 +494,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (431).json"
+        "converted/$$$ Royal - Mashup (431).json"
       ]
     },
     "6203f801": {
@@ -520,8 +520,8 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/$$$ Royal - Mashup (489).json",
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Halfbreak - Light of Breakers.json"
+        "converted/$$$ Royal - Mashup (489).json",
+        "converted/Halfbreak - Light of Breakers.json"
       ]
     },
     "2d291d59": {
@@ -545,7 +545,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/11.json"
+        "converted/11.json"
       ]
     },
     "76f3ae87": {
@@ -569,7 +569,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/158.json"
+        "converted/158.json"
       ]
     },
     "e38da229": {
@@ -593,7 +593,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/269.json"
+        "converted/269.json"
       ]
     },
     "42dbcf34": {
@@ -617,7 +617,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/27.json"
+        "converted/27.json"
       ]
     },
     "e62b0cd8": {
@@ -639,7 +639,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/286.json"
+        "converted/286.json"
       ]
     },
     "bf35f194": {
@@ -663,7 +663,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/444.json"
+        "converted/444.json"
       ]
     },
     "3a6d3ff5": {
@@ -687,7 +687,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/A Tribute to Martin - bombyx mori - Ft Flexi - AdamFX - StahlRegen - Krash - Rovastar -  Hd in Milk T.json"
+        "converted/A Tribute to Martin - bombyx mori - Ft Flexi - AdamFX - StahlRegen - Krash - Rovastar -  Hd in Milk T.json"
       ]
     },
     "d4314b8e": {
@@ -709,7 +709,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Baked Ft another AdamFX Mashup 7_1.json"
+        "converted/Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Baked Ft another AdamFX Mashup 7_1.json"
       ]
     },
     "6d6a5939": {
@@ -731,7 +731,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Eos Ft Flexi n Hexocollie + Baked + Santa Fucking Claus.json"
+        "converted/Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Eos Ft Flexi n Hexocollie + Baked + Santa Fucking Claus.json"
       ]
     },
     "ed51d5d4": {
@@ -755,7 +755,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Adam Fx 2 Zylot - Age of Science Fierceness 16 - mash0000 - gerber full heaving baby.json"
+        "converted/Adam Fx 2 Zylot - Age of Science Fierceness 16 - mash0000 - gerber full heaving baby.json"
       ]
     },
     "9629de39": {
@@ -779,7 +779,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Adam Fx 2 Zylot - Age of Science Fierceness BEAST2 - mash0000 - ethics is for weiner dogs.json"
+        "converted/Adam Fx 2 Zylot - Age of Science Fierceness BEAST2 - mash0000 - ethics is for weiner dogs.json"
       ]
     },
     "79be8c87": {
@@ -803,7 +803,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Adam Fx 2 Zylot - Age of Science Fierceness Starburst 5 - mash0000.json"
+        "converted/Adam Fx 2 Zylot - Age of Science Fierceness Starburst 5 - mash0000.json"
       ]
     },
     "04191572": {
@@ -825,7 +825,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/AdamFX Enterz Tha Mash With Martin + stahlregen - AdamFX - In Tha Mash Effectz E.json"
+        "converted/AdamFX Enterz Tha Mash With Martin + stahlregen - AdamFX - In Tha Mash Effectz E.json"
       ]
     },
     "99e748d2": {
@@ -850,7 +850,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/AdamFx 2 Aderrasi - Airhandler (Last Breath - Calm)Ilusional Discontent2.json"
+        "converted/AdamFx 2 Aderrasi - Airhandler (Last Breath - Calm)Ilusional Discontent2.json"
       ]
     },
     "1f8f2d42": {
@@ -874,7 +874,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/AdamFx 2 Geiss -Somewhat Distort Me 3_1.json"
+        "converted/AdamFx 2 Geiss -Somewhat Distort Me 3_1.json"
       ]
     },
     "bc513870": {
@@ -898,7 +898,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/AdamFx 2 Geiss, Zylot and Flexi - Reaction Diffusion 3 (Overload Mix 2) EATIT4 (BCCNJ4).json"
+        "converted/AdamFx 2 Geiss, Zylot and Flexi - Reaction Diffusion 3 (Overload Mix 2) EATIT4 (BCCNJ4).json"
       ]
     },
     "b955a1da": {
@@ -920,7 +920,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/AdamFx 2 Geiss, Zylot and Flexi - Reaction Diffusion 3 (Overload Mix 2) EATIT4 hypno.json"
+        "converted/AdamFx 2 Geiss, Zylot and Flexi - Reaction Diffusion 3 (Overload Mix 2) EATIT4 hypno.json"
       ]
     },
     "79b58143": {
@@ -943,8 +943,8 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi + Geiss - Airhandler (Kali Mix) - Canvas Mix.json",
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi + Geiss - Airhandler (Kali Mix) - Painterly Tendrils Colorfast.json"
+        "converted/Aderrasi + Geiss - Airhandler (Kali Mix) - Canvas Mix.json",
+        "converted/Aderrasi + Geiss - Airhandler (Kali Mix) - Painterly Tendrils Colorfast.json"
       ]
     },
     "65ecb830": {
@@ -968,7 +968,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi + Geiss - Airhandler (Square Mix).json"
+        "converted/Aderrasi + Geiss - Airhandler (Square Mix).json"
       ]
     },
     "07628175": {
@@ -992,7 +992,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Agitator.json"
+        "converted/Aderrasi - Agitator.json"
       ]
     },
     "eeb7dfc8": {
@@ -1017,7 +1017,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Airhandler (Last Breath - Calm).json"
+        "converted/Aderrasi - Airhandler (Last Breath - Calm).json"
       ]
     },
     "c0152e6c": {
@@ -1042,7 +1042,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Airhandler (Principle of Sharing).json"
+        "converted/Aderrasi - Airhandler (Principle of Sharing).json"
       ]
     },
     "6a661f56": {
@@ -1067,7 +1067,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Contortion (Escher′s Tunnel Mix).json"
+        "converted/Aderrasi - Contortion (Escher′s Tunnel Mix).json"
       ]
     },
     "fed1d0f1": {
@@ -1092,7 +1092,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Contortion (Wide Twist Mix).json"
+        "converted/Aderrasi - Contortion (Wide Twist Mix).json"
       ]
     },
     "0975ca24": {
@@ -1117,7 +1117,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Curse of the Mirror Emu.json"
+        "converted/Aderrasi - Curse of the Mirror Emu.json"
       ]
     },
     "52c8c817": {
@@ -1141,7 +1141,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Graft (First Rate Heart).json"
+        "converted/Aderrasi - Graft (First Rate Heart).json"
       ]
     },
     "d67b58b5": {
@@ -1166,7 +1166,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Halls Of Centrifuge.json"
+        "converted/Aderrasi - Halls Of Centrifuge.json"
       ]
     },
     "85c625c4": {
@@ -1191,7 +1191,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Mother Of Pearl - mash0000 - how to piss off your eyes.json"
+        "converted/Aderrasi - Mother Of Pearl - mash0000 - how to piss off your eyes.json"
       ]
     },
     "e82aaac7": {
@@ -1216,7 +1216,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Potion of Spirits.json"
+        "converted/Aderrasi - Potion of Spirits.json"
       ]
     },
     "fd453f52": {
@@ -1240,7 +1240,7 @@
         "warmupTime": 5
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Songflower (Moss Posy).json"
+        "converted/Aderrasi - Songflower (Moss Posy).json"
       ]
     },
     "f86401ef": {
@@ -1265,7 +1265,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Storm of the Eye (Thunder) - mash0000 - quasi pseudo meta concentrics.json"
+        "converted/Aderrasi - Storm of the Eye (Thunder) - mash0000 - quasi pseudo meta concentrics.json"
       ]
     },
     "98d35046": {
@@ -1289,7 +1289,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Aderrasi - Veil of Steel (Steel Storm) - mash0000 - bob ross finally loses it.json"
+        "converted/Aderrasi - Veil of Steel (Steel Storm) - mash0000 - bob ross finally loses it.json"
       ]
     },
     "13c4d7b3": {
@@ -1314,7 +1314,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/An AdamFX n Martin Infusion 2 flexi - Why The Sky Looks Diffrent Today - AdamFx n Martin Infusion - Tack Tile Disfunction B.json"
+        "converted/An AdamFX n Martin Infusion 2 flexi - Why The Sky Looks Diffrent Today - AdamFx n Martin Infusion - Tack Tile Disfunction B.json"
       ]
     },
     "6e6e7534": {
@@ -1338,7 +1338,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Cope - Keanu Reeves Is A Bad Actor.json"
+        "converted/Cope - Keanu Reeves Is A Bad Actor.json"
       ]
     },
     "ded81fac": {
@@ -1362,7 +1362,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Cope - Passage (mandala mix).json"
+        "converted/Cope - Passage (mandala mix).json"
       ]
     },
     "03f5bffd": {
@@ -1384,7 +1384,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Cope - The Neverending Explosion of Red Liquid Fire.json"
+        "converted/Cope - The Neverending Explosion of Red Liquid Fire.json"
       ]
     },
     "b6a9f589": {
@@ -1408,7 +1408,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Cope - The Red.json"
+        "converted/Cope - The Red.json"
       ]
     },
     "b3336b2d": {
@@ -1432,7 +1432,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/DemonLD_-_Toxic_water_diffusion threx angela vs debi brown (nice).json"
+        "converted/DemonLD_-_Toxic_water_diffusion threx angela vs debi brown (nice).json"
       ]
     },
     "3a626536": {
@@ -1456,7 +1456,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/EVET + Flexi - Rainbox Splash Poolz.json"
+        "converted/EVET + Flexi - Rainbox Splash Poolz.json"
       ]
     },
     "498d5f9c": {
@@ -1478,7 +1478,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/EVET - RGB Singularity.json"
+        "converted/EVET - RGB Singularity.json"
       ]
     },
     "a200d366": {
@@ -1500,7 +1500,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. + Geiss - glowsticks v2 02 (Relief Mix).json"
+        "converted/Eo.S. + Geiss - glowsticks v2 02 (Relief Mix).json"
       ]
     },
     "ad91ca9b": {
@@ -1524,7 +1524,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. + Phat - Emergent factors.json"
+        "converted/Eo.S. + Phat - Emergent factors.json"
       ]
     },
     "af7f9d55": {
@@ -1548,7 +1548,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. + Phat - cubetrace - v2.json"
+        "converted/Eo.S. + Phat - cubetrace - v2.json"
       ]
     },
     "72574eb0": {
@@ -1572,7 +1572,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. + Phat cubetrace (cybercity madness remix) - mash0000 - evaporating crystal pharma.json"
+        "converted/Eo.S. + Phat cubetrace (cybercity madness remix) - mash0000 - evaporating crystal pharma.json"
       ]
     },
     "db335c8d": {
@@ -1594,7 +1594,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. + Zylot - skylight (Stained Glass Majesty mix).json"
+        "converted/Eo.S. + Zylot - skylight (Stained Glass Majesty mix).json"
       ]
     },
     "e4fc65e0": {
@@ -1618,7 +1618,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. + flexi - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix02b + illumination (Stahl′s Mix).json"
+        "converted/Eo.S. + flexi - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix02b + illumination (Stahl′s Mix).json"
       ]
     },
     "c39ae4b7": {
@@ -1640,7 +1640,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. - glowsticks v2 03 music.json"
+        "converted/Eo.S. - glowsticks v2 03 music.json"
       ]
     },
     "28838b27": {
@@ -1664,7 +1664,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix03 madhatter_v2.json"
+        "converted/Eo.S. - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix03 madhatter_v2.json"
       ]
     },
     "47432f6d": {
@@ -1688,7 +1688,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix07 recursive demons.json"
+        "converted/Eo.S. - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix07 recursive demons.json"
       ]
     },
     "eb0a66ba": {
@@ -1710,7 +1710,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. - multisphere 01 B_Phat_Ra_mix.json"
+        "converted/Eo.S. - multisphere 01 B_Phat_Ra_mix.json"
       ]
     },
     "e5d0b911": {
@@ -1734,7 +1734,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Eo.S. - spark C_Phat_Jester_Mix_v2.json"
+        "converted/Eo.S. - spark C_Phat_Jester_Mix_v2.json"
       ]
     },
     "f5321503": {
@@ -1758,7 +1758,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/EoS - particle storm B - couldn't not.json"
+        "converted/EoS - particle storm B - couldn't not.json"
       ]
     },
     "a96b624f": {
@@ -1783,7 +1783,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/EoS_Phat Dark_heart_nobal_cause cpe ap4+.json"
+        "converted/EoS_Phat Dark_heart_nobal_cause cpe ap4+.json"
       ]
     },
     "ba2ce59e": {
@@ -1807,7 +1807,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + Geiss + Demon Lord - unholy tokamak clot-plot.json"
+        "converted/Flexi + Geiss + Demon Lord - unholy tokamak clot-plot.json"
       ]
     },
     "4a9c2d8d": {
@@ -1831,7 +1831,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + Geiss - Tokamak mindblob 2.0.json"
+        "converted/Flexi + Geiss - Tokamak mindblob 2.0.json"
       ]
     },
     "b8327901": {
@@ -1856,7 +1856,7 @@
         "warmupTime": 5
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + Geiss - antagonizing beat detection codes.json"
+        "converted/Flexi + Geiss - antagonizing beat detection codes.json"
       ]
     },
     "0af8e2d6": {
@@ -1880,7 +1880,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + Geiss - pogo-cubes on tokamak matter (Jelly 5.55).json"
+        "converted/Flexi + Geiss - pogo-cubes on tokamak matter (Jelly 5.55).json"
       ]
     },
     "b1410a51": {
@@ -1902,7 +1902,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + Martin - astral projection.json"
+        "converted/Flexi + Martin - astral projection.json"
       ]
     },
     "62a8b344": {
@@ -1926,7 +1926,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + Martin - cascading decay swing.json"
+        "converted/Flexi + Martin - cascading decay swing.json"
       ]
     },
     "30fde51c": {
@@ -1950,7 +1950,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + Martin - dive.json"
+        "converted/Flexi + Martin - dive.json"
       ]
     },
     "0c3133be": {
@@ -1974,7 +1974,7 @@
         "warmupTime": 4
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + Martin - tunnel of supraschismatika.json"
+        "converted/Flexi + Martin - tunnel of supraschismatika.json"
       ]
     },
     "b5c21c7c": {
@@ -2000,8 +2000,8 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + Rovastar - Fractopia [lovecraft].json",
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi, Rovastar + Geiss - Fractopia vs bas relief.json"
+        "converted/Flexi + Rovastar - Fractopia [lovecraft].json",
+        "converted/Flexi, Rovastar + Geiss - Fractopia vs bas relief.json"
       ]
     },
     "cc49c3a4": {
@@ -2025,7 +2025,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + amandio c - piercing 05 - Kopie (2) - Kopie.json"
+        "converted/Flexi + amandio c - piercing 05 - Kopie (2) - Kopie.json"
       ]
     },
     "54c9fa17": {
@@ -2049,7 +2049,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + fiShbRaiN - operation fatcap II.json"
+        "converted/Flexi + fiShbRaiN - operation fatcap II.json"
       ]
     },
     "cb35e922": {
@@ -2074,7 +2074,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + stahlregen - jelly showoff parade.json"
+        "converted/Flexi + stahlregen - jelly showoff parade.json"
       ]
     },
     "36bd7224": {
@@ -2098,7 +2098,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi + stahlregen - jelly space.json"
+        "converted/Flexi + stahlregen - jelly space.json"
       ]
     },
     "0bd0dd62": {
@@ -2120,7 +2120,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - alien fader.json"
+        "converted/Flexi - alien fader.json"
       ]
     },
     "a6dfd65d": {
@@ -2144,7 +2144,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - alien fish pond.json"
+        "converted/Flexi - alien fish pond.json"
       ]
     },
     "092dfe2d": {
@@ -2169,7 +2169,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - alien web bouncer [26].json"
+        "converted/Flexi - alien web bouncer [26].json"
       ]
     },
     "7a404679": {
@@ -2193,7 +2193,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - area 51.json"
+        "converted/Flexi - area 51.json"
       ]
     },
     "53821c8d": {
@@ -2217,7 +2217,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - blame hexcollie twice.json"
+        "converted/Flexi - blame hexcollie twice.json"
       ]
     },
     "1c609a74": {
@@ -2241,7 +2241,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - crush ice 72.json"
+        "converted/Flexi - crush ice 72.json"
       ]
     },
     "d9fd919d": {
@@ -2265,7 +2265,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - dimensions, projection and abstraction.json"
+        "converted/Flexi - dimensions, projection and abstraction.json"
       ]
     },
     "73accdf1": {
@@ -2289,7 +2289,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - infused with the spiral.json"
+        "converted/Flexi - infused with the spiral.json"
       ]
     },
     "eec275eb": {
@@ -2313,7 +2313,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - mindblob 2.0.json"
+        "converted/Flexi - mindblob 2.0.json"
       ]
     },
     "9c1ac867": {
@@ -2337,7 +2337,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - mindblob [shiny mix].json"
+        "converted/Flexi - mindblob [shiny mix].json"
       ]
     },
     "9ebc7df2": {
@@ -2361,7 +2361,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - mindblob mix.json"
+        "converted/Flexi - mindblob mix.json"
       ]
     },
     "6d69ee95": {
@@ -2385,7 +2385,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - piercing.json"
+        "converted/Flexi - piercing.json"
       ]
     },
     "697e053c": {
@@ -2409,7 +2409,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - predator-prey-spirals [stahlregens gelatine finish].json"
+        "converted/Flexi - predator-prey-spirals [stahlregens gelatine finish].json"
       ]
     },
     "69f838bb": {
@@ -2433,7 +2433,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - predator-prey-spirals.json"
+        "converted/Flexi - predator-prey-spirals.json"
       ]
     },
     "60bfc4de": {
@@ -2457,7 +2457,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - psychenapping.json"
+        "converted/Flexi - psychenapping.json"
       ]
     },
     "c5c37e91": {
@@ -2481,7 +2481,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - reality tunnel.json"
+        "converted/Flexi - reality tunnel.json"
       ]
     },
     "566e782d": {
@@ -2503,7 +2503,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - smashing fractals 2.0.json"
+        "converted/Flexi - smashing fractals 2.0.json"
       ]
     },
     "c5a1cda7": {
@@ -2525,7 +2525,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - smashing fractals [acid etching mix].json"
+        "converted/Flexi - smashing fractals [acid etching mix].json"
       ]
     },
     "7daf1111": {
@@ -2550,7 +2550,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - the distant point between derivative.json"
+        "converted/Flexi - the distant point between derivative.json"
       ]
     },
     "45157dfb": {
@@ -2574,7 +2574,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - truly soft piece of software - this is generic texturing (Jelly) .json"
+        "converted/Flexi - truly soft piece of software - this is generic texturing (Jelly) .json"
       ]
     },
     "0adb7f0e": {
@@ -2598,7 +2598,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi - wild at range.json"
+        "converted/Flexi - wild at range.json"
       ]
     },
     "d53a225a": {
@@ -2622,7 +2622,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi, Geiss and Rovastar - chaos layered tokamak.json"
+        "converted/Flexi, Geiss and Rovastar - chaos layered tokamak.json"
       ]
     },
     "5851137c": {
@@ -2646,7 +2646,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi, Martin, Phat, Zylot + Eo.S - one way trip trap proof of concept [epileptic zoom tunnel edit].json"
+        "converted/Flexi, Martin, Phat, Zylot + Eo.S - one way trip trap proof of concept [epileptic zoom tunnel edit].json"
       ]
     },
     "e7001563": {
@@ -2670,7 +2670,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi, fishbrain + Martin - witchery.json"
+        "converted/Flexi, fishbrain + Martin - witchery.json"
       ]
     },
     "264afa59": {
@@ -2694,7 +2694,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi, fishbrain, Geiss + Martin - tokamak witchery.json"
+        "converted/Flexi, fishbrain, Geiss + Martin - tokamak witchery.json"
       ]
     },
     "f4d34c29": {
@@ -2718,7 +2718,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi, martin + geiss - dedicated to the sherwin maxawow.json"
+        "converted/Flexi, martin + geiss - dedicated to the sherwin maxawow.json"
       ]
     },
     "d7c33f3b": {
@@ -2742,7 +2742,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Flexi, martin + geiss - painterly rogue wave strike.json"
+        "converted/Flexi, martin + geiss - painterly rogue wave strike.json"
       ]
     },
     "7ea6ec6f": {
@@ -2767,7 +2767,7 @@
         "warmupTime": 6
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Fumbling_Foo & Flexi, Martin, Orb, Unchained - Star Nova v7b.json"
+        "converted/Fumbling_Foo & Flexi, Martin, Orb, Unchained - Star Nova v7b.json"
       ]
     },
     "8205d809": {
@@ -2791,7 +2791,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Fumbling_Foo + En D & Martin - Mandelverse.json"
+        "converted/Fumbling_Foo + En D & Martin - Mandelverse.json"
       ]
     },
     "7b14c234": {
@@ -2815,7 +2815,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - 3 layers (Tunnel Mix).json"
+        "converted/Geiss - 3 layers (Tunnel Mix).json"
       ]
     },
     "294765d4": {
@@ -2837,7 +2837,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Bipolar 2 Enhanced.json"
+        "converted/Geiss - Bipolar 2 Enhanced.json"
       ]
     },
     "1b0c1a82": {
@@ -2861,7 +2861,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Brain Zoom 4.json"
+        "converted/Geiss - Brain Zoom 4.json"
       ]
     },
     "9f86d7a6": {
@@ -2885,7 +2885,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Cauldron - painterly (saturation remix).json"
+        "converted/Geiss - Cauldron - painterly (saturation remix).json"
       ]
     },
     "ceb714d0": {
@@ -2909,7 +2909,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Cauldron - painterly 2 (saturation remix).json"
+        "converted/Geiss - Cauldron - painterly 2 (saturation remix).json"
       ]
     },
     "f577421b": {
@@ -2934,7 +2934,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Color Pox (Acid Impression Mix) (color saturation remix).json"
+        "converted/Geiss - Color Pox (Acid Impression Mix) (color saturation remix).json"
       ]
     },
     "ca342c1f": {
@@ -2958,7 +2958,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Desert Rose 4.json"
+        "converted/Geiss - Desert Rose 4.json"
       ]
     },
     "928fad11": {
@@ -2982,7 +2982,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Drop Shadow 1.json"
+        "converted/Geiss - Drop Shadow 1.json"
       ]
     },
     "9c724b2d": {
@@ -3006,7 +3006,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Drop Shadow 2.json"
+        "converted/Geiss - Drop Shadow 2.json"
       ]
     },
     "eb7dfc96": {
@@ -3030,7 +3030,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Eggs.json"
+        "converted/Geiss - Eggs.json"
       ]
     },
     "d531e7b5": {
@@ -3055,7 +3055,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - El Cubismo.json"
+        "converted/Geiss - El Cubismo.json"
       ]
     },
     "50320d2e": {
@@ -3079,7 +3079,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Explosion Mod 2bd (wave).json"
+        "converted/Geiss - Explosion Mod 2bd (wave).json"
       ]
     },
     "a864f944": {
@@ -3101,7 +3101,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Feedback 2.json"
+        "converted/Geiss - Feedback 2.json"
       ]
     },
     "ef272b4e": {
@@ -3125,7 +3125,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Flotsam - mash0000 - unfathomably advanced yet psychotic aliens churn my mental insides.json"
+        "converted/Geiss - Flotsam - mash0000 - unfathomably advanced yet psychotic aliens churn my mental insides.json"
       ]
     },
     "51840e41": {
@@ -3149,7 +3149,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Game of Life 3.json"
+        "converted/Geiss - Game of Life 3.json"
       ]
     },
     "20038ad8": {
@@ -3171,7 +3171,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Hurricane.json"
+        "converted/Geiss - Hurricane.json"
       ]
     },
     "456240e1": {
@@ -3195,7 +3195,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Myriad Mosaics.json"
+        "converted/Geiss - Myriad Mosaics.json"
       ]
     },
     "cf8ea3aa": {
@@ -3217,7 +3217,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Planet 1.json"
+        "converted/Geiss - Planet 1.json"
       ]
     },
     "1eb5db39": {
@@ -3239,7 +3239,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Reaction Diffusion (Puddle Mix)s a aa aa.json"
+        "converted/Geiss - Reaction Diffusion (Puddle Mix)s a aa aa.json"
       ]
     },
     "1dbfed1e": {
@@ -3263,7 +3263,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Reaction Diffusion (Relief Mix).json"
+        "converted/Geiss - Reaction Diffusion (Relief Mix).json"
       ]
     },
     "c89ade51": {
@@ -3287,7 +3287,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Reaction Diffusion 2.json"
+        "converted/Geiss - Reaction Diffusion 2.json"
       ]
     },
     "af5c5bb8": {
@@ -3311,7 +3311,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Reaction Diffusion 3 (Lichen Mix).json"
+        "converted/Geiss - Reaction Diffusion 3 (Lichen Mix).json"
       ]
     },
     "da6ba07b": {
@@ -3335,7 +3335,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Reaction Diffusion 3.json"
+        "converted/Geiss - Reaction Diffusion 3.json"
       ]
     },
     "9f542500": {
@@ -3360,7 +3360,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Skin Dots 9.json"
+        "converted/Geiss - Skin Dots 9.json"
       ]
     },
     "6a16a14c": {
@@ -3385,7 +3385,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Skin Dots Multi-layer 3.json"
+        "converted/Geiss - Skin Dots Multi-layer 3.json"
       ]
     },
     "f4a7d07b": {
@@ -3409,7 +3409,7 @@
         "warmupTime": 5
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Spiral Artifact.json"
+        "converted/Geiss - Spiral Artifact.json"
       ]
     },
     "c84dc0b0": {
@@ -3433,7 +3433,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Thumb Drum.json"
+        "converted/Geiss - Thumb Drum.json"
       ]
     },
     "5d1f2a24": {
@@ -3457,7 +3457,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Tokamak Plus 2.json"
+        "converted/Geiss - Tokamak Plus 2.json"
       ]
     },
     "0190ca5e": {
@@ -3479,7 +3479,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss - Two-Pointed Pulsagon - mash0000 - bubonic super-fluid centrifuge.json"
+        "converted/Geiss - Two-Pointed Pulsagon - mash0000 - bubonic super-fluid centrifuge.json"
       ]
     },
     "e820bcc0": {
@@ -3503,7 +3503,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Geiss, Flexi + Stahlregen - Thumbdrum Tokamak [crossfiring aftermath jelly mashup].json"
+        "converted/Geiss, Flexi + Stahlregen - Thumbdrum Tokamak [crossfiring aftermath jelly mashup].json"
       ]
     },
     "d6ee8005": {
@@ -3525,7 +3525,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Goody + flexi - Data Crusher.json"
+        "converted/Goody + flexi - Data Crusher.json"
       ]
     },
     "98dac100": {
@@ -3549,7 +3549,7 @@
         "warmupTime": 5
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Goody - Ego Decontructor.json"
+        "converted/Goody - Ego Decontructor.json"
       ]
     },
     "df0caa9e": {
@@ -3573,7 +3573,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Goody - The Wild Vort.json"
+        "converted/Goody - The Wild Vort.json"
       ]
     },
     "e49e4736": {
@@ -3597,7 +3597,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/GreatWho - Lasershow.json"
+        "converted/GreatWho - Lasershow.json"
       ]
     },
     "e80f3f32": {
@@ -3622,7 +3622,7 @@
         "warmupTime": 4
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Halfbreak - Funny Madness.json"
+        "converted/Halfbreak - Funny Madness.json"
       ]
     },
     "ec80b51a": {
@@ -3646,7 +3646,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Hexcollie - Cell division.json"
+        "converted/Hexcollie - Cell division.json"
       ]
     },
     "da759999": {
@@ -3670,7 +3670,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Hexcollie - Nautalisk - mash0000 - but officer, my fingerprint always changes.json"
+        "converted/Hexcollie - Nautalisk - mash0000 - but officer, my fingerprint always changes.json"
       ]
     },
     "d5b4d68f": {
@@ -3694,7 +3694,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Hexcollie, Pieturp, Orb, Flexi, Geiss n Demon Lord - Premeditative Urination Clause.json"
+        "converted/Hexcollie, Pieturp, Orb, Flexi, Geiss n Demon Lord - Premeditative Urination Clause.json"
       ]
     },
     "96e16270": {
@@ -3718,7 +3718,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Idiot - Star Of Annon.json"
+        "converted/Idiot - Star Of Annon.json"
       ]
     },
     "2e766509": {
@@ -3742,7 +3742,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Illusion & Rovastar - Dotty Mad Space (Jelly).json"
+        "converted/Illusion & Rovastar - Dotty Mad Space (Jelly).json"
       ]
     },
     "4c925e99": {
@@ -3766,7 +3766,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Ishan - Anuera.json"
+        "converted/Ishan - Anuera.json"
       ]
     },
     "4fbc5d1b": {
@@ -3788,7 +3788,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Isosceles mashup07.json"
+        "converted/Isosceles mashup07.json"
       ]
     },
     "4946ccab": {
@@ -3812,7 +3812,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Krash & Rovastar - A Million Miles from Earth (Ripple Mix).json"
+        "converted/Krash & Rovastar - A Million Miles from Earth (Ripple Mix).json"
       ]
     },
     "8f266b6d": {
@@ -3837,7 +3837,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Krash + Illusion + Geiss - Spiral Movement (Reaction Diffusion mix).json"
+        "converted/Krash + Illusion + Geiss - Spiral Movement (Reaction Diffusion mix).json"
       ]
     },
     "be99f9ff": {
@@ -3862,7 +3862,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Krash + Illusion - Spiral Movement.json"
+        "converted/Krash + Illusion - Spiral Movement.json"
       ]
     },
     "d1d10ca4": {
@@ -3886,7 +3886,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Krash - War Machine (Shifting Complexity Mix).json"
+        "converted/Krash - War Machine (Shifting Complexity Mix).json"
       ]
     },
     "c6f86bf9": {
@@ -3910,7 +3910,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/LuxXx - Fuck Your Code ii.json"
+        "converted/LuxXx - Fuck Your Code ii.json"
       ]
     },
     "bc25f519": {
@@ -3934,7 +3934,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/LuxXx - GrindFace  225 mg dose  .json"
+        "converted/LuxXx - GrindFace  225 mg dose  .json"
       ]
     },
     "2f88c7d1": {
@@ -3960,8 +3960,8 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/LuxXx - Play v3 (the war within all of us).json",
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Waltra - Square Orgy.json"
+        "converted/LuxXx - Play v3 (the war within all of us).json",
+        "converted/Waltra - Square Orgy.json"
       ]
     },
     "a18ac501": {
@@ -3985,7 +3985,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/LuxXx - Subtle HipHopFlake.json"
+        "converted/LuxXx - Subtle HipHopFlake.json"
       ]
     },
     "7cf6ca40": {
@@ -4007,7 +4007,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/LuxXx - iWhat Happened Right After I Ate That Toxic Waste beta ii.json"
+        "converted/LuxXx - iWhat Happened Right After I Ate That Toxic Waste beta ii.json"
       ]
     },
     "8ccaf21c": {
@@ -4031,7 +4031,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - Diabolo.json"
+        "converted/Martin - Diabolo.json"
       ]
     },
     "ea177638": {
@@ -4055,7 +4055,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - QBikal - Surface Turbulence II.json"
+        "converted/Martin - QBikal - Surface Turbulence II.json"
       ]
     },
     "0884484d": {
@@ -4079,7 +4079,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - QBikal - Surface Turbulence IIb.json"
+        "converted/Martin - QBikal - Surface Turbulence IIb.json"
       ]
     },
     "81ec5385": {
@@ -4101,7 +4101,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - acid wiring.json"
+        "converted/Martin - acid wiring.json"
       ]
     },
     "efb69ca0": {
@@ -4125,7 +4125,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - bombyx mori mix2.json"
+        "converted/Martin - bombyx mori mix2.json"
       ]
     },
     "bb77489b": {
@@ -4149,7 +4149,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - charisma.json"
+        "converted/Martin - charisma.json"
       ]
     },
     "d92cef8b": {
@@ -4173,7 +4173,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - cool morning.json"
+        "converted/Martin - cool morning.json"
       ]
     },
     "7eaa64ff": {
@@ -4197,7 +4197,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - disco mix 3 -fast.json"
+        "converted/Martin - disco mix 3 -fast.json"
       ]
     },
     "7aac6471": {
@@ -4221,7 +4221,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - disco mix 6.json"
+        "converted/Martin - disco mix 6.json"
       ]
     },
     "d8a20eab": {
@@ -4243,7 +4243,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - journey into space.json"
+        "converted/Martin - journey into space.json"
       ]
     },
     "c9da007f": {
@@ -4267,7 +4267,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin - liquid arrows.json"
+        "converted/Martin - liquid arrows.json"
       ]
     },
     "4498632e": {
@@ -4292,7 +4292,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Martin N AdamFX Infusion = Phat+Yin+Eo.S_Mandala Chaser Ft AdamFX n Martin - The Beast Mandala Chaser FX H.json"
+        "converted/Martin N AdamFX Infusion = Phat+Yin+Eo.S_Mandala Chaser Ft AdamFX n Martin - The Beast Mandala Chaser FX H.json"
       ]
     },
     "622e327f": {
@@ -4316,7 +4316,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Milk Artist At our Best - FED - SlowFast Ft AdamFX n Martin - HD CosmoFX.json"
+        "converted/Milk Artist At our Best - FED - SlowFast Ft AdamFX n Martin - HD CosmoFX.json"
       ]
     },
     "f909c7f5": {
@@ -4338,7 +4338,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/MilkDrop2077.R002.json"
+        "converted/MilkDrop2077.R002.json"
       ]
     },
     "080b71ec": {
@@ -4362,7 +4362,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/MilkDrop2077.R012.json"
+        "converted/MilkDrop2077.R012.json"
       ]
     },
     "27be1fc8": {
@@ -4386,7 +4386,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/MilkDrop2077.R033.json"
+        "converted/MilkDrop2077.R033.json"
       ]
     },
     "6a469120": {
@@ -4408,7 +4408,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/MilkDrop2077.R037.json"
+        "converted/MilkDrop2077.R037.json"
       ]
     },
     "0eaefcd6": {
@@ -4430,7 +4430,7 @@
         "warmupTime": 4
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/NeW Adam Master Mashup FX 2 Geiss - Reaction Diffusion 34 + Swelling Spiral  + Liquid Fire  + Geiss an46.json"
+        "converted/NeW Adam Master Mashup FX 2 Geiss - Reaction Diffusion 34 + Swelling Spiral  + Liquid Fire  + Geiss an46.json"
       ]
     },
     "c016eca1": {
@@ -4454,7 +4454,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/NeW Adam Master Mashup FX 2 Geiss and Zylot - Reaction Diffusion 3 (Overload Mix 2) AMAZING MASUP Various + Hurricane Nightmare.json"
+        "converted/NeW Adam Master Mashup FX 2 Geiss and Zylot - Reaction Diffusion 3 (Overload Mix 2) AMAZING MASUP Various + Hurricane Nightmare.json"
       ]
     },
     "77c47cb6": {
@@ -4476,7 +4476,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ORB - Blue Emotion.json"
+        "converted/ORB - Blue Emotion.json"
       ]
     },
     "ffcc9cd2": {
@@ -4498,7 +4498,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ORB - Depth Charge 2.json"
+        "converted/ORB - Depth Charge 2.json"
       ]
     },
     "96e89f5c": {
@@ -4523,7 +4523,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ORB - Fire and Fumes 2.json"
+        "converted/ORB - Fire and Fumes 2.json"
       ]
     },
     "28ea63a1": {
@@ -4545,7 +4545,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ORB - Lazer Ride.json"
+        "converted/ORB - Lazer Ride.json"
       ]
     },
     "ccfe05d0": {
@@ -4567,7 +4567,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ORB - Magma Pool.json"
+        "converted/ORB - Magma Pool.json"
       ]
     },
     "6fbfa0a7": {
@@ -4589,7 +4589,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ORB - Pastel Primer.json"
+        "converted/ORB - Pastel Primer.json"
       ]
     },
     "43ecd5cc": {
@@ -4611,7 +4611,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ORB - Sandblade.json"
+        "converted/ORB - Sandblade.json"
       ]
     },
     "deb51092": {
@@ -4635,7 +4635,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ORB - Solar Radiation.json"
+        "converted/ORB - Solar Radiation.json"
       ]
     },
     "33da8449": {
@@ -4659,7 +4659,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ORB - Waaa.json"
+        "converted/ORB - Waaa.json"
       ]
     },
     "1ce00d8f": {
@@ -4681,7 +4681,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Phat + Zylot + Eo.S. - work with lines.json"
+        "converted/Phat + Zylot + Eo.S. - work with lines.json"
       ]
     },
     "c9c8e618": {
@@ -4706,7 +4706,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Phat+fiShbRaiN+Eo.S_Mandala_Chasers_remix.json"
+        "converted/Phat+fiShbRaiN+Eo.S_Mandala_Chasers_remix.json"
       ]
     },
     "827e1df4": {
@@ -4730,7 +4730,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Phat_Zylot_Eo.S. spiral_Movements_Beatle.json"
+        "converted/Phat_Zylot_Eo.S. spiral_Movements_Beatle.json"
       ]
     },
     "1eff121d": {
@@ -4754,7 +4754,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Phat_Zylot_Eo.S. square_faces_v2_alt_colours.json"
+        "converted/Phat_Zylot_Eo.S. square_faces_v2_alt_colours.json"
       ]
     },
     "fca91a9d": {
@@ -4778,7 +4778,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/PieturP - triptrap_(getting_concrete_visions_through_a_diafragma_version).json"
+        "converted/PieturP - triptrap_(getting_concrete_visions_through_a_diafragma_version).json"
       ]
     },
     "39c4ec56": {
@@ -4802,7 +4802,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/PieturP - triptrap_(ultimate-trip-mix).json"
+        "converted/PieturP - triptrap_(ultimate-trip-mix).json"
       ]
     },
     "3060149e": {
@@ -4826,7 +4826,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Redi Jedi - i dont think those were portabello mushrooms.json"
+        "converted/Redi Jedi - i dont think those were portabello mushrooms.json"
       ]
     },
     "86a202c4": {
@@ -4850,7 +4850,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rocke - Answer.42 (New Mix 1) - mash0000 - slash and char p. jungle.json"
+        "converted/Rocke - Answer.42 (New Mix 1) - mash0000 - slash and char p. jungle.json"
       ]
     },
     "ad038480": {
@@ -4874,7 +4874,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar & Idiot24-7 - Balk Acid.json"
+        "converted/Rovastar & Idiot24-7 - Balk Acid.json"
       ]
     },
     "e44f0c6f": {
@@ -4896,7 +4896,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar & Loadus + Zylot - FractalDrop (Spark Machine v2.0).json"
+        "converted/Rovastar & Loadus + Zylot - FractalDrop (Spark Machine v2.0).json"
       ]
     },
     "853b70ad": {
@@ -4921,7 +4921,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Che - Asylum Animations.json"
+        "converted/Rovastar + Che - Asylum Animations.json"
       ]
     },
     "07347ed8": {
@@ -4946,7 +4946,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Flexi - Hurricane Nightmare (Moebius Mix).json"
+        "converted/Rovastar + Flexi - Hurricane Nightmare (Moebius Mix).json"
       ]
     },
     "56464aed": {
@@ -4970,7 +4970,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Fvese - Mosaic Waves.json"
+        "converted/Rovastar + Fvese - Mosaic Waves.json"
       ]
     },
     "981f91ef": {
@@ -4996,8 +4996,8 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Geiss - Hurricane Nightmare (Gold Chrome Mix).json",
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Geiss - Hurricane Nightmare (Relief Mix).json"
+        "converted/Rovastar + Geiss - Hurricane Nightmare (Gold Chrome Mix).json",
+        "converted/Rovastar + Geiss - Hurricane Nightmare (Relief Mix).json"
       ]
     },
     "64d825d7": {
@@ -5022,7 +5022,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Geiss - Hurricane Nightmare.json"
+        "converted/Rovastar + Geiss - Hurricane Nightmare.json"
       ]
     },
     "b6e56c3e": {
@@ -5044,7 +5044,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Geiss - Hyperkaleidoscope Glow 2 motion blur (Jelly).json"
+        "converted/Rovastar + Geiss - Hyperkaleidoscope Glow 2 motion blur (Jelly).json"
       ]
     },
     "a7415d47": {
@@ -5066,7 +5066,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Geiss - Hyperspace - kaleidoscope.json"
+        "converted/Rovastar + Geiss - Hyperspace - kaleidoscope.json"
       ]
     },
     "49557e0c": {
@@ -5090,7 +5090,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Geiss - Snapshot Of Space (LSB mix).json"
+        "converted/Rovastar + Geiss - Snapshot Of Space (LSB mix).json"
       ]
     },
     "8d43529a": {
@@ -5112,7 +5112,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Loadus + Geiss - FractalDrop (Triple Mix).json"
+        "converted/Rovastar + Loadus + Geiss - FractalDrop (Triple Mix).json"
       ]
     },
     "d298d5d8": {
@@ -5134,7 +5134,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Loadus + Geiss - Tone-mapped FractalDrop 7c.json"
+        "converted/Rovastar + Loadus + Geiss - Tone-mapped FractalDrop 7c.json"
       ]
     },
     "96b98677": {
@@ -5158,7 +5158,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar + Telek - Altars of Madness (Rolling Oceans Mix).json"
+        "converted/Rovastar + Telek - Altars of Madness (Rolling Oceans Mix).json"
       ]
     },
     "f4d2cfef": {
@@ -5182,7 +5182,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar - A Million Miles From Earth (Wormhole Mix).json"
+        "converted/Rovastar - A Million Miles From Earth (Wormhole Mix).json"
       ]
     },
     "4382aca9": {
@@ -5206,7 +5206,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar - Explosive Minds.json"
+        "converted/Rovastar - Explosive Minds.json"
       ]
     },
     "18573e11": {
@@ -5231,7 +5231,7 @@
         "warmupTime": 5
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar - Harlequin′s Fractal Encounter - cancer of saints.json"
+        "converted/Rovastar - Harlequin′s Fractal Encounter - cancer of saints.json"
       ]
     },
     "2bdc34b8": {
@@ -5253,7 +5253,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar - Hyperspace.json"
+        "converted/Rovastar - Hyperspace.json"
       ]
     },
     "ed4fc7b6": {
@@ -5278,7 +5278,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar - Oozing Resistance.json"
+        "converted/Rovastar - Oozing Resistance.json"
       ]
     },
     "d4ed1330": {
@@ -5302,7 +5302,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar - Torrid Tales.json"
+        "converted/Rovastar - Torrid Tales.json"
       ]
     },
     "f7cbf0dd": {
@@ -5324,7 +5324,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar - Trippy Sperm (Jelly).json"
+        "converted/Rovastar - Trippy Sperm (Jelly).json"
       ]
     },
     "06d28b74": {
@@ -5348,7 +5348,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rovastar-altarsofmadness(forgottenrea.json"
+        "converted/Rovastar-altarsofmadness(forgottenrea.json"
       ]
     },
     "2d1233d8": {
@@ -5372,7 +5372,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Rozzor & Shreyas - Deeper Aesthetics.json"
+        "converted/Rozzor & Shreyas - Deeper Aesthetics.json"
       ]
     },
     "a1599704": {
@@ -5394,7 +5394,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ShadowHarlequin - LovelyShinySquares [ liquid starburst rmx ] - unchained + rovaster - luckless - martin - starfield sector.json"
+        "converted/ShadowHarlequin - LovelyShinySquares [ liquid starburst rmx ] - unchained + rovaster - luckless - martin - starfield sector.json"
       ]
     },
     "7385a5ca": {
@@ -5418,7 +5418,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Stahlregen & Boz + Eo.S + Geiss + Phat + Rovastar + Zylot - Machine Code [Jelly].json"
+        "converted/Stahlregen & Boz + Eo.S + Geiss + Phat + Rovastar + Zylot - Machine Code [Jelly].json"
       ]
     },
     "74e2e0e9": {
@@ -5442,7 +5442,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Stahlregen & Boz - Machine Code (Reaction Diffusion)_1 - Isosceles Tweak 08.json"
+        "converted/Stahlregen & Boz - Machine Code (Reaction Diffusion)_1 - Isosceles Tweak 08.json"
       ]
     },
     "d6b3437e": {
@@ -5466,7 +5466,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Stahlregen & fishbrain + flexi + geiss - The Machine that conquered the Aether.json"
+        "converted/Stahlregen & fishbrain + flexi + geiss - The Machine that conquered the Aether.json"
       ]
     },
     "25c27968": {
@@ -5490,7 +5490,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Stahlregen & flexi + Geiss + Rovastar + Shifter - Fractal Feedback (for Hexcollie).json"
+        "converted/Stahlregen & flexi + Geiss + Rovastar + Shifter - Fractal Feedback (for Hexcollie).json"
       ]
     },
     "581c63b4": {
@@ -5512,7 +5512,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Stahlregen + martin + others - Psychedelic Metal Flower.json"
+        "converted/Stahlregen + martin + others - Psychedelic Metal Flower.json"
       ]
     },
     "c2fc76c1": {
@@ -5534,7 +5534,7 @@
         "warmupTime": 4
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Stahlregen - Dots (Pixels - Blocky) (Jelly V2).json"
+        "converted/Stahlregen - Dots (Pixels - Blocky) (Jelly V2).json"
       ]
     },
     "e3606589": {
@@ -5559,7 +5559,7 @@
         "warmupTime": 5
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Studio Music and Unchained - Rapid Alteration.json"
+        "converted/Studio Music and Unchained - Rapid Alteration.json"
       ]
     },
     "ecaa008d": {
@@ -5583,7 +5583,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/TEcHNO & SandStorm - Psychodelic Highway.json"
+        "converted/TEcHNO & SandStorm - Psychodelic Highway.json"
       ]
     },
     "bc86e09b": {
@@ -5608,7 +5608,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Telek - City Helix Lattice.json"
+        "converted/Telek - City Helix Lattice.json"
       ]
     },
     "460d95b2": {
@@ -5632,7 +5632,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Telek - Sine Wave.json"
+        "converted/Telek - Sine Wave.json"
       ]
     },
     "4598f663": {
@@ -5657,7 +5657,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/The NG + Flexi + BDRV - Ultramix, Aderrasi + Flexi - Predator Prey Spirals, Flexi - Jellyfish Jam.json"
+        "converted/The NG + Flexi + BDRV - Ultramix, Aderrasi + Flexi - Predator Prey Spirals, Flexi - Jellyfish Jam.json"
       ]
     },
     "fbdcb0ce": {
@@ -5679,7 +5679,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/TonyMilkdrop - Leonardo Da Vinci's Balloon [Flexi - merry-go-round + techstyle].json"
+        "converted/TonyMilkdrop - Leonardo Da Vinci's Balloon [Flexi - merry-go-round + techstyle].json"
       ]
     },
     "1c33d55f": {
@@ -5705,8 +5705,8 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/TonyMilkdrop - Magellan's Nebula [Flexi - fancy + $this shall not retain].json",
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/TonyMilkdrop - Magellan's Nebula [Flexi - you enter first + multiverse].json"
+        "converted/TonyMilkdrop - Magellan's Nebula [Flexi - fancy + $this shall not retain].json",
+        "converted/TonyMilkdrop - Magellan's Nebula [Flexi - you enter first + multiverse].json"
       ]
     },
     "960d34f0": {
@@ -5731,7 +5731,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Unchained & Rovastar - Wormhole Pillars (Hall of Shadows mix).json"
+        "converted/Unchained & Rovastar - Wormhole Pillars (Hall of Shadows mix).json"
       ]
     },
     "4c7529d4": {
@@ -5756,7 +5756,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Unchained - All You Can Eat.json"
+        "converted/Unchained - All You Can Eat.json"
       ]
     },
     "df8edabd": {
@@ -5781,7 +5781,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Unchained - Fuzzy Sciences.json"
+        "converted/Unchained - Fuzzy Sciences.json"
       ]
     },
     "3fd3e95e": {
@@ -5806,7 +5806,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Unchained - Making a Science of It 4.json"
+        "converted/Unchained - Making a Science of It 4.json"
       ]
     },
     "ab004e01": {
@@ -5831,7 +5831,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Unchained - Making a Science of It 7.json"
+        "converted/Unchained - Making a Science of It 7.json"
       ]
     },
     "022c7b60": {
@@ -5855,7 +5855,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Unchained - Rewop.json"
+        "converted/Unchained - Rewop.json"
       ]
     },
     "5455d2a5": {
@@ -5879,7 +5879,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Unchained - Unified Drag 2.json"
+        "converted/Unchained - Unified Drag 2.json"
       ]
     },
     "8fcade47": {
@@ -5903,7 +5903,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Waltra - Cosmic Wind.json"
+        "converted/Waltra - Cosmic Wind.json"
       ]
     },
     "90f75026": {
@@ -5925,7 +5925,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Waltra - Heaven Liquid.json"
+        "converted/Waltra - Heaven Liquid.json"
       ]
     },
     "d8a82308": {
@@ -5947,7 +5947,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Waltra - Ice Plasma.json"
+        "converted/Waltra - Ice Plasma.json"
       ]
     },
     "02583737": {
@@ -5971,7 +5971,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Zylot - Age of Science (seeking truth mix).json"
+        "converted/Zylot - Age of Science (seeking truth mix).json"
       ]
     },
     "982f1c67": {
@@ -5995,7 +5995,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Zylot - Crossing Over (Paint Spatter mix).json"
+        "converted/Zylot - Crossing Over (Paint Spatter mix).json"
       ]
     },
     "95d7c36e": {
@@ -6020,7 +6020,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Zylot - Heaven Bloom nz+.json"
+        "converted/Zylot - Heaven Bloom nz+.json"
       ]
     },
     "1b6ad204": {
@@ -6044,7 +6044,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Zylot - In death there is life (Geiss Layered Mix) (Jelly).json"
+        "converted/Zylot - In death there is life (Geiss Layered Mix) (Jelly).json"
       ]
     },
     "4dc4ca75": {
@@ -6068,7 +6068,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Zylot - In death there is life (Geiss Layered Mix).json"
+        "converted/Zylot - In death there is life (Geiss Layered Mix).json"
       ]
     },
     "bf765a81": {
@@ -6092,7 +6092,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Zylot - Paint Spill (Music Reactive Paint Mix).json"
+        "converted/Zylot - Paint Spill (Music Reactive Paint Mix).json"
       ]
     },
     "2857a069": {
@@ -6117,7 +6117,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Zylot - Star Ornament.json"
+        "converted/Zylot - Star Ornament.json"
       ]
     },
     "cf1e60de": {
@@ -6143,8 +6143,8 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Zylot - True Visionary (Final Mix).json",
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/Zylot - True Visionary.json"
+        "converted/Zylot - True Visionary (Final Mix).json",
+        "converted/Zylot - True Visionary.json"
       ]
     },
     "6cb6371d": {
@@ -6169,7 +6169,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Aderrasi - Wanderer in Curved Space - mash0000 - faclempt kibitzing meshuggana schmaltz (Geiss color mix).json"
+        "converted/_Aderrasi - Wanderer in Curved Space - mash0000 - faclempt kibitzing meshuggana schmaltz (Geiss color mix).json"
       ]
     },
     "644f967a": {
@@ -6191,7 +6191,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Eo.S. - glowsticks v2 02 - Geiss HPF.json"
+        "converted/_Eo.S. - glowsticks v2 02 - Geiss HPF.json"
       ]
     },
     "6b83d5fc": {
@@ -6215,7 +6215,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Flexi, martin + geiss - painterly rogue wave strike (color emboss mix).json"
+        "converted/_Flexi, martin + geiss - painterly rogue wave strike (color emboss mix).json"
       ]
     },
     "dbc3a11b": {
@@ -6239,7 +6239,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Geiss - Artifact 01.json"
+        "converted/_Geiss - Artifact 01.json"
       ]
     },
     "d5c57abb": {
@@ -6263,7 +6263,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Geiss - Artifact 03.json"
+        "converted/_Geiss - Artifact 03.json"
       ]
     },
     "430ab889": {
@@ -6287,7 +6287,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Geiss - Brain Zoom 3 (Color Emboss Mix).json"
+        "converted/_Geiss - Brain Zoom 3 (Color Emboss Mix).json"
       ]
     },
     "2933f70c": {
@@ -6311,7 +6311,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Geiss - Desert Rose 2.json"
+        "converted/_Geiss - Desert Rose 2.json"
       ]
     },
     "092fb1a0": {
@@ -6335,7 +6335,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Geiss - Explosion Mod 2b.json"
+        "converted/_Geiss - Explosion Mod 2b.json"
       ]
     },
     "f924e90f": {
@@ -6360,7 +6360,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Geiss - untitled.json"
+        "converted/_Geiss - untitled.json"
       ]
     },
     "fbd478bc": {
@@ -6384,7 +6384,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Krash + Eo.S. - Photographic Sentinel.json"
+        "converted/_Krash + Eo.S. - Photographic Sentinel.json"
       ]
     },
     "ca9773ae": {
@@ -6406,7 +6406,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_004_version2.json"
+        "converted/_Mig_004_version2.json"
       ]
     },
     "d10b2d53": {
@@ -6430,7 +6430,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_009.json"
+        "converted/_Mig_009.json"
       ]
     },
     "9782a67d": {
@@ -6454,7 +6454,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_014_version2.json"
+        "converted/_Mig_014_version2.json"
       ]
     },
     "2dad60b1": {
@@ -6479,7 +6479,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_028.json"
+        "converted/_Mig_028.json"
       ]
     },
     "5d79cb2c": {
@@ -6501,7 +6501,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_039.json"
+        "converted/_Mig_039.json"
       ]
     },
     "d1dbe663": {
@@ -6525,7 +6525,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_049.json"
+        "converted/_Mig_049.json"
       ]
     },
     "f624d61c": {
@@ -6549,7 +6549,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_056.json"
+        "converted/_Mig_056.json"
       ]
     },
     "8e2bb5ca": {
@@ -6573,7 +6573,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_079.json"
+        "converted/_Mig_079.json"
       ]
     },
     "97706de3": {
@@ -6595,7 +6595,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_085.json"
+        "converted/_Mig_085.json"
       ]
     },
     "d5ee982c": {
@@ -6620,7 +6620,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_COLORFUL9.json"
+        "converted/_Mig_COLORFUL9.json"
       ]
     },
     "4c45ee0a": {
@@ -6644,7 +6644,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Mig_Oscilloscope008.json"
+        "converted/_Mig_Oscilloscope008.json"
       ]
     },
     "2acb2dab": {
@@ -6669,7 +6669,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Rovastar + Geiss - Hurricane Nightmare (Posterize Mix).json"
+        "converted/_Rovastar + Geiss - Hurricane Nightmare (Posterize Mix).json"
       ]
     },
     "e23a6163": {
@@ -6693,7 +6693,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_Vovan + Geiss - Bass With Flover (Feedback Mix) 2.json"
+        "converted/_Vovan + Geiss - Bass With Flover (Feedback Mix) 2.json"
       ]
     },
     "d2c11931": {
@@ -6717,7 +6717,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/_geiss_experimental__wavefronts.json"
+        "converted/_geiss_experimental__wavefronts.json"
       ]
     },
     "9a063076": {
@@ -6741,7 +6741,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/adam eatit fx 2 martin - disco mix, lodus, geiss, ludicrous speed,flexi, aderrasi n hexcollie.json"
+        "converted/adam eatit fx 2 martin - disco mix, lodus, geiss, ludicrous speed,flexi, aderrasi n hexcollie.json"
       ]
     },
     "e22d4653": {
@@ -6765,7 +6765,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/afro-legionican.json"
+        "converted/afro-legionican.json"
       ]
     },
     "b8319a47": {
@@ -6787,7 +6787,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/amandio c - feeling well 3.json"
+        "converted/amandio c - feeling well 3.json"
       ]
     },
     "2c137a9e": {
@@ -6811,7 +6811,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/amandio c - flashy thing.json"
+        "converted/amandio c - flashy thing.json"
       ]
     },
     "ea0fbcc4": {
@@ -6833,7 +6833,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/amandio c - fume.json"
+        "converted/amandio c - fume.json"
       ]
     },
     "3fe247b3": {
@@ -6857,7 +6857,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/amandio c - salty beats - spiral.json"
+        "converted/amandio c - salty beats - spiral.json"
       ]
     },
     "e19bb45e": {
@@ -6881,7 +6881,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/amandio c - salty bits - 5 nz+ jealiousea.json"
+        "converted/amandio c - salty bits - 5 nz+ jealiousea.json"
       ]
     },
     "c01408ed": {
@@ -6905,7 +6905,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/baked - Chinese Fingerbang (cao ni ma =]) - PieturP colors - Bitcore speed tweak.json"
+        "converted/baked - Chinese Fingerbang (cao ni ma =]) - PieturP colors - Bitcore speed tweak.json"
       ]
     },
     "21d5eb16": {
@@ -6929,7 +6929,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/baked - River of Illusion Dillusion [Bubble].json"
+        "converted/baked - River of Illusion Dillusion [Bubble].json"
       ]
     },
     "2646d270": {
@@ -6953,7 +6953,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/baked - mushroom rainbows[acid Storm].json"
+        "converted/baked - mushroom rainbows[acid Storm].json"
       ]
     },
     "2d74cc17": {
@@ -6977,7 +6977,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/bdrv + al shifter - feathers (angel wings)_phat_remix4 bdrv et  AL  rmxmix bdrv et.AL5.json"
+        "converted/bdrv + al shifter - feathers (angel wings)_phat_remix4 bdrv et  AL  rmxmix bdrv et.AL5.json"
       ]
     },
     "5386227d": {
@@ -7002,7 +7002,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/bdrv - ultramix2 #43.json"
+        "converted/bdrv - ultramix2 #43.json"
       ]
     },
     "2bb74377": {
@@ -7026,7 +7026,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/beta106at shape - mash0000 - hulk spirit cum.json"
+        "converted/beta106at shape - mash0000 - hulk spirit cum.json"
       ]
     },
     "705e5796": {
@@ -7050,7 +7050,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/beta106i - Brilliance (Space-Time Breaking) - mash0000 - it′s 2009 and you haven′t replaced your analog tv with digital.json"
+        "converted/beta106i - Brilliance (Space-Time Breaking) - mash0000 - it′s 2009 and you haven′t replaced your analog tv with digital.json"
       ]
     },
     "c6e4a386": {
@@ -7074,7 +7074,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/beta106i - Burning Form (Seething Mass) - mash0000 - fire paint easter egg internals.json"
+        "converted/beta106i - Burning Form (Seething Mass) - mash0000 - fire paint easter egg internals.json"
       ]
     },
     "e85177df": {
@@ -7099,7 +7099,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/beta106i - Inhuman Emotion (Regret) - mash0000 - genetic mutant incubators in the hands of toddlers.json"
+        "converted/beta106i - Inhuman Emotion (Regret) - mash0000 - genetic mutant incubators in the hands of toddlers.json"
       ]
     },
     "f15494f4": {
@@ -7123,7 +7123,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/beta106i - Potion of Ink.json"
+        "converted/beta106i - Potion of Ink.json"
       ]
     },
     "074e2708": {
@@ -7148,7 +7148,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope + flexi - colorful marble (ghost mix).json"
+        "converted/cope + flexi - colorful marble (ghost mix).json"
       ]
     },
     "be17bc8b": {
@@ -7172,7 +7172,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope + flexi - mother-of-whirl [no fnords were hurt].json"
+        "converted/cope + flexi - mother-of-whirl [no fnords were hurt].json"
       ]
     },
     "90c49a0a": {
@@ -7196,7 +7196,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope + geiss + stahlregen - cartune (bending gelatine mix).json"
+        "converted/cope + geiss + stahlregen - cartune (bending gelatine mix).json"
       ]
     },
     "ef4bb6cd": {
@@ -7220,7 +7220,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope + martin - mother-of-pearl.json"
+        "converted/cope + martin - mother-of-pearl.json"
       ]
     },
     "250388f1": {
@@ -7242,7 +7242,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope - alternative energy (antimatter mod_1)4z.json"
+        "converted/cope - alternative energy (antimatter mod_1)4z.json"
       ]
     },
     "74b2b547": {
@@ -7264,7 +7264,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope - digital sea.json"
+        "converted/cope - digital sea.json"
       ]
     },
     "fd0f81a4": {
@@ -7288,7 +7288,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope - matrixcode7.json"
+        "converted/cope - matrixcode7.json"
       ]
     },
     "f11a1edb": {
@@ -7310,7 +7310,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope - soar (v2.0).json"
+        "converted/cope - soar (v2.0).json"
       ]
     },
     "fddaf5ac": {
@@ -7334,7 +7334,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope - strange attractor [flexis let it grow mix] (Jelly 5.56 [volume noise zoom-in]).json"
+        "converted/cope - strange attractor [flexis let it grow mix] (Jelly 5.56 [volume noise zoom-in]).json"
       ]
     },
     "d30cde72": {
@@ -7358,7 +7358,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope - the drain to heaven.json"
+        "converted/cope - the drain to heaven.json"
       ]
     },
     "b7cb86b1": {
@@ -7380,7 +7380,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/cope, martin + flexi - the slickery of alternative varnish.json"
+        "converted/cope, martin + flexi - the slickery of alternative varnish.json"
       ]
     },
     "6b00623c": {
@@ -7402,7 +7402,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ech0 - liquid firesticks I.json"
+        "converted/ech0 - liquid firesticks I.json"
       ]
     },
     "4657485c": {
@@ -7426,7 +7426,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/ethical rotterdamasm.json"
+        "converted/ethical rotterdamasm.json"
       ]
     },
     "f97fd707": {
@@ -7450,7 +7450,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fed + flexi + geiss - tokamak repellor tech twist mix [stabilized].json"
+        "converted/fed + flexi + geiss - tokamak repellor tech twist mix [stabilized].json"
       ]
     },
     "d8ab796b": {
@@ -7474,7 +7474,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fed + flexi - tech test 2-1 - humpgorge.json"
+        "converted/fed + flexi - tech test 2-1 - humpgorge.json"
       ]
     },
     "222130c0": {
@@ -7498,7 +7498,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fed - glowing 5 - fingers rmx nz+ round squarishness.json"
+        "converted/fed - glowing 5 - fingers rmx nz+ round squarishness.json"
       ]
     },
     "a26aa99a": {
@@ -7522,7 +7522,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fed - slowfast 1.1.json"
+        "converted/fed - slowfast 1.1.json"
       ]
     },
     "558ef28b": {
@@ -7546,7 +7546,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fiShbRaiN + Flexi - witchcraft 2.0.json"
+        "converted/fiShbRaiN + Flexi - witchcraft 2.0.json"
       ]
     },
     "157b94d4": {
@@ -7570,7 +7570,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fiShbRaiN + Flexi - witchcraft unleashed.json"
+        "converted/fiShbRaiN + Flexi - witchcraft unleashed.json"
       ]
     },
     "ebdddc5e": {
@@ -7594,7 +7594,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fiShbRaiN + flexi - witchcraft 2.0 - mash0000 - no one cares about mi, the note (major third).json"
+        "converted/fiShbRaiN + flexi - witchcraft 2.0 - mash0000 - no one cares about mi, the note (major third).json"
       ]
     },
     "f10afd34": {
@@ -7616,7 +7616,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fiShbRaiN + geiss - witchcraft (Grow Mix 3).json"
+        "converted/fiShbRaiN + geiss - witchcraft (Grow Mix 3).json"
       ]
     },
     "ce93017a": {
@@ -7640,7 +7640,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fiShbRaiN - a quiet death.json"
+        "converted/fiShbRaiN - a quiet death.json"
       ]
     },
     "b7b391b3": {
@@ -7662,7 +7662,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fiShbRaiN - breakfast cruiser.json"
+        "converted/fiShbRaiN - breakfast cruiser.json"
       ]
     },
     "49f29c0d": {
@@ -7684,7 +7684,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fiShbRaiN - the adventures of prismo jenkins.json"
+        "converted/fiShbRaiN - the adventures of prismo jenkins.json"
       ]
     },
     "9f689fd8": {
@@ -7706,7 +7706,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fiShbRaiN - toffee cream and icing sugar.json"
+        "converted/fiShbRaiN - toffee cream and icing sugar.json"
       ]
     },
     "eff5ff61": {
@@ -7728,7 +7728,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fiShbRaiN - witchcraft (necromancer remix)_phat_edit_v3.json"
+        "converted/fiShbRaiN - witchcraft (necromancer remix)_phat_edit_v3.json"
       ]
     },
     "28ab70df": {
@@ -7750,7 +7750,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fiShbRaiN, flexi + martin - grafitti tagging witchcraft must be overrated - demonlord shaders - lampshade hubrys2.json"
+        "converted/fiShbRaiN, flexi + martin - grafitti tagging witchcraft must be overrated - demonlord shaders - lampshade hubrys2.json"
       ]
     },
     "c240e534": {
@@ -7774,7 +7774,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/fishbrain + flexi - stitchcraft.json"
+        "converted/fishbrain + flexi - stitchcraft.json"
       ]
     },
     "5abd87a9": {
@@ -7798,7 +7798,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + amandio c - organic [random mashup].json"
+        "converted/flexi + amandio c - organic [random mashup].json"
       ]
     },
     "8e8668e8": {
@@ -7822,7 +7822,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + amandio c - organic.json"
+        "converted/flexi + amandio c - organic.json"
       ]
     },
     "9cf2a95f": {
@@ -7847,7 +7847,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + amandio c - organic12-3d-2.json"
+        "converted/flexi + amandio c - organic12-3d-2.json"
       ]
     },
     "9e5d91c0": {
@@ -7872,7 +7872,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + bdrv - acid etching (jelly v5.5).json"
+        "converted/flexi + bdrv - acid etching (jelly v5.5).json"
       ]
     },
     "5931e0e5": {
@@ -7894,7 +7894,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + cope - i blew you a soap bubble now what - feel the projection you are, connected to it all nz+ wrepwrimindloss w8.json"
+        "converted/flexi + cope - i blew you a soap bubble now what - feel the projection you are, connected to it all nz+ wrepwrimindloss w8.json"
       ]
     },
     "f5612fe2": {
@@ -7918,7 +7918,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + fishbrain - neon mindblob grafitti.json"
+        "converted/flexi + fishbrain - neon mindblob grafitti.json"
       ]
     },
     "580a5e25": {
@@ -7940,7 +7940,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + fishbrain - warpcraft [random mashup].json"
+        "converted/flexi + fishbrain - warpcraft [random mashup].json"
       ]
     },
     "6abe842f": {
@@ -7962,7 +7962,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + fishbrain - witchcraft [complex terraforming - fiddling twists in the fabric of space].json"
+        "converted/flexi + fishbrain - witchcraft [complex terraforming - fiddling twists in the fabric of space].json"
       ]
     },
     "9864293d": {
@@ -7984,7 +7984,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + fishbrain - witchcraft [complex terraforming].json"
+        "converted/flexi + fishbrain - witchcraft [complex terraforming].json"
       ]
     },
     "a0e28d0b": {
@@ -8008,7 +8008,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + geiss - infused with the spiral (Heavy Oil Mix) nz+ rapery.json"
+        "converted/flexi + geiss - infused with the spiral (Heavy Oil Mix) nz+ rapery.json"
       ]
     },
     "6778e0bd": {
@@ -8032,7 +8032,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + geiss - pogo cubes vs. tokamak vs. game of life [stahls jelly 4.5 finish].json"
+        "converted/flexi + geiss - pogo cubes vs. tokamak vs. game of life [stahls jelly 4.5 finish].json"
       ]
     },
     "b43b0c87": {
@@ -8056,7 +8056,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + geiss - pogo-cubes on tokamak matter (bccn Jelly V4).json"
+        "converted/flexi + geiss - pogo-cubes on tokamak matter (bccn Jelly V4).json"
       ]
     },
     "91995e91": {
@@ -8080,7 +8080,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + geiss - pogo-cubes on tokamak matter [mind over matter remix]2.json"
+        "converted/flexi + geiss - pogo-cubes on tokamak matter [mind over matter remix]2.json"
       ]
     },
     "dc2fce82": {
@@ -8105,7 +8105,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi + nitorami - beat explorer (cn bc jelly 4).json"
+        "converted/flexi + nitorami - beat explorer (cn bc jelly 4).json"
       ]
     },
     "cb1dab95": {
@@ -8129,7 +8129,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - Mindblob.json"
+        "converted/flexi - Mindblob.json"
       ]
     },
     "e2072b39": {
@@ -8153,7 +8153,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - alien canvas [learning].json"
+        "converted/flexi - alien canvas [learning].json"
       ]
     },
     "224e6dac": {
@@ -8177,7 +8177,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - borderline imagery.json"
+        "converted/flexi - borderline imagery.json"
       ]
     },
     "364cd4fd": {
@@ -8201,7 +8201,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - bouncing balls [double mindblob gastrointestinal mix].json"
+        "converted/flexi - bouncing balls [double mindblob gastrointestinal mix].json"
       ]
     },
     "4259700d": {
@@ -8225,7 +8225,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - bouncing balls [double mindblob neon mix].json"
+        "converted/flexi - bouncing balls [double mindblob neon mix].json"
       ]
     },
     "610c571a": {
@@ -8249,7 +8249,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - bouncing balls [illumination mix].json"
+        "converted/flexi - bouncing balls [illumination mix].json"
       ]
     },
     "69668a41": {
@@ -8273,7 +8273,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - bouncing balls [mindblob terraforming] flx roams domikleasing undergraeduhate.json"
+        "converted/flexi - bouncing balls [mindblob terraforming] flx roams domikleasing undergraeduhate.json"
       ]
     },
     "bb8fa43b": {
@@ -8297,7 +8297,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - can′t think of mosaic cages.json"
+        "converted/flexi - can′t think of mosaic cages.json"
       ]
     },
     "0588ca22": {
@@ -8322,7 +8322,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - grind my glitch up [190].json"
+        "converted/flexi - grind my glitch up [190].json"
       ]
     },
     "710a4f63": {
@@ -8347,7 +8347,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - hyperspaceflight (bn cn Jelly 4).json"
+        "converted/flexi - hyperspaceflight (bn cn Jelly 4).json"
       ]
     },
     "65b997a2": {
@@ -8371,7 +8371,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - infused with the spiral (jelly 4.x cn).json"
+        "converted/flexi - infused with the spiral (jelly 4.x cn).json"
       ]
     },
     "1784513a": {
@@ -8395,7 +8395,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - inter state.json"
+        "converted/flexi - inter state.json"
       ]
     },
     "3fc4a3d0": {
@@ -8419,7 +8419,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - jelly fish mandala.json"
+        "converted/flexi - jelly fish mandala.json"
       ]
     },
     "be1810a3": {
@@ -8443,7 +8443,7 @@
         "warmupTime": 4
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - meta4free.json"
+        "converted/flexi - meta4free.json"
       ]
     },
     "4ea69b8e": {
@@ -8465,7 +8465,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - mom, why the sky looks different today.json"
+        "converted/flexi - mom, why the sky looks different today.json"
       ]
     },
     "9d5001a1": {
@@ -8489,7 +8489,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - patternton, district of media, capitol of the united abstractions of fractopia.json"
+        "converted/flexi - patternton, district of media, capitol of the united abstractions of fractopia.json"
       ]
     },
     "62bf4f07": {
@@ -8514,7 +8514,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - splatter effects 17 the wave, a google love story written in decay roam3-2 .json"
+        "converted/flexi - splatter effects 17 the wave, a google love story written in decay roam3-2 .json"
       ]
     },
     "228164d6": {
@@ -8538,7 +8538,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - swing out on the spiral.json"
+        "converted/flexi - swing out on the spiral.json"
       ]
     },
     "cca5cef4": {
@@ -8562,7 +8562,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi - what is the matrix.json"
+        "converted/flexi - what is the matrix.json"
       ]
     },
     "79f2b5e6": {
@@ -8586,7 +8586,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi, geiss and rovastar - chaos layered sinewsed tokamak 2.json"
+        "converted/flexi, geiss and rovastar - chaos layered sinewsed tokamak 2.json"
       ]
     },
     "b27d4d28": {
@@ -8610,7 +8610,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/flexi, stahlregen, geiss + tobias wolfboi - space gelatine burst - mash0000 - chromatidal pool mirror blasphemy.json"
+        "converted/flexi, stahlregen, geiss + tobias wolfboi - space gelatine burst - mash0000 - chromatidal pool mirror blasphemy.json"
       ]
     },
     "2a70c9ed": {
@@ -8632,7 +8632,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/goody + martin - crystal palace - schizotoxin - the wild iris bloom - 16 iterations.json"
+        "converted/goody + martin - crystal palace - schizotoxin - the wild iris bloom - 16 iterations.json"
       ]
     },
     "b9544f43": {
@@ -8657,7 +8657,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/gunthry is out back bloodying up the pine trees - adm atomising (v) the disintigrate (n).json"
+        "converted/gunthry is out back bloodying up the pine trees - adm atomising (v) the disintigrate (n).json"
       ]
     },
     "154c2eed": {
@@ -8681,7 +8681,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/high-altitude basket unraveling - singh grooves nitrogen argon nz+.json"
+        "converted/high-altitude basket unraveling - singh grooves nitrogen argon nz+.json"
       ]
     },
     "da71eb78": {
@@ -8705,7 +8705,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/iMuS and  Rovastar - The Shroomery (psilobellum).json"
+        "converted/iMuS and  Rovastar - The Shroomery (psilobellum).json"
       ]
     },
     "947e4171": {
@@ -8730,7 +8730,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/it is the night of the demon weed bowel.json"
+        "converted/it is the night of the demon weed bowel.json"
       ]
     },
     "ba1dd54c": {
@@ -8754,7 +8754,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/lit claw (explorers grid) - i don′t have either a belfry or bats bitch.json"
+        "converted/lit claw (explorers grid) - i don′t have either a belfry or bats bitch.json"
       ]
     },
     "382f2d6a": {
@@ -8776,7 +8776,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin + flexi - diamond cutter [prismaticvortex.com] - camille - i wish i wish i wish i was constrained.json"
+        "converted/martin + flexi - diamond cutter [prismaticvortex.com] - camille - i wish i wish i wish i was constrained.json"
       ]
     },
     "67b4aaf7": {
@@ -8800,7 +8800,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin + stahlregen - martin in da mash 12a.json"
+        "converted/martin + stahlregen - martin in da mash 12a.json"
       ]
     },
     "49315dad": {
@@ -8824,7 +8824,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin + stahlregen - martin in da mash 14.json"
+        "converted/martin + stahlregen - martin in da mash 14.json"
       ]
     },
     "51217a07": {
@@ -8848,7 +8848,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin + stahlregen - martin in da mash 16.json"
+        "converted/martin + stahlregen - martin in da mash 16.json"
       ]
     },
     "3d1f70ae": {
@@ -8872,7 +8872,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin + stahlregen - martin in da mash 3.json"
+        "converted/martin + stahlregen - martin in da mash 3.json"
       ]
     },
     "90660a93": {
@@ -8896,7 +8896,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - Flexis swarm in Martins pond [not yet a boid implementation] .json"
+        "converted/martin - Flexis swarm in Martins pond [not yet a boid implementation] .json"
       ]
     },
     "c0d861eb": {
@@ -8920,7 +8920,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - The Bridge of Khazad-Dum.json"
+        "converted/martin - The Bridge of Khazad-Dum.json"
       ]
     },
     "e1d53a5a": {
@@ -8944,7 +8944,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - adrift on a dead planet - lard mix.json"
+        "converted/martin - adrift on a dead planet - lard mix.json"
       ]
     },
     "a3dce2ab": {
@@ -8968,7 +8968,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - adrift on a dead planet - lite.json"
+        "converted/martin - adrift on a dead planet - lite.json"
       ]
     },
     "ba9067a6": {
@@ -8990,7 +8990,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - alien grand theft water.json"
+        "converted/martin - alien grand theft water.json"
       ]
     },
     "0bc2d42e": {
@@ -9015,7 +9015,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - amandio c - a different view of the green machine.json"
+        "converted/martin - amandio c - a different view of the green machine.json"
       ]
     },
     "3add98e7": {
@@ -9039,7 +9039,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - angel flight.json"
+        "converted/martin - angel flight.json"
       ]
     },
     "edb66f41": {
@@ -9063,7 +9063,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - another kind of groove.json"
+        "converted/martin - another kind of groove.json"
       ]
     },
     "8488ab1a": {
@@ -9085,7 +9085,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - attack of the beast.json"
+        "converted/martin - attack of the beast.json"
       ]
     },
     "c232b4e4": {
@@ -9109,7 +9109,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - baby one more time.json"
+        "converted/martin - baby one more time.json"
       ]
     },
     "d727d890": {
@@ -9133,7 +9133,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - basal ganglion.json"
+        "converted/martin - basal ganglion.json"
       ]
     },
     "f14dc5c4": {
@@ -9157,7 +9157,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - bombyx mori [flexi′s logarithmic edit].json"
+        "converted/martin - bombyx mori [flexi′s logarithmic edit].json"
       ]
     },
     "7edefa12": {
@@ -9181,7 +9181,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - bombyx mori.json"
+        "converted/martin - bombyx mori.json"
       ]
     },
     "28ba60e9": {
@@ -9205,7 +9205,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - bring up the big guns.json"
+        "converted/martin - bring up the big guns.json"
       ]
     },
     "a704043e": {
@@ -9229,7 +9229,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - carpet weaver.json"
+        "converted/martin - carpet weaver.json"
       ]
     },
     "622849f2": {
@@ -9253,7 +9253,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - castle in the air.json"
+        "converted/martin - castle in the air.json"
       ]
     },
     "6b4ccf5a": {
@@ -9277,7 +9277,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - chain breaker xxx.json"
+        "converted/martin - chain breaker xxx.json"
       ]
     },
     "b01f9067": {
@@ -9301,7 +9301,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - chain breaker.json"
+        "converted/martin - chain breaker.json"
       ]
     },
     "eb0e2bb3": {
@@ -9325,7 +9325,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - cherry brain wall mod.json"
+        "converted/martin - cherry brain wall mod.json"
       ]
     },
     "b34dab8b": {
@@ -9349,7 +9349,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - city of shadows.json"
+        "converted/martin - city of shadows.json"
       ]
     },
     "6bb6de01": {
@@ -9373,7 +9373,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - cope - laser dome.json"
+        "converted/martin - cope - laser dome.json"
       ]
     },
     "4eca58c9": {
@@ -9395,7 +9395,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - crystal alley.json"
+        "converted/martin - crystal alley.json"
       ]
     },
     "5c0440a3": {
@@ -9417,7 +9417,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - crystal palace.json"
+        "converted/martin - crystal palace.json"
       ]
     },
     "386140e9": {
@@ -9441,7 +9441,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - dark galaxy.json"
+        "converted/martin - dark galaxy.json"
       ]
     },
     "7dc975ae": {
@@ -9465,7 +9465,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - disco mix 4.json"
+        "converted/martin - disco mix 4.json"
       ]
     },
     "3ce0eac5": {
@@ -9489,7 +9489,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - dune racer.json"
+        "converted/martin - dune racer.json"
       ]
     },
     "42e82a00": {
@@ -9513,7 +9513,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - elusive impressions mix1.json"
+        "converted/martin - elusive impressions mix1.json"
       ]
     },
     "bfcf29e9": {
@@ -9537,7 +9537,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - elusive impressions mix2 - flacc mess proph nz+2.json"
+        "converted/martin - elusive impressions mix2 - flacc mess proph nz+2.json"
       ]
     },
     "bc33f23c": {
@@ -9561,7 +9561,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - extreme heat.json"
+        "converted/martin - extreme heat.json"
       ]
     },
     "7015085c": {
@@ -9585,7 +9585,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - frosty caves 2.json"
+        "converted/martin - frosty caves 2.json"
       ]
     },
     "6e66f032": {
@@ -9609,7 +9609,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - fruit machine.json"
+        "converted/martin - fruit machine.json"
       ]
     },
     "ad6a924c": {
@@ -9633,7 +9633,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - gate to moria.json"
+        "converted/martin - gate to moria.json"
       ]
     },
     "323923df": {
@@ -9655,7 +9655,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - ghost city.json"
+        "converted/martin - ghost city.json"
       ]
     },
     "cdbd7103": {
@@ -9679,7 +9679,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - glass corridor nz2 incline.json"
+        "converted/martin - glass corridor nz2 incline.json"
       ]
     },
     "d0288c9e": {
@@ -9703,7 +9703,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - glass corridor.json"
+        "converted/martin - glass corridor.json"
       ]
     },
     "53f7ee17": {
@@ -9725,7 +9725,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - glassball dance.json"
+        "converted/martin - glassball dance.json"
       ]
     },
     "66b6239a": {
@@ -9749,7 +9749,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - ice flames.json"
+        "converted/martin - ice flames.json"
       ]
     },
     "c8ec0bf8": {
@@ -9773,7 +9773,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - infinity (2010 update).json"
+        "converted/martin - infinity (2010 update).json"
       ]
     },
     "3e015087": {
@@ -9797,7 +9797,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - into the fireworks.json"
+        "converted/martin - into the fireworks.json"
       ]
     },
     "cbf9d58e": {
@@ -9819,7 +9819,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - ludicrous speed.json"
+        "converted/martin - ludicrous speed.json"
       ]
     },
     "275dfeaa": {
@@ -9843,7 +9843,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - mandelbox explorer - high speed demo version.json"
+        "converted/martin - mandelbox explorer - high speed demo version.json"
       ]
     },
     "e2d420a8": {
@@ -9867,7 +9867,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - move this body.json"
+        "converted/martin - move this body.json"
       ]
     },
     "7befbd2f": {
@@ -9891,7 +9891,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - mucus cervix.json"
+        "converted/martin - mucus cervix.json"
       ]
     },
     "ec9ad4f6": {
@@ -9915,7 +9915,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - neon space ps2 (ati fix) - yaqui graph - flx food.json"
+        "converted/martin - neon space ps2 (ati fix) - yaqui graph - flx food.json"
       ]
     },
     "9e2da797": {
@@ -9939,7 +9939,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - organic light.json"
+        "converted/martin - organic light.json"
       ]
     },
     "ee9eb058": {
@@ -9961,7 +9961,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - reflections on black tiles.json"
+        "converted/martin - reflections on black tiles.json"
       ]
     },
     "c41d84c6": {
@@ -9985,7 +9985,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - resonant twister - steel spring.json"
+        "converted/martin - resonant twister - steel spring.json"
       ]
     },
     "7bbee86a": {
@@ -10009,7 +10009,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - rogue wave -ps2.json"
+        "converted/martin - rogue wave -ps2.json"
       ]
     },
     "2e7d3d0b": {
@@ -10033,7 +10033,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - rogue wave -ps3.json"
+        "converted/martin - rogue wave -ps3.json"
       ]
     },
     "d4953370": {
@@ -10057,7 +10057,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - satellite view.json"
+        "converted/martin - satellite view.json"
       ]
     },
     "9baacbea": {
@@ -10079,7 +10079,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - shifter - armorial bearings of robotopia.json"
+        "converted/martin - shifter - armorial bearings of robotopia.json"
       ]
     },
     "74446db4": {
@@ -10101,7 +10101,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - skywards.json"
+        "converted/martin - skywards.json"
       ]
     },
     "016cbf20": {
@@ -10125,7 +10125,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - soma in pink.json"
+        "converted/martin - soma in pink.json"
       ]
     },
     "df91d786": {
@@ -10147,7 +10147,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - sparky caleidoscope.json"
+        "converted/martin - sparky caleidoscope.json"
       ]
     },
     "8accbed9": {
@@ -10169,7 +10169,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - starfield sectors.json"
+        "converted/martin - starfield sectors.json"
       ]
     },
     "db402bc0": {
@@ -10193,7 +10193,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - stormy sea (2010 update).json"
+        "converted/martin - stormy sea (2010 update).json"
       ]
     },
     "e54effd9": {
@@ -10217,7 +10217,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - sunset over the river.json"
+        "converted/martin - sunset over the river.json"
       ]
     },
     "e38ac355": {
@@ -10239,7 +10239,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - test.json"
+        "converted/martin - test.json"
       ]
     },
     "954dcd14": {
@@ -10263,7 +10263,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - the bridge of khazad-dum [flexi's growth raised to the power of transcendence mix].json"
+        "converted/martin - the bridge of khazad-dum [flexi's growth raised to the power of transcendence mix].json"
       ]
     },
     "f2d0b180": {
@@ -10287,7 +10287,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - the forge of Isengard.json"
+        "converted/martin - the forge of Isengard.json"
       ]
     },
     "d48da2af": {
@@ -10311,7 +10311,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - tunnel race.json"
+        "converted/martin - tunnel race.json"
       ]
     },
     "9ce7076b": {
@@ -10333,7 +10333,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - unholy amulet 2.json"
+        "converted/martin - unholy amulet 2.json"
       ]
     },
     "38c0a948": {
@@ -10357,7 +10357,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - violet flash.json"
+        "converted/martin - violet flash.json"
       ]
     },
     "772f28c9": {
@@ -10381,7 +10381,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin - witchcraft reloaded.json"
+        "converted/martin - witchcraft reloaded.json"
       ]
     },
     "856782de": {
@@ -10403,7 +10403,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin [shadow harlequins shape code] - fata morgana.json"
+        "converted/martin [shadow harlequins shape code] - fata morgana.json"
       ]
     },
     "bb4421c5": {
@@ -10427,7 +10427,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin, fishbrain + flexi - mandelbox explorer v1 Eo.S. optimize [bipolar witchcraft mix].json"
+        "converted/martin, fishbrain + flexi - mandelbox explorer v1 Eo.S. optimize [bipolar witchcraft mix].json"
       ]
     },
     "99f74183": {
@@ -10451,7 +10451,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/martin, flexi, fishbrain + sto - enterstate [random mashup].json"
+        "converted/martin, flexi, fishbrain + sto - enterstate [random mashup].json"
       ]
     },
     "88736da6": {
@@ -10473,7 +10473,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/never suggest things roam glance at sun for galactic upgrade.json"
+        "converted/never suggest things roam glance at sun for galactic upgrade.json"
       ]
     },
     "fd451b9b": {
@@ -10498,7 +10498,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/one-sided infinite-dimensional shape - helenisch.json"
+        "converted/one-sided infinite-dimensional shape - helenisch.json"
       ]
     },
     "871e8881": {
@@ -10522,7 +10522,7 @@
         "warmupTime": 4
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/orb - acid cycle [flexi shader mix] - yaqui graph.json"
+        "converted/orb - acid cycle [flexi shader mix] - yaqui graph.json"
       ]
     },
     "a85e181c": {
@@ -10544,7 +10544,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/orb - toxic goo.json"
+        "converted/orb - toxic goo.json"
       ]
     },
     "897b0f0d": {
@@ -10569,7 +10569,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/phat + Eo.S. - Bass_responce_Red_Movements_Disorienting nebula3.json"
+        "converted/phat + Eo.S. - Bass_responce_Red_Movements_Disorienting nebula3.json"
       ]
     },
     "63e9e801": {
@@ -10591,7 +10591,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/raron - a grayish blob - mash0000 - pungent gastric automata cloud fumes.json"
+        "converted/raron - a grayish blob - mash0000 - pungent gastric automata cloud fumes.json"
       ]
     },
     "e31e53de": {
@@ -10615,7 +10615,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/rce-ordinary + flexi - far away distance (custom beat detection + bipolar colour ghost mix).json"
+        "converted/rce-ordinary + flexi - far away distance (custom beat detection + bipolar colour ghost mix).json"
       ]
     },
     "eea3915e": {
@@ -10639,7 +10639,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/repressed americans - massive cheese lard nz+ redkneck treads.json"
+        "converted/repressed americans - massive cheese lard nz+ redkneck treads.json"
       ]
     },
     "3356e8e0": {
@@ -10663,7 +10663,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/sawtooth grin nz+ m10 w4.json"
+        "converted/sawtooth grin nz+ m10 w4.json"
       ]
     },
     "0dbb5255": {
@@ -10687,7 +10687,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/sawtooth grin roam.json"
+        "converted/sawtooth grin roam.json"
       ]
     },
     "f3ecb403": {
@@ -10709,7 +10709,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter + flexi - american oblivion pie.json"
+        "converted/shifter + flexi - american oblivion pie.json"
       ]
     },
     "de6cc4d9": {
@@ -10733,7 +10733,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter - dark tides bdrv mix 2.json"
+        "converted/shifter - dark tides bdrv mix 2.json"
       ]
     },
     "b917df64": {
@@ -10757,7 +10757,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter - dark tides bdrv mix.json"
+        "converted/shifter - dark tides bdrv mix.json"
       ]
     },
     "857e91c2": {
@@ -10781,7 +10781,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter - escape (sigur ros).json"
+        "converted/shifter - escape (sigur ros).json"
       ]
     },
     "c3b9ed29": {
@@ -10806,7 +10806,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter - escape the worm - Eo.S. + Phat - Before_It_Eats_Your_Brain_Mix_v2.json"
+        "converted/shifter - escape the worm - Eo.S. + Phat - Before_It_Eats_Your_Brain_Mix_v2.json"
       ]
     },
     "44edb492": {
@@ -10828,7 +10828,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter - feathers (angel wings).json"
+        "converted/shifter - feathers (angel wings).json"
       ]
     },
     "ba2be859": {
@@ -10850,7 +10850,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter - feathers (angel wings)_phat_remix relief 2.json"
+        "converted/shifter - feathers (angel wings)_phat_remix relief 2.json"
       ]
     },
     "d4882608": {
@@ -10874,7 +10874,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter - fire and brimstone.json"
+        "converted/shifter - fire and brimstone.json"
       ]
     },
     "fae8ede2": {
@@ -10896,7 +10896,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter - fractal grinder.json"
+        "converted/shifter - fractal grinder.json"
       ]
     },
     "3b76f61c": {
@@ -10920,7 +10920,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter - fuzzball 3d (glasses) false auralary2 undre thee bottom qoaguluste.json"
+        "converted/shifter - fuzzball 3d (glasses) false auralary2 undre thee bottom qoaguluste.json"
       ]
     },
     "82df07cc": {
@@ -10944,7 +10944,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shifter - liquid circuitry - conjugoth.json"
+        "converted/shifter - liquid circuitry - conjugoth.json"
       ]
     },
     "c3f0695a": {
@@ -10969,7 +10969,7 @@
         "warmupTime": 4
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/shut down all survival paradigms.json"
+        "converted/shut down all survival paradigms.json"
       ]
     },
     "25eb6376": {
@@ -10993,7 +10993,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/stahlregen & geiss + rovastar - fields of flowers (mashup 9 - space flower rmx) - mash0001 - pack em in, we got a long haul + flashlight.json"
+        "converted/stahlregen & geiss + rovastar - fields of flowers (mashup 9 - space flower rmx) - mash0001 - pack em in, we got a long haul + flashlight.json"
       ]
     },
     "f7fd8e5d": {
@@ -11015,7 +11015,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/stahlregen + geiss + shifter - babylon.json"
+        "converted/stahlregen + geiss + shifter - babylon.json"
       ]
     },
     "357682b4": {
@@ -11037,7 +11037,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/stahlregen - dots (layered) - suksma world humanvirus replication killphreqs mix.json"
+        "converted/stahlregen - dots (layered) - suksma world humanvirus replication killphreqs mix.json"
       ]
     },
     "f0cac3f9": {
@@ -11059,7 +11059,7 @@
         "warmupTime": 5
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/stahlregen - old school, baby (spiral ornament).json"
+        "converted/stahlregen - old school, baby (spiral ornament).json"
       ]
     },
     "e749a9e5": {
@@ -11083,7 +11083,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - Hexcollie - Julian Carnival - shimmy dumb grid.json"
+        "converted/suksma - Hexcollie - Julian Carnival - shimmy dumb grid.json"
       ]
     },
     "266d0894": {
@@ -11107,7 +11107,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - Rovastar - Sunflower Passion (Enlightment Mix)_Phat_edit + flexi und martin shaders - circumflex in character classes in regular expression.json"
+        "converted/suksma - Rovastar - Sunflower Passion (Enlightment Mix)_Phat_edit + flexi und martin shaders - circumflex in character classes in regular expression.json"
       ]
     },
     "fa1c77f9": {
@@ -11131,7 +11131,7 @@
         "warmupTime": 2
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - barium titanate.json"
+        "converted/suksma - barium titanate.json"
       ]
     },
     "2d5c08d1": {
@@ -11155,7 +11155,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - coal drapes - mrt fsh gordo dog crap in my bed cuz i sleep wid my shoes on.json"
+        "converted/suksma - coal drapes - mrt fsh gordo dog crap in my bed cuz i sleep wid my shoes on.json"
       ]
     },
     "e04f9a0d": {
@@ -11179,7 +11179,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - diploautomatic autoimmunity vs passivematic aggpressive - troll.json"
+        "converted/suksma - diploautomatic autoimmunity vs passivematic aggpressive - troll.json"
       ]
     },
     "a7d32249": {
@@ -11201,7 +11201,7 @@
         "warmupTime": 5
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - ed geining hateops - flx i want you, i'm sick with you.json"
+        "converted/suksma - ed geining hateops - flx i want you, i'm sick with you.json"
       ]
     },
     "d3d83ec5": {
@@ -11226,7 +11226,7 @@
         "warmupTime": 5
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - ed geining hateops - squeakers.json"
+        "converted/suksma - ed geining hateops - squeakers.json"
       ]
     },
     "878b208d": {
@@ -11250,7 +11250,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - feign shoulder concern when i should be executed - everything is eternally shrinking.json"
+        "converted/suksma - feign shoulder concern when i should be executed - everything is eternally shrinking.json"
       ]
     },
     "0d5cf61e": {
@@ -11272,7 +11272,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - gaeomaentaec - log smell 2 - steaming wienies2.json"
+        "converted/suksma - gaeomaentaec - log smell 2 - steaming wienies2.json"
       ]
     },
     "515f15b8": {
@@ -11296,7 +11296,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - grainery clock mortis.json"
+        "converted/suksma - grainery clock mortis.json"
       ]
     },
     "739300aa": {
@@ -11320,7 +11320,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - heretical crosscut playpen.json"
+        "converted/suksma - heretical crosscut playpen.json"
       ]
     },
     "3363ca66": {
@@ -11342,7 +11342,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - nip tuck.json"
+        "converted/suksma - nip tuck.json"
       ]
     },
     "66ba2d4f": {
@@ -11367,7 +11367,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - pus on my cat - j4+ - cubby.json"
+        "converted/suksma - pus on my cat - j4+ - cubby.json"
       ]
     },
     "4b60f9f1": {
@@ -11391,7 +11391,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - uninitialized variabowl (hydroponic chronic).json"
+        "converted/suksma - uninitialized variabowl (hydroponic chronic).json"
       ]
     },
     "a5cc7491": {
@@ -11415,7 +11415,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - vector exp 1 - couldn′t not.json"
+        "converted/suksma - vector exp 1 - couldn′t not.json"
       ]
     },
     "d662bbe3": {
@@ -11439,7 +11439,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - water cooled red uranium vs dotes - freeenergynow.net.json"
+        "converted/suksma - water cooled red uranium vs dotes - freeenergynow.net.json"
       ]
     },
     "62f604dd": {
@@ -11463,7 +11463,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/suksma - youtube PQsWLhvuKk8 - waving goodbye to earth.json"
+        "converted/suksma - youtube PQsWLhvuKk8 - waving goodbye to earth.json"
       ]
     },
     "7496ada1": {
@@ -11487,7 +11487,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/undulate harque - shit broo.json"
+        "converted/undulate harque - shit broo.json"
       ]
     },
     "537b7704": {
@@ -11512,7 +11512,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/va ultramix - 154 [chaos].json"
+        "converted/va ultramix - 154 [chaos].json"
       ]
     },
     "db3d13c6": {
@@ -11536,7 +11536,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/various artists - 1200774354134 - mash0000 - what the writer′s guild is doing with the extra money.json"
+        "converted/various artists - 1200774354134 - mash0000 - what the writer′s guild is doing with the extra money.json"
       ]
     },
     "051a8526": {
@@ -11560,7 +11560,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/xtramartin (849).json"
+        "converted/xtramartin (849).json"
       ]
     },
     "81a396d6": {
@@ -11584,7 +11584,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/yin + Geiss - 240 - Electric universe (Bkg Mix).json"
+        "converted/yin + Geiss - 240 - Electric universe (Bkg Mix).json"
       ]
     },
     "6689d0f2": {
@@ -11608,7 +11608,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/yin - 190 - Temporal fluctuations.json"
+        "converted/yin - 190 - Temporal fluctuations.json"
       ]
     },
     "04e97524": {
@@ -11633,7 +11633,7 @@
         "warmupTime": 3
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/yin - 191 - Temporal singularities.json"
+        "converted/yin - 191 - Temporal singularities.json"
       ]
     },
     "bc3866cb": {
@@ -11655,7 +11655,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/yin - 250 - Artificial poles of the continuum_Phat′s_Orbit_mix.json"
+        "converted/yin - 250 - Artificial poles of the continuum_Phat′s_Orbit_mix.json"
       ]
     },
     "1299fc35": {
@@ -11677,7 +11677,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/yin - 253 - Artificial poles of the continuum (remix #3).json"
+        "converted/yin - 253 - Artificial poles of the continuum (remix #3).json"
       ]
     },
     "c2043da2": {
@@ -11701,7 +11701,7 @@
         "warmupTime": 1
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/yin - 315 - Ocean of Light (yo im peakin yo Eo.S.-Phat).json"
+        "converted/yin - 315 - Ocean of Light (yo im peakin yo Eo.S.-Phat).json"
       ]
     },
     "d64040be": {
@@ -11725,7 +11725,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/yin - 352 - Chromatron (warped).json"
+        "converted/yin - 352 - Chromatron (warped).json"
       ]
     },
     "5c1a4254": {
@@ -11749,7 +11749,7 @@
         "warmupTime": 0
       },
       "files": [
-        "/Users/twin2/Desktop/projects/music_autovis/brother-help/butterchurn/node_modules/butterchurn-presets/presets/converted/yin - 393 - Artificial Inspiration (music driven - outward).json"
+        "converted/yin - 393 - Artificial Inspiration (music driven - outward).json"
       ]
     }
   },

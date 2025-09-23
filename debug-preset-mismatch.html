@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Preset Mismatch</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #0f0;
+        }
+        pre {
+            background: #000;
+            padding: 10px;
+            border: 1px solid #0f0;
+            overflow: auto;
+            max-height: 400px;
+        }
+        .error { color: #f00; }
+        .warning { color: #ff0; }
+        .success { color: #0f0; }
+    </style>
+</head>
+<body>
+    <h1>Preset Database/Pack Mismatch Debug</h1>
+    <div id="output"></div>
+
+    <!-- Load preset packs -->
+    <script src="https://unpkg.com/butterchurn-presets@2.4.7/lib/butterchurnPresets.min.js"></script>
+    <script src="https://unpkg.com/butterchurn-presets@2.4.7/lib/butterchurnPresetsExtra.min.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(msg, className = '') {
+            const div = document.createElement('div');
+            div.className = className;
+            div.textContent = msg;
+            output.appendChild(div);
+        }
+
+        async function analyze() {
+            log('=== PRESET MISMATCH ANALYSIS ===', 'success');
+
+            // Load fingerprint database
+            let fingerprintDb;
+            try {
+                const response = await fetch('fingerprints.json');
+                fingerprintDb = await response.json();
+                log(`✓ Loaded fingerprint database: ${Object.keys(fingerprintDb.presets).length} presets`, 'success');
+            } catch (e) {
+                log(`✗ Failed to load fingerprints.json: ${e}`, 'error');
+                return;
+            }
+
+            // Load preset packs
+            const allPresets = {};
+            if (typeof butterchurnPresets !== 'undefined') {
+                Object.assign(allPresets, butterchurnPresets.getPresets());
+                log(`✓ Loaded butterchurnPresets: ${Object.keys(butterchurnPresets.getPresets()).length} presets`);
+            }
+            if (typeof butterchurnPresetsExtra !== 'undefined') {
+                Object.assign(allPresets, butterchurnPresetsExtra.getPresets());
+                log(`✓ Loaded butterchurnPresetsExtra: ${Object.keys(butterchurnPresetsExtra.getPresets()).length} presets`);
+            }
+
+            const packNames = Object.keys(allPresets);
+            log(`\n📦 Total presets in packs: ${packNames.length}`, 'success');
+
+            // Check the specific failing preset
+            const problemPreset = "Stahlregen & fishbrain + flexi + geiss - The Machine that conquered the Aether";
+            log(`\n=== CHECKING PROBLEM PRESET ===`, 'warning');
+            log(`Looking for: "${problemPreset}"`);
+
+            // Check if it's in the fingerprint DB
+            const dbEntry = Object.entries(fingerprintDb.presets).find(([hash, data]) =>
+                data.names.includes(problemPreset)
+            );
+
+            if (dbEntry) {
+                log(`✓ Found in fingerprint DB:`, 'success');
+                log(`  Hash: ${dbEntry[0]}`);
+                log(`  Names: ${dbEntry[1].names.join(', ')}`);
+            } else {
+                log(`✗ NOT found in fingerprint database!`, 'error');
+            }
+
+            // Check if it's in the preset packs
+            const exactMatch = allPresets[problemPreset];
+            if (exactMatch) {
+                log(`✓ EXACT match in preset pack`, 'success');
+            } else {
+                log(`✗ NO exact match in preset pack`, 'error');
+
+                // Look for similar names
+                log(`\nSearching for similar names...`, 'warning');
+                const similar = packNames.filter(name =>
+                    name.toLowerCase().includes('machine') ||
+                    name.toLowerCase().includes('conquered') ||
+                    name.toLowerCase().includes('aether')
+                );
+
+                if (similar.length > 0) {
+                    log(`Found ${similar.length} similar preset(s):`, 'warning');
+                    similar.forEach(name => log(`  - "${name}"`));
+                } else {
+                    log(`No similar names found`, 'error');
+                }
+            }
+
+            // Compare all names
+            log(`\n=== NAME COMPARISON ===`, 'warning');
+
+            // Get all names from fingerprint DB
+            const dbNames = new Set();
+            Object.values(fingerprintDb.presets).forEach(preset => {
+                preset.names.forEach(name => dbNames.add(name));
+            });
+
+            // Find mismatches
+            const inDbNotInPack = [];
+            const inPackNotInDb = [];
+
+            dbNames.forEach(name => {
+                if (!allPresets[name]) {
+                    inDbNotInPack.push(name);
+                }
+            });
+
+            packNames.forEach(name => {
+                if (!dbNames.has(name)) {
+                    inPackNotInDb.push(name);
+                }
+            });
+
+            log(`\nPresets in DB but NOT in pack: ${inDbNotInPack.length}`, 'error');
+            if (inDbNotInPack.length > 0 && inDbNotInPack.length <= 10) {
+                inDbNotInPack.slice(0, 10).forEach(name => log(`  - "${name}"`));
+            }
+
+            log(`\nPresets in pack but NOT in DB: ${inPackNotInDb.length}`, 'warning');
+            if (inPackNotInDb.length > 0 && inPackNotInDb.length <= 10) {
+                inPackNotInDb.slice(0, 10).forEach(name => log(`  - "${name}"`));
+            }
+
+            // Summary
+            log(`\n=== SUMMARY ===`, 'success');
+            log(`Database has ${dbNames.size} unique names`);
+            log(`Packs have ${packNames.length} presets`);
+            log(`Mismatches: ${inDbNotInPack.length} missing from pack, ${inPackNotInDb.length} missing from DB`);
+
+            if (inDbNotInPack.length > 0) {
+                log(`\n⚠️ CRITICAL: The fingerprint database contains presets that don't exist in the preset packs!`, 'error');
+                log(`This means the database was generated from a different preset collection.`, 'error');
+            }
+        }
+
+        // Run analysis
+        analyze();
+    </script>
+</body>
+</html>
