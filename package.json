@@ -9,7 +9,16 @@
   "files": [
     "dist/butterchurn.js",
     "dist/butterchurn.min.js",
-    "dist/isSupported.min.js"
+    "dist/isSupported.min.js",
+    "presets/alaska-butter/*.js",
+    "presets/alaska-butter/*.min.js",
+    "presets/alaska-butter/*.fingerprints.json",
+    "presets/alaska-butter/*.fingerprints.min.json",
+    "presets/full-collection/*.min.js",
+    "presets/full-collection/*.fingerprints.json",
+    "presets/full-collection/*.fingerprints.min.json",
+    "src/fingerprintLoader.js",
+    "src/fingerprintAdapter.js"
   ],
   "scripts": {
     "prebuild": "npm run lint:check",
@@ -22,7 +31,7 @@
     "typecheck": "tsc --noEmit",
     "analyze": "npm run lint:check && npm run typecheck && npm run lint:glsl",
     "precommit": "npm run analyze",
-    "build:cdn": "npm run build && cp dist/butterchurn.min.js docs/cdn/ && cp test/fingerprints.json docs/cdn/ && cp presets/full-collection/*.min.js docs/cdn/presets/",
+    "build:cdn": "npm run dev-build && cp dist/butterchurn.min.js docs/cdn/ && cp presets/full-collection/*.min.js docs/cdn/presets/ && cp presets/alaska-butter/*.min.js docs/cdn/presets/ && cp presets/full-collection/*.fingerprints.min.json docs/cdn/presets/ && cp presets/alaska-butter/*.fingerprints.min.json docs/cdn/presets/",
     "deploy:cdn": "npm run build:cdn && git add docs/cdn && git commit -m 'chore: Update CDN build' && git push",
     "test": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs",
     "test:visual": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js",

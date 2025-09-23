@@ -34,8 +34,18 @@ coverage/
 .env.local
 .env.*.local
 
-# Downloaded presets (large files)
-presets/full-collection/
+# Preset files - we commit everything for simplicity and consistency
+# Only exclude the source JSON files (we have fingerprints for those)
+presets/*/butterchurnPresets*.json
+presets/*/alaskaButter.json
+# But keep all JS files, fingerprints, and metadata
+!presets/*/*.fingerprints.json
+!presets/*/*.fingerprints.min.json
+!presets/*/metadata.json
+
+# Archive and source directories
+presets/full-collection/archive/
+presets/full-collection/presets/
 
 # Temporary files
 *.tmp

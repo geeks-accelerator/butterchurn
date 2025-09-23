@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extract Presets to JSON</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #0f0;
+        }
+        button {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #0a0;
+        }
+        pre {
+            background: #000;
+            padding: 10px;
+            border: 1px solid #0f0;
+            overflow: auto;
+            max-height: 400px;
+        }
+        .pack {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #333;
+        }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>Extract Presets to JSON Files</h1>
+    <p>This page extracts presets from the browser-only JavaScript files and saves them as JSON.</p>
+    <p>Open this page via the test server: http://localhost:8192/tools/extract-presets.html</p>
+
+    <button onclick="extractAll()">Extract All Preset Packs</button>
+    <button onclick="copyAll()">Copy All as Single JSON</button>
+
+    <div id="output"></div>
+
+    <!-- Load all preset packs -->
+    <script src="../presets/full-collection/butterchurnPresets.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsExtra.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsExtra2.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsMD1.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsMinimal.min.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsNonMinimal.min.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(msg, className = '') {
+            const div = document.createElement('div');
+            div.className = className;
+            div.textContent = msg;
+            output.appendChild(div);
+        }
+
+        function downloadJSON(data, filename) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function extractAll() {
+            output.innerHTML = '';
+            log('=== Extracting All Preset Packs ===', 'success');
+
+            const packs = [
+                { name: 'butterchurnPresets', obj: window.butterchurnPresets },
+                { name: 'butterchurnPresetsExtra', obj: window.butterchurnPresetsExtra },
+                { name: 'butterchurnPresetsExtra2', obj: window.butterchurnPresetsExtra2 },
+                { name: 'butterchurnPresetsMD1', obj: window.butterchurnPresetsMD1 },
+                { name: 'butterchurnPresetsMinimal', obj: window.butterchurnPresetsMinimal },
+                { name: 'butterchurnPresetsNonMinimal', obj: window.butterchurnPresetsNonMinimal }
+            ];
+
+            for (const pack of packs) {
+                const packDiv = document.createElement('div');
+                packDiv.className = 'pack';
+
+                if (pack.obj && typeof pack.obj.getPresets === 'function') {
+                    const presets = pack.obj.getPresets();
+                    const count = Object.keys(presets).length;
+
+                    packDiv.innerHTML = `
+                        <strong>${pack.name}:</strong> ${count} presets
+                        <button onclick="downloadPack('${pack.name}')">Download ${pack.name}.json</button>
+                        <button onclick="showPack('${pack.name}')">Show Preset Names</button>
+                        <pre id="pack-${pack.name}" style="display:none"></pre>
+                    `;
+
+                    // Store for download
+                    window[`${pack.name}_data`] = presets;
+
+                    log(`✓ ${pack.name}: ${count} presets`, 'success');
+                } else {
+                    packDiv.innerHTML = `<strong>${pack.name}:</strong> <span class="error">Not loaded</span>`;
+                    log(`✗ ${pack.name}: Not loaded`, 'error');
+                }
+
+                output.appendChild(packDiv);
+            }
+
+            log('\n=== Instructions ===', 'success');
+            log('1. Click each "Download" button to save the JSON file');
+            log('2. Save them to presets/full-collection/');
+            log('3. Run: node tools/generate-fingerprints.js on each JSON file');
+        }
+
+        function downloadPack(packName) {
+            const data = window[`${packName}_data`];
+            if (data) {
+                downloadJSON(data, `${packName}.json`);
+                log(`Downloaded ${packName}.json`, 'success');
+            }
+        }
+
+        function showPack(packName) {
+            const pre = document.getElementById(`pack-${packName}`);
+            const data = window[`${packName}_data`];
+            if (pre && data) {
+                if (pre.style.display === 'none') {
+                    pre.style.display = 'block';
+                    pre.textContent = Object.keys(data).sort().join('\n');
+                } else {
+                    pre.style.display = 'none';
+                }
+            }
+        }
+
+        function copyAll() {
+            const allPresets = {};
+            const packs = [
+                window.butterchurnPresets,
+                window.butterchurnPresetsExtra,
+                window.butterchurnPresetsExtra2,
+                window.butterchurnPresetsMD1,
+                window.butterchurnPresetsMinimal,
+                window.butterchurnPresetsNonMinimal
+            ];
+
+            let totalCount = 0;
+            for (const pack of packs) {
+                if (pack && typeof pack.getPresets === 'function') {
+                    const presets = pack.getPresets();
+                    Object.assign(allPresets, presets);
+                    totalCount += Object.keys(presets).length;
+                }
+            }
+
+            const json = JSON.stringify(allPresets, null, 2);
+            navigator.clipboard.writeText(json).then(() => {
+                log(`✓ Copied ${Object.keys(allPresets).length} unique presets (${totalCount} total) to clipboard`, 'success');
+            }).catch(err => {
+                log(`✗ Failed to copy: ${err}`, 'error');
+            });
+        }
+
+        // Auto-extract on load
+        window.addEventListener('load', () => {
+            setTimeout(extractAll, 100);
+        });
+    </script>
+</body>
+</html>

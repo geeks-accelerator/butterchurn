@@ -15,10 +15,12 @@ Butterchurn is an intelligent WebGL implementation of the Milkdrop Visualizer wi
 - **Community-driven** - Built on the extensive Milkdrop preset ecosystem with attribution preservation
 
 ### Key Capabilities
-- **500+ Unique Presets** - Curated from 5 preset libraries with mathematical deduplication
-- **Intelligent Selection** - Real-time audio analysis drives preset switching based on energy, bass, and complexity
+- **388+ Unique Presets** - Alaska Butter collection combines 6 preset libraries with mathematical deduplication
+- **Individual Pack Support** - Access full-collection packs with 1:1 fingerprint mapping for targeted selection
+- **Intelligent Selection** - Real-time audio analysis drives preset switching using equation-based fingerprints
 - **Smooth Transitions** - Fixed blending system provides seamless crossfades (no more fade-to-black)
 - **Enhanced Audio Processing** - 2048-sample FFT buffer for superior bass response and frequency resolution
+- **Scene-Based Switching** - Moving Average crossover detection for musical scene transitions
 - **Visual Regression Testing** - Deterministic rendering for reliable automated testing
 
 ### Performance Improvements
@@ -67,7 +69,7 @@ cd butterchurn
 # Install dependencies (legacy flag required for eel-wasm)
 npm install --legacy-peer-deps
 
-# Download full preset collection (optional, ~3MB)
+# Download preset source files (optional, needed for fingerprint regeneration)
 ./setup-full-presets.sh
 
 # Build for production
@@ -90,15 +92,21 @@ npm run serve:test
 <!-- Core Butterchurn library (Enhanced Fork) -->
 <script src="https://geeks-accelerator.github.io/butterchurn/cdn/butterchurn.min.js"></script>
 
-<!-- Preset collections -->
+<!-- Alaska Butter - Unified preset collection (388 unique presets) -->
+<script src="https://geeks-accelerator.github.io/butterchurn/cdn/presets/alaskaButter.min.js"></script>
+
+<!-- Or load individual preset packs -->
 <script src="https://geeks-accelerator.github.io/butterchurn/cdn/presets/butterchurnPresets.min.js"></script>
 <script src="https://geeks-accelerator.github.io/butterchurn/cdn/presets/butterchurnPresetsExtra.min.js"></script>
 
-<!-- Fingerprint database for intelligent selection -->
-<script>
-  fetch('https://geeks-accelerator.github.io/butterchurn/cdn/fingerprints.json')
-    .then(r => r.json())
-    .then(db => console.log(`Loaded ${Object.keys(db.presets).length} preset fingerprints`));
+<!-- Fingerprint databases for intelligent selection -->
+<script type="module">
+  // Load fingerprint loader
+  import FingerprintLoader from './src/fingerprintLoader.js';
+
+  const loader = new FingerprintLoader();
+  await loader.loadAllFingerprints('/cdn/presets/');
+  console.log(`Loaded ${loader.getStats().totalPresets} preset fingerprints`);
 </script>
 ```
 
@@ -155,24 +163,19 @@ const presetKeys = Object.keys(presets);
 visualizer.loadPreset(presets[presetKeys[0]], 0.0);
 ```
 
-### Intelligent Preset Selection
+### Intelligent Preset Selection with Alaska Butter
 ```javascript
-// Load intelligent selector with fingerprint database
-import { IntelligentPresetSelector } from './src/intelligentPresetSelector.js';
+// Load intelligent selector with new fingerprint system
+import IntelligentPresetSelector from './src/intelligentPresetSelector.js';
 
-// Load fingerprint database (495 unique presets analyzed)
-const response = await fetch('fingerprints.json');
-const fingerprintDatabase = await response.json();
+// Create intelligent selector (auto-loads fingerprints)
+const selector = new IntelligentPresetSelector(visualizer);
 
-// Create intelligent selector
-const selector = new IntelligentPresetSelector(visualizer, fingerprintDatabase);
-
-// Set preset collection
-const allPresets = {
-  ...butterchurnPresets.getPresets(),
-  // Add additional preset packs as needed
-};
-selector.setPresetPack(allPresets);
+// Initialize with Alaska Butter preset collection
+await selector.initialize({
+  basePath: '/presets/',  // Location of preset and fingerprint files
+  autoLoadPacks: true     // Automatically load all preset JS files
+});
 
 // Render loop with intelligent selection
 function animate() {
@@ -182,7 +185,7 @@ function animate() {
     timeByteArrayR: new Uint8Array(visualizer.audio.timeByteArrayR)
   };
 
-  // Intelligent preset selection based on audio features
+  // Intelligent preset selection with Moving Average crossovers
   selector.update(audioLevels);
 
   // Render with audio data
@@ -191,6 +194,17 @@ function animate() {
   requestAnimationFrame(animate);
 }
 animate();
+```
+
+### Manual Preset Loading by Hash
+```javascript
+// Load specific preset using 8-character hash ID
+const presetHash = 'a3f7b2c9';  // Content-based hash
+await selector.loadPresetByHash(presetHash, 2.0);  // 2-second crossfade
+
+// Get preset info by hash
+const preset = await selector.getPresetByHash(presetHash);
+console.log('Loaded:', preset.name, 'by', preset.author);
 ```
 
 ### Advanced Configuration
@@ -254,10 +268,17 @@ Preset Database ← Intelligent Selector ← Audio Features
 
 ### Mathematical Fingerprinting System
 Each preset is analyzed by its mathematical equations to generate:
-- **Energy Score**: Complexity of motion and transformation equations
-- **Bass Responsiveness**: Usage of bass frequency variables (bass, bass_att, etc.)
-- **Performance Rating**: Estimated FPS based on shader complexity
-- **Content Hash**: 8-character unique identifier for deduplication
+- **Content Hash**: 8-character SHA256-based unique identifier for deduplication
+- **Energy Score**: Complexity based on equation analysis and variable usage
+- **Bass Reactivity**: Frequency of bass-related variables (bass, bass_att, etc.)
+- **Treble Reactivity**: Usage of treble frequency variables (treb, high, etc.)
+- **Performance Estimate**: Shader complexity scoring for FPS estimation
+- **Pack Attribution**: Source pack tracking with author and name preservation
+
+### Preset Collections
+- **Alaska Butter**: 388 unique presets (deduplicated from all 6 packs)
+- **Full Collection**: Individual packs with 1:1 fingerprint mapping
+- **Total Available**: 553 presets before deduplication (160 duplicates removed)
 
 ### Troubleshooting Guide
 

@@ -11,6 +11,8 @@ This file provides AI-optimized development context for Claude Code when working
 - **MAINTAIN** direct WebGL rendering - no Canvas 2D intermediate copies
 - **PRESERVE** 2048-sample audio buffer size - never revert to 512
 - **KEEP** deterministic RNG context for visual regression tests
+- **MAINTAIN** 1:1 preset-to-fingerprint mapping - each JS file must have matching .fingerprints.json
+- **USE** equation analysis for fingerprints - never audio testing or random data
 
 ### WebGL/Performance Rules
 - Use WebGL2 context directly on output canvas (`preserveDrawingBuffer: true`)
@@ -37,11 +39,15 @@ This file provides AI-optimized development context for Claude Code when working
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
-- Phase 2 intelligent preset selection with fingerprint database
+- Phase 2 intelligent preset selection with equation-based fingerprinting
+- Alaska Butter unified collection (388 unique presets with deduplication)
+- Individual preset pack support with 1:1 fingerprint mapping
+- FingerprintLoader + FingerprintAdapter system for modular preset loading
+- Moving Average crossover detection for scene-based preset switching
 - Separate alpha buffer blending system (fixes fade-to-black bug)
 - 2048-sample audio processing with superior bass response
 - Visual regression testing with deterministic RNG
-- Full preset collection (395+ presets) with deduplication
+- Updated CDN distribution with all preset and fingerprint files
 - GitHub Pages CDN at https://geeks-accelerator.github.io/butterchurn/cdn/
 - AlaskaButter demo site at https://alaskabutter.com
 
@@ -52,11 +58,15 @@ This file provides AI-optimized development context for Claude Code when working
 - Real-time spectral analysis for instrument detection
 
 ### Critical Files Status
-- `src/intelligentPresetSelector.js` - ✅ Complete intelligent selection
-- `fingerprints.json` - ✅ Complete database (395 unique presets)
-- `setup-full-presets.sh` - ✅ Automated preset collection download
-- `test/intelligent-selector-test.html` - ✅ Working demo
-- `docs/cdn/` - ✅ GitHub Pages CDN distribution
+- `src/intelligentPresetSelector.js` - ✅ Complete with preset loading and MA crossovers
+- `src/fingerprintLoader.js` - ✅ Modular fingerprint database loader
+- `src/fingerprintAdapter.js` - ✅ Database format adapter for selector compatibility
+- `presets/alaska-butter/` - ✅ Unified collection (388 presets + fingerprints)
+- `presets/full-collection/` - ✅ Individual packs with 1:1 fingerprint mapping
+- `tools/generate-fingerprints.js` - ✅ Equation-based fingerprint generator
+- `tools/create-alaska-butter.js` - ✅ Deduplication and collection merger
+- `test/fingerprint-test.html` - ✅ Working demo with new system
+- `docs/cdn/presets/` - ✅ Updated CDN with all preset + fingerprint files
 
 ## ARCHITECTURE ESSENTIALS
 
@@ -76,13 +86,17 @@ src/
 ├── rendering/renderer.js       # Separate alpha buffers for blending
 ├── equations/                  # JS + WASM equation evaluation
 ├── utils/rngContext.js         # Deterministic RNG for testing
-└── intelligentPresetSelector.js # Audio-reactive preset selection
+├── intelligentPresetSelector.js # Audio-reactive preset selection with MA crossovers
+├── fingerprintLoader.js        # Modular fingerprint database loading
+└── fingerprintAdapter.js       # Database format compatibility layer
 ```
 
 ### Key Integration Patterns
 - **Rendering**: Output canvas → WebGL2 context (no intermediate copies)
-- **Audio Flow**: AudioContext → Analyser → FFT → Preset selection
+- **Audio Flow**: AudioContext → Analyser → FFT → MA Crossover → Preset selection
 - **Blending**: Separate `prevWarpColor` + `warpColor` buffers with inverted alpha
+- **Fingerprinting**: Equation analysis → Content hashing → Pack-based loading
+- **Preset Loading**: Hash ID → Pack lookup → Dynamic import → Butterchurn load
 - **Testing**: Seeded RNG overrides Math.random for deterministic output
 
 ### Build System

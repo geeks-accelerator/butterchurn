@@ -206,6 +206,29 @@ class PresetFingerprintGenerator {
     }
 
     /**
+     * Analyze treble/high frequency reactivity
+     */
+    analyzeTrebleReactivity(preset) {
+        const trebleVars = ['treb', 'high', 'treble', 'treb_att'];
+        const allEqs = this.getAllEquations(preset);
+
+        let totalCount = 0;
+        for (const varName of trebleVars) {
+            const regex = new RegExp(varName, 'g');
+            const matches = allEqs.match(regex) || [];
+            totalCount += matches.length;
+        }
+
+        // Check for high-frequency responsive patterns
+        if (allEqs.includes('treb') && allEqs.includes('zoom')) totalCount += 2;
+        if (allEqs.includes('treb') && allEqs.includes('rot')) totalCount += 2;
+        if (allEqs.includes('treb_att')) totalCount += 3; // Attenuated treble is more sophisticated
+
+        // Normalize to 0-1 range (8+ mentions = highly reactive)
+        return Math.min(1, totalCount / 8);
+    }
+
+    /**
      * Detect beat synchronization patterns
      */
     analyzeBeatSync(preset) {
@@ -445,13 +468,15 @@ class PresetFingerprintGenerator {
             else if (fp.energy < 0.3) this.database.indices.calm.push(hash);
 
             // Audio reactivity
-            if (fp.bass > 0.6) this.database.indices.bass.push(hash);
+            if ((fp.bass || fp.bassEnergy || 0) > 0.6) this.database.indices.bass.push(hash);
 
-            // Visual style categories
-            if (fp.styles.includes('particle')) this.database.indices.particle.push(hash);
-            if (fp.styles.includes('fractal')) this.database.indices.fractal.push(hash);
-            if (fp.styles.includes('geometric')) this.database.indices.geometric.push(hash);
-            if (fp.styles.includes('organic')) this.database.indices.organic.push(hash);
+            // Visual style categories (check if styles exists)
+            if (fp.styles) {
+                if (fp.styles.includes('particle')) this.database.indices.particle.push(hash);
+                if (fp.styles.includes('fractal')) this.database.indices.fractal.push(hash);
+                if (fp.styles.includes('geometric')) this.database.indices.geometric.push(hash);
+                if (fp.styles.includes('organic')) this.database.indices.organic.push(hash);
+            }
         }
     }
 
@@ -475,6 +500,98 @@ class PresetFingerprintGenerator {
         }
 
         return files;
+    }
+
+    /**
+     * Generate fingerprints for all presets in a JSON file
+     */
+    async generateForJSONFile(jsonFile, options = {}) {
+        console.log(`\n🔍 Processing JSON file: ${jsonFile}\n`);
+
+        // Read the JSON file
+        const jsonContent = await fs.readFile(jsonFile, 'utf8');
+        const presets = JSON.parse(jsonContent);
+
+        console.log(`📁 Found ${Object.keys(presets).length} presets in JSON file\n`);
+
+        // Process each preset
+        for (const [presetName, presetContent] of Object.entries(presets)) {
+            try {
+                // Parse the preset content if it's a string
+                const presetData = typeof presetContent === 'string'
+                    ? JSON.parse(presetContent)
+                    : presetContent;
+
+                // Generate hash
+                const hash = this.generateContentHash(presetData);
+
+                // Extract author from name
+                const author = this.extractAuthor(presetName);
+                this.stats.authorsIdentified.add(author);
+
+                // Check if we've seen this hash before
+                if (this.database.presets[hash]) {
+                    // It's a duplicate
+                    this.stats.duplicatesFound++;
+
+                    // Add this as an alternate name
+                    if (!this.database.presets[hash].names.includes(presetName)) {
+                        this.database.presets[hash].names.push(presetName);
+                    }
+
+                    // Add author if not already included
+                    if (!this.database.presets[hash].authors.includes(author)) {
+                        this.database.presets[hash].authors.push(author);
+                    }
+                } else {
+                    // New unique preset
+                    this.stats.uniquePresets++;
+
+                    // Analyze the preset directly
+                    const fingerprint = {
+                        energy: this.analyzeEnergy(presetData),
+                        bassEnergy: this.analyzeBassReactivity(presetData),
+                        trebleEnergy: this.analyzeTrebleReactivity(presetData),
+                        complexity: this.analyzeComplexity(presetData),
+                        beatSync: this.analyzeBeatSync(presetData),
+                        fps: this.estimatePerformance(presetData)
+                    };
+
+                    // Store in database
+                    this.database.presets[hash] = {
+                        authors: [author],
+                        names: [presetName],
+                        fingerprint,
+                        pack: path.basename(jsonFile, '.json')
+                    };
+                }
+
+                this.stats.totalFiles++;
+
+                // Progress indicator
+                if (this.stats.totalFiles % 100 === 0) {
+                    process.stdout.write('.');
+                }
+            } catch (error) {
+                console.error(`\n⚠️ Failed to process preset: ${presetName}`);
+                console.error(`   Error: ${error.message}`);
+                this.stats.failedFiles.push(presetName);
+            }
+        }
+
+        // Build category indices
+        this.buildIndices();
+
+        // Update stats
+        this.database.stats = {
+            totalFiles: this.stats.totalFiles,
+            uniquePresets: this.stats.uniquePresets,
+            duplicatesFound: this.stats.duplicatesFound,
+            authorsCount: this.stats.authorsIdentified.size,
+            failedFiles: this.stats.failedFiles.length
+        };
+
+        return this.database;
     }
 
     /**
@@ -583,19 +700,30 @@ async function main() {
         outputFile = path.resolve(process.cwd(), outputFile);
     }
 
-    // Check if input directory exists
+    // Check if input exists
     try {
         await fs.access(inputDir);
     } catch (error) {
-        console.error(`❌ Input directory not found: ${inputDir}`);
-        console.error('Please install butterchurn-presets or specify a valid preset directory');
+        console.error(`❌ Input not found: ${inputDir}`);
+        console.error('Please install butterchurn-presets or specify a valid preset directory or JSON file');
         console.error('Run: npm install butterchurn-presets');
         process.exit(1);
     }
 
     // Generate fingerprints
     const generator = new PresetFingerprintGenerator();
-    const database = await generator.generateForDirectory(inputDir, { limit });
+    let database;
+
+    // Check if input is a JSON file or directory
+    const inputStats = await fs.stat(inputDir);
+    if (inputStats.isFile() && inputDir.endsWith('.json')) {
+        database = await generator.generateForJSONFile(inputDir, { limit });
+    } else if (inputStats.isDirectory()) {
+        database = await generator.generateForDirectory(inputDir, { limit });
+    } else {
+        console.error(`❌ Input must be a directory or JSON file: ${inputDir}`);
+        process.exit(1);
+    }
 
     // Save database
     await fs.writeFile(outputFile, JSON.stringify(database, null, 2));
