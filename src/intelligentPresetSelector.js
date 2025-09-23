@@ -15,19 +15,38 @@
  * these features will be disabled but core functionality will work.
  */
 
-// Import advanced feature modules
-import { frameAnalyzer } from './analysis/liveFrameAnalyzer.js';
-import { presetLogger } from './analysis/presetFailureLogger.js';
-import { emergencyManager } from './presets/emergencyPresetManager.js';
-import { blocklistManager } from './blocklist/blocklistManager.js';
-import config from './config/config.js';
-import { AdvancedAudioAnalyzer } from './audio/advancedAnalyzer.js';
-import { MultiSignalCrossover } from './audio/movingAverageCrossover.js';
+// Import working modules only
+import FingerprintLoader from './fingerprintLoader.js';
+import FingerprintAdapter from './fingerprintAdapter.js';
+
+// Advanced modules (optional - will be disabled if not available)
+let frameAnalyzer, presetLogger, emergencyManager, blocklistManager, config, AdvancedAudioAnalyzer, MultiSignalCrossover;
+try {
+    const modules = await Promise.all([
+        import('./analysis/liveFrameAnalyzer.js').catch(() => null),
+        import('./analysis/presetFailureLogger.js').catch(() => null),
+        import('./presets/emergencyPresetManager.js').catch(() => null),
+        import('./blocklist/blocklistManager.js').catch(() => null),
+        import('./config/config.js').catch(() => null),
+        import('./audio/advancedAnalyzer.js').catch(() => null),
+        import('./audio/movingAverageCrossover.js').catch(() => null)
+    ]);
+    [frameAnalyzer, presetLogger, emergencyManager, blocklistManager, config, AdvancedAudioAnalyzer, MultiSignalCrossover] = modules.map(m => m?.default || m);
+} catch (e) {
+    console.log('[IntelligentSelector] Advanced modules not available, using fallback mode');
+}
 
 class IntelligentPresetSelector {
     constructor(butterchurn, fingerprintDatabase) {
         this.butterchurn = butterchurn;
         this.db = fingerprintDatabase;
+
+        // Preset loading system
+        this.loader = null;
+        this.adapter = null;
+        this.presetCache = {};
+        this.loadedPacks = new Set();
+        this.isInitialized = false;
 
         // Selection state
         this.currentHash = null;
@@ -35,17 +54,20 @@ class IntelligentPresetSelector {
         this.lastSwitch = 0;
         this.currentWarmupTime = 0; // Track warmup requirement for current preset
 
-        // Initialize audio analyzer with config
-        const analyzerConfig = (typeof config !== 'undefined' && config?.get) ? {
-            dropThreshold: config.get('audioAnalysis.dropThreshold', 0.7),
-            buildupThreshold: config.get('audioAnalysis.buildupThreshold', 0.5),
-            breakdownThreshold: config.get('audioAnalysis.breakdownThreshold', 0.3),
-            chillThreshold: config.get('audioAnalysis.chillThreshold', 0.3),
-            bassWeight: config.get('audioAnalysis.bassWeight', 0.6),
-            trebleWeight: config.get('audioAnalysis.trebleWeight', 0.3),
-            maxHistorySize: config.get('audioAnalysis.maxHistorySize', 30)
-        } : {};
-        this.audioAnalyzer = new AdvancedAudioAnalyzer(analyzerConfig);
+        // Initialize audio analyzer with config (optional)
+        this.audioAnalyzer = null;
+        if (AdvancedAudioAnalyzer) {
+            const analyzerConfig = (typeof config !== 'undefined' && config?.get) ? {
+                dropThreshold: config.get('audioAnalysis.dropThreshold', 0.7),
+                buildupThreshold: config.get('audioAnalysis.buildupThreshold', 0.5),
+                breakdownThreshold: config.get('audioAnalysis.breakdownThreshold', 0.3),
+                chillThreshold: config.get('audioAnalysis.chillThreshold', 0.3),
+                bassWeight: config.get('audioAnalysis.bassWeight', 0.6),
+                trebleWeight: config.get('audioAnalysis.trebleWeight', 0.3),
+                maxHistorySize: config.get('audioAnalysis.maxHistorySize', 30)
+            } : {};
+            this.audioAnalyzer = new AdvancedAudioAnalyzer(analyzerConfig);
+        }
 
         // Load timing configuration (config is optional - use defaults if not available)
         this.minSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
@@ -68,7 +90,12 @@ class IntelligentPresetSelector {
             signalThreshold: config.get('crossover.signalThreshold', 0.2),  // Changed from 0.4 to 0.2
             consensusRequired: config.get('crossover.consensusRequired', 2)
         } : {};
-        this.crossoverDetector = new MultiSignalCrossover(crossoverConfig);
+
+        // Initialize crossover detector if available
+        this.crossoverDetector = null;
+        if (MultiSignalCrossover) {
+            this.crossoverDetector = new MultiSignalCrossover(crossoverConfig);
+        }
 
         // Fallback thresholds (kept for compatibility, but MA crossover is primary)
         this.energyChangeThreshold = 0.25;  // Now just a fallback
@@ -145,6 +172,125 @@ class IntelligentPresetSelector {
         console.log('Preset pack loaded with', Object.keys(presets).length, 'presets');
     }
 
+    /**
+     * Load all preset pack JS files
+     */
+    async loadAllPresetPacks() {
+        const packNames = [
+            'butterchurnPresets',
+            'butterchurnPresetsExtra',
+            'butterchurnPresetsExtra2',
+            'butterchurnPresetsMD1',
+            'butterchurnPresetsMinimal',
+            'butterchurnPresetsNonMinimal'
+        ];
+
+        console.log('[IntelligentSelector] Loading preset packs...');
+
+        for (const packName of packNames) {
+            try {
+                await this.loadPresetPack(packName);
+            } catch (error) {
+                console.error(`[IntelligentSelector] Failed to load pack ${packName}:`, error);
+            }
+        }
+    }
+
+    /**
+     * Load a specific preset pack
+     */
+    async loadPresetPack(packName) {
+        if (this.loadedPacks.has(packName)) {
+            return this.presetCache[packName];
+        }
+
+        try {
+            // Check if it's already loaded globally (from script tags)
+            if (typeof window !== 'undefined' && window[packName]) {
+                const presets = window[packName].getPresets();
+                this.presetCache[packName] = presets;
+                this.loadedPacks.add(packName);
+                console.log(`[IntelligentSelector] Loaded ${packName} from global (${Object.keys(presets).length} presets)`);
+                return presets;
+            }
+
+            // Try dynamic import
+            const packUrl = `/presets/full-collection/${packName}.js`;
+            const module = await import(packUrl);
+
+            let presets;
+            if (module.default && typeof module.default.getPresets === 'function') {
+                presets = module.default.getPresets();
+            } else if (module[packName] && typeof module[packName].getPresets === 'function') {
+                presets = module[packName].getPresets();
+            } else {
+                throw new Error(`Could not find getPresets function in ${packName}`);
+            }
+
+            this.presetCache[packName] = presets;
+            this.loadedPacks.add(packName);
+            console.log(`[IntelligentSelector] Loaded ${packName} via import (${Object.keys(presets).length} presets)`);
+
+            return presets;
+
+        } catch (error) {
+            console.error(`[IntelligentSelector] Error loading pack ${packName}:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get a preset by hash
+     */
+    async getPresetByHash(hash) {
+        const fingerprint = this.loader.getPresetFingerprint(hash);
+        if (!fingerprint) {
+            throw new Error(`No fingerprint found for hash: ${hash}`);
+        }
+
+        const packName = fingerprint.pack;
+        const presetName = fingerprint.names?.[0];
+
+        if (!presetName) {
+            throw new Error(`No preset name found for hash: ${hash}`);
+        }
+
+        // Ensure pack is loaded
+        if (!this.loadedPacks.has(packName)) {
+            await this.loadPresetPack(packName);
+        }
+
+        const pack = this.presetCache[packName];
+        if (!pack) {
+            throw new Error(`Pack not loaded: ${packName}`);
+        }
+
+        const preset = pack[presetName];
+        if (!preset) {
+            throw new Error(`Preset not found: ${presetName} in ${packName}`);
+        }
+
+        // Parse if string
+        return typeof preset === 'string' ? JSON.parse(preset) : preset;
+    }
+
+    /**
+     * Load a preset into Butterchurn by hash
+     */
+    async loadPresetByHash(hash, transitionTime = 0.5) {
+        try {
+            const preset = await this.getPresetByHash(hash);
+            this.butterchurn.loadPreset(preset, transitionTime);
+
+            const fingerprint = this.loader.getPresetFingerprint(hash);
+            console.log(`[IntelligentSelector] Loaded preset: ${fingerprint.names?.[0]} (${hash})`);
+
+            return preset;
+        } catch (error) {
+            console.error(`[IntelligentSelector] Error loading preset ${hash}:`, error);
+            throw error;
+        }
+    }
 
     /**
      * Pause the selector (stop switching presets)
@@ -180,19 +326,45 @@ class IntelligentPresetSelector {
     /**
      * Initialize with fingerprint database
      */
-    async initialize() {
+    async initialize(options = {}) {
+        const {
+            basePath = '/presets/full-collection/',
+            autoLoadPacks = true
+        } = options;
+
+        console.log('[IntelligentSelector] Initializing...');
+
+        // Initialize loader and adapter
+        this.loader = new FingerprintLoader();
+        this.adapter = new FingerprintAdapter(this.loader);
+
+        // Load all fingerprints
+        await this.loader.loadAllFingerprints(basePath);
+
+        // Build database if not provided
+        if (!this.db) {
+            this.db = await this.adapter.buildDatabase();
+            console.log('[IntelligentSelector] Built database from fingerprints');
+        }
+
         // Initialize the preset failure logger if available
         if (this.presetLogger) {
             await this.presetLogger.initialize();
         }
+
+        // Legacy support: Load from URL if string
         if (typeof this.db === 'string') {
-            // Load from URL
             const response = await fetch(this.db);
             this.db = await response.json();
         }
 
         if (this.db) {
             console.log(`Intelligent selector initialized with ${Object.keys(this.db.presets).length} unique presets`);
+
+            // Auto-load preset packs if requested
+            if (autoLoadPacks) {
+                await this.loadAllPresetPacks();
+            }
 
             // Validate database structure
             if (!this.db.presets || !this.db.indices) {
@@ -205,6 +377,9 @@ class IntelligentPresetSelector {
             const stats = this.presetLogger.getStatistics();
             console.log(`[IntelligentSelector] Loaded blocklist with ${stats.blocklist.permanent} permanent blocks`);
         }
+
+        this.isInitialized = true;
+        console.log('[IntelligentSelector] Initialization complete');
     }
 
     /**
@@ -374,21 +549,33 @@ class IntelligentPresetSelector {
             return null;
         }
 
-        // Use AdvancedAudioAnalyzer for feature extraction
-        const features = this.audioAnalyzer.calculateFeatures(
-            audio.freqArray,
-            audio.timeArray
-        );
+        // Use AdvancedAudioAnalyzer for feature extraction (if available)
+        let features, musicalEvent;
+        if (this.audioAnalyzer) {
+            features = this.audioAnalyzer.calculateFeatures(
+                audio.freqArray,
+                audio.timeArray
+            );
 
-        // Debug: Log what AdvancedAudioAnalyzer returns
-        if (this.updateCount <= 10) {
-            console.log('[AdvancedAudioAnalyzer] Raw features:', features);
-            console.log('[Audio Data] freqArray sample:', Array.from(audio.freqArray.slice(0, 10)));
-            console.log('[Audio Data] timeArray sample:', Array.from(audio.timeArray.slice(0, 10)));
+            // Debug: Log what AdvancedAudioAnalyzer returns
+            if (this.updateCount <= 10) {
+                console.log('[AdvancedAudioAnalyzer] Raw features:', features);
+                console.log('[Audio Data] freqArray sample:', Array.from(audio.freqArray.slice(0, 10)));
+                console.log('[Audio Data] timeArray sample:', Array.from(audio.timeArray.slice(0, 10)));
+            }
+
+            // Detect musical events
+            musicalEvent = this.audioAnalyzer.detectMusicalEvent(features);
+        } else {
+            // Fallback: Simple feature extraction from basic audio data
+            features = {
+                bass: audio.bass || 0,
+                mid: audio.mid || 0,
+                treble: audio.treb || 0,
+                energy: (audio.bass + audio.mid + audio.treb) / 3 || 0
+            };
+            musicalEvent = { type: 'none', intensity: 0 };
         }
-
-        // Detect musical events
-        const musicalEvent = this.audioAnalyzer.detectMusicalEvent(features);
 
         // Map to expected format while maintaining compatibility
         // Calculate overall energy from available bands
@@ -520,20 +707,27 @@ class IntelligentPresetSelector {
             if (this.debugSceneChange) {
                 console.log(`[Switch Decision] Too soon: ${timeSinceSwitch}ms < ${minimumTime}ms minimum`);
             }
-            // Still update the detector to track state, but don't act on it
-            this.crossoverDetector.update(features);
+            // Still update the detector to track state, but don't act on it (if available)
+            if (this.crossoverDetector) {
+                this.crossoverDetector.update(features);
+            }
             return false;
         }
 
-        // Update MA crossover detector with latest audio features
-        const crossoverResult = this.crossoverDetector.update(features);
+        // Update MA crossover detector with latest audio features (if available)
+        let crossoverResult = { shouldSwitch: false, reason: 'no_crossover_detector' };
+        if (this.crossoverDetector) {
+            crossoverResult = this.crossoverDetector.update(features);
+        }
 
         // MA Crossover is the primary decision maker
         if (crossoverResult.shouldSwitch) {
             if (this.debugSceneChange) {
                 console.log(`[MA Crossover] Switch triggered: ${crossoverResult.switchReason}`);
                 console.log(`[MA Crossover] Blended score: ${crossoverResult.blended.score.toFixed(3)}, Direction: ${crossoverResult.blended.direction}`);
-                console.log(`[MA Crossover] Energy: ${this.crossoverDetector.energy.status}, Bass: ${this.crossoverDetector.bass.status}, Treble: ${this.crossoverDetector.treble.status}`);
+                if (this.crossoverDetector) {
+                    console.log(`[MA Crossover] Energy: ${this.crossoverDetector.energy.status}, Bass: ${this.crossoverDetector.bass.status}, Treble: ${this.crossoverDetector.treble.status}`);
+                }
             }
             return true;
         }
@@ -547,7 +741,7 @@ class IntelligentPresetSelector {
         }
 
         // Debug output for MA crossover state (first few updates)
-        if (this.updateCount <= 15 && this.debugSceneChange) {
+        if (this.updateCount <= 15 && this.debugSceneChange && this.crossoverDetector) {
             const state = this.crossoverDetector.getDebugState();
             console.log(`[MA Debug ${this.updateCount}] Energy: ${state.energy}, Bass: ${state.bass}, Treble: ${state.treble}`);
         }
@@ -680,8 +874,11 @@ class IntelligentPresetSelector {
                 return [];
             }
         } else {
-            // Use MA crossover signals for smarter preset selection
-            const crossoverState = this.crossoverDetector.getDebugState();
+            // Use MA crossover signals for smarter preset selection (if available)
+            let crossoverState = { energy: 'none', bass: 'none', treble: 'none' };
+            if (this.crossoverDetector) {
+                crossoverState = this.crossoverDetector.getDebugState();
+            }
 
             // Prioritize based on crossover signals
             if (crossoverState.energy === 'golden' || features.energy > 0.8) {

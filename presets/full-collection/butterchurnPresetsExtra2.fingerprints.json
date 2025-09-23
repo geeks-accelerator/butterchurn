@@ -1,0 +1,2150 @@
+{
+  "version": "1.0.0",
+  "generated": "2025-09-23T21:11:38.124Z",
+  "presets": {
+    "38747828": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - shifter - armorial bearings of robotopia"
+      ],
+      "fingerprint": {
+        "energy": 0.7500000000000001,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.625,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 58.1
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "98203958": {
+      "authors": [
+        "Unchained"
+      ],
+      "names": [
+        "Unchained - Fuzzy Sciences"
+      ],
+      "fingerprint": {
+        "energy": 1,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 1,
+        "complexity": 0.35,
+        "beatSync": 0.3,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "aca05de6": {
+      "authors": [
+        "11"
+      ],
+      "names": [
+        "11"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 56.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "dbf62fef": {
+      "authors": [
+        "158"
+      ],
+      "names": [
+        "158"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 1,
+        "trebleEnergy": 0.875,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 56.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ae337d8b": {
+      "authors": [
+        "444"
+      ],
+      "names": [
+        "444"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.3,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "7dddd128": {
+      "authors": [
+        "$$$ Royal"
+      ],
+      "names": [
+        "$$$ Royal - Mashup (160)"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 57.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ab11f184": {
+      "authors": [
+        "$$$ Royal"
+      ],
+      "names": [
+        "$$$ Royal - Mashup (253)"
+      ],
+      "fingerprint": {
+        "energy": 0.9,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.5,
+        "complexity": 0.2,
+        "beatSync": 0.3,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "317b8ff2": {
+      "authors": [
+        "$$$ Royal"
+      ],
+      "names": [
+        "$$$ Royal - Mashup (337)"
+      ],
+      "fingerprint": {
+        "energy": 1,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "4cafdc1d": {
+      "authors": [
+        "_Geiss"
+      ],
+      "names": [
+        "_Geiss - Brain Zoom 3 (Color Emboss Mix)"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0,
+        "complexity": 0.15000000000000002,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "a6c3cfc8": {
+      "authors": [
+        "_Geiss"
+      ],
+      "names": [
+        "_Geiss - Explosion Mod 2b"
+      ],
+      "fingerprint": {
+        "energy": 0.6000000000000001,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "f8a32365": {
+      "authors": [
+        "unknown"
+      ],
+      "names": [
+        "_Mig_009"
+      ],
+      "fingerprint": {
+        "energy": 0.85,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "7fd19578": {
+      "authors": [
+        "unknown"
+      ],
+      "names": [
+        "_Mig_014_version2"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.875,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "6a06d250": {
+      "authors": [
+        "unknown"
+      ],
+      "names": [
+        "_Mig_039"
+      ],
+      "fingerprint": {
+        "energy": 0.8,
+        "bassEnergy": 0.8,
+        "trebleEnergy": 1,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 57.3
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "c58d4f18": {
+      "authors": [
+        "unknown"
+      ],
+      "names": [
+        "_Mig_056"
+      ],
+      "fingerprint": {
+        "energy": 0.9,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ee7a5706": {
+      "authors": [
+        "_Vovan"
+      ],
+      "names": [
+        "_Vovan + Geiss - Bass With Flover (Feedback Mix) 2"
+      ],
+      "fingerprint": {
+        "energy": 0.7000000000000001,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.625,
+        "complexity": 0.3,
+        "beatSync": 0,
+        "fps": 49.5
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "f736ac3e": {
+      "authors": [
+        "A Tribute to Martin"
+      ],
+      "names": [
+        "A Tribute to Martin - bombyx mori - Ft Flexi - AdamFX - StahlRegen - Krash - Rovastar -  Hd in Milk T"
+      ],
+      "fingerprint": {
+        "energy": 0.19999999999999998,
+        "bassEnergy": 0.9,
+        "trebleEnergy": 0.875,
+        "complexity": 0.25,
+        "beatSync": 0.5,
+        "fps": 49.1
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "b5cc32a0": {
+      "authors": [
+        "adam eatit fx 2 martin"
+      ],
+      "names": [
+        "adam eatit fx 2 martin - disco mix, lodus, geiss, ludicrous speed,flexi, aderrasi n hexcollie"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ea53a14d": {
+      "authors": [
+        "Adam Eatit Mashup FX 2 martin"
+      ],
+      "names": [
+        "Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Aderrasi 2_1"
+      ],
+      "fingerprint": {
+        "energy": 0.5,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.1,
+        "beatSync": 0.3,
+        "fps": 55.1
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "9bd95745": {
+      "authors": [
+        "Adam Eatit Mashup FX 2 martin"
+      ],
+      "names": [
+        "Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Baked Ft another AdamFX Mashup 7_1"
+      ],
+      "fingerprint": {
+        "energy": 0.3,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.1,
+        "beatSync": 0.3,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "467d75dc": {
+      "authors": [
+        "Adam Eatit Mashup FX 2 martin"
+      ],
+      "names": [
+        "Adam Eatit Mashup FX 2 martin - disco mix + Lodus + Geiss + Ludicrous speed + Eos Ft Flexi n Hexocollie + Baked + Santa Fucking Claus"
+      ],
+      "fingerprint": {
+        "energy": 0.65,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.625,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 51.6
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "b26b7811": {
+      "authors": [
+        "AdamFx 2 Aderrasi"
+      ],
+      "names": [
+        "AdamFx 2 Aderrasi - Airhandler (Last Breath - Calm)Ilusional Discontent2"
+      ],
+      "fingerprint": {
+        "energy": 0.7,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 1,
+        "complexity": 0.3,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "3870d23a": {
+      "authors": [
+        "AdamFx 2 Geiss"
+      ],
+      "names": [
+        "AdamFx 2 Geiss -Somewhat Distort Me 3_1"
+      ],
+      "fingerprint": {
+        "energy": 1,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.25,
+        "beatSync": 0,
+        "fps": 47.7
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "270af00f": {
+      "authors": [
+        "AdamFx 2 Geiss, Zylot and Flexi"
+      ],
+      "names": [
+        "AdamFx 2 Geiss, Zylot and Flexi - Reaction Diffusion 3 (Overload Mix 2) EATIT4 (BCCNJ4)"
+      ],
+      "fingerprint": {
+        "energy": 0.45000000000000007,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "c0594d12": {
+      "authors": [
+        "Aderrasi"
+      ],
+      "names": [
+        "Aderrasi + Geiss - Airhandler (Square Mix)"
+      ],
+      "fingerprint": {
+        "energy": 1,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.3,
+        "beatSync": 0,
+        "fps": 25.5
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "76cff618": {
+      "authors": [
+        "Aderrasi"
+      ],
+      "names": [
+        "Aderrasi - Agitator"
+      ],
+      "fingerprint": {
+        "energy": 0.5499999999999999,
+        "bassEnergy": 0.7,
+        "trebleEnergy": 0,
+        "complexity": 0.39999999999999997,
+        "beatSync": 0,
+        "fps": 33.5
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "6d9b729f": {
+      "authors": [
+        "Aderrasi"
+      ],
+      "names": [
+        "Aderrasi - Airhandler (Principle of Sharing)"
+      ],
+      "fingerprint": {
+        "energy": 0.9,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0,
+        "complexity": 0.3,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "5ec602be": {
+      "authors": [
+        "Aderrasi"
+      ],
+      "names": [
+        "Aderrasi - Contortion (Escher′s Tunnel Mix)"
+      ],
+      "fingerprint": {
+        "energy": 0.9500000000000001,
+        "bassEnergy": 0.5,
+        "trebleEnergy": 0,
+        "complexity": 0.3,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "bf3cf940": {
+      "authors": [
+        "Aderrasi"
+      ],
+      "names": [
+        "Aderrasi - Curse of the Mirror Emu"
+      ],
+      "fingerprint": {
+        "energy": 0.9500000000000001,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 0,
+        "complexity": 0.35,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "114417c0": {
+      "authors": [
+        "baked"
+      ],
+      "names": [
+        "baked - River of Illusion Dillusion [Bubble]"
+      ],
+      "fingerprint": {
+        "energy": 0.5,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.25,
+        "beatSync": 0.5,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ca475d9c": {
+      "authors": [
+        "beta106at shape"
+      ],
+      "names": [
+        "beta106at shape - mash0000 - hulk spirit cum"
+      ],
+      "fingerprint": {
+        "energy": 0.55,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.25,
+        "beatSync": 0.5,
+        "fps": 34.5
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "6976d09d": {
+      "authors": [
+        "beta106i"
+      ],
+      "names": [
+        "beta106i - Brilliance (Space-Time Breaking) - mash0000 - it′s 2009 and you haven′t replaced your analog tv with digital"
+      ],
+      "fingerprint": {
+        "energy": 0.8,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0,
+        "complexity": 0.35,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "2037ad52": {
+      "authors": [
+        "beta106i"
+      ],
+      "names": [
+        "beta106i - Inhuman Emotion (Regret) - mash0000 - genetic mutant incubators in the hands of toddlers"
+      ],
+      "fingerprint": {
+        "energy": 1,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.35,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "5c2783d7": {
+      "authors": [
+        "beta106i"
+      ],
+      "names": [
+        "beta106i - Potion of Ink"
+      ],
+      "fingerprint": {
+        "energy": 0.19999999999999998,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0,
+        "complexity": 0.3,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "9eb3d4e6": {
+      "authors": [
+        "cope"
+      ],
+      "names": [
+        "cope + flexi - mother-of-whirl [no fnords were hurt]"
+      ],
+      "fingerprint": {
+        "energy": 0.85,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.125,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "3a7bbd38": {
+      "authors": [
+        "cope"
+      ],
+      "names": [
+        "cope - alternative energy (antimatter mod_1)4z"
+      ],
+      "fingerprint": {
+        "energy": 0.95,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.875,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 55.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "39d964b8": {
+      "authors": [
+        "cope"
+      ],
+      "names": [
+        "cope - digital sea"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 1,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ea4c0aba": {
+      "authors": [
+        "cope"
+      ],
+      "names": [
+        "cope - soar (v2.0)"
+      ],
+      "fingerprint": {
+        "energy": 0.5,
+        "bassEnergy": 0.5,
+        "trebleEnergy": 0.625,
+        "complexity": 0.3,
+        "beatSync": 0,
+        "fps": 49.5
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "c1a8e5d1": {
+      "authors": [
+        "ech0"
+      ],
+      "names": [
+        "ech0 - liquid firesticks I"
+      ],
+      "fingerprint": {
+        "energy": 0.15,
+        "bassEnergy": 0.9,
+        "trebleEnergy": 1,
+        "complexity": 0,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "5c5560af": {
+      "authors": [
+        "Eo.S."
+      ],
+      "names": [
+        "Eo.S. + Geiss - glowsticks v2 02 (Relief Mix)"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "2bb3fe5d": {
+      "authors": [
+        "Eo.S."
+      ],
+      "names": [
+        "Eo.S. + Phat - Emergent factors"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.625,
+        "complexity": 0.35,
+        "beatSync": 0,
+        "fps": 45
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "2aa4d452": {
+      "authors": [
+        "Eo.S."
+      ],
+      "names": [
+        "Eo.S. + Phat cubetrace (cybercity madness remix) - mash0000 - evaporating crystal pharma"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.375,
+        "complexity": 0.1,
+        "beatSync": 0.5,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "3460bd78": {
+      "authors": [
+        "Eo.S."
+      ],
+      "names": [
+        "Eo.S. - spark C_Phat_Jester_Mix_v2"
+      ],
+      "fingerprint": {
+        "energy": 0.5,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 1,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 52.6
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "83c58db4": {
+      "authors": [
+        "fed"
+      ],
+      "names": [
+        "fed - slowfast 1.1"
+      ],
+      "fingerprint": {
+        "energy": 0.7999999999999999,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 1,
+        "complexity": 0,
+        "beatSync": 0,
+        "fps": 55.6
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "3b9149fe": {
+      "authors": [
+        "fiShbRaiN"
+      ],
+      "names": [
+        "fiShbRaiN + flexi - witchcraft 2.0 - mash0000 - no one cares about mi, the note (major third)"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "6605901b": {
+      "authors": [
+        "fiShbRaiN"
+      ],
+      "names": [
+        "fiShbRaiN - breakfast cruiser"
+      ],
+      "fingerprint": {
+        "energy": 0.3,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 51.4
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "eed16ebb": {
+      "authors": [
+        "fiShbRaiN"
+      ],
+      "names": [
+        "fiShbRaiN - the adventures of prismo jenkins"
+      ],
+      "fingerprint": {
+        "energy": 0.45000000000000007,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 1,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 56.2
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "42b5217d": {
+      "authors": [
+        "fiShbRaiN"
+      ],
+      "names": [
+        "fiShbRaiN - witchcraft (necromancer remix)_phat_edit_v3"
+      ],
+      "fingerprint": {
+        "energy": 0.44999999999999996,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0,
+        "beatSync": 0,
+        "fps": 58.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "14b023d9": {
+      "authors": [
+        "flexi"
+      ],
+      "names": [
+        "flexi + fishbrain - warpcraft [random mashup]"
+      ],
+      "fingerprint": {
+        "energy": 0.7,
+        "bassEnergy": 0.7,
+        "trebleEnergy": 0.375,
+        "complexity": 0.25,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "a31b101a": {
+      "authors": [
+        "flexi"
+      ],
+      "names": [
+        "flexi + fishbrain - witchcraft [complex terraforming]"
+      ],
+      "fingerprint": {
+        "energy": 0.19999999999999998,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0.875,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "12bd6fec": {
+      "authors": [
+        "Flexi"
+      ],
+      "names": [
+        "Flexi + Geiss + Demon Lord - unholy tokamak clot-plot"
+      ],
+      "fingerprint": {
+        "energy": 0.5499999999999999,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.44999999999999996,
+        "beatSync": 0,
+        "fps": 36.9
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "4f53f2e4": {
+      "authors": [
+        "flexi"
+      ],
+      "names": [
+        "flexi + geiss - infused with the spiral (Heavy Oil Mix) nz+ rapery"
+      ],
+      "fingerprint": {
+        "energy": 0.24999999999999997,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.15000000000000002,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "cef273c5": {
+      "authors": [
+        "flexi"
+      ],
+      "names": [
+        "flexi + geiss - pogo-cubes on tokamak matter (bccn Jelly V4)"
+      ],
+      "fingerprint": {
+        "energy": 0.9,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0.875,
+        "complexity": 0.44999999999999996,
+        "beatSync": 0,
+        "fps": 31.9
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "61688fb6": {
+      "authors": [
+        "flexi"
+      ],
+      "names": [
+        "flexi + geiss - pogo-cubes on tokamak matter [mind over matter remix]2"
+      ],
+      "fingerprint": {
+        "energy": 0.9,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0.875,
+        "complexity": 0.44999999999999996,
+        "beatSync": 0,
+        "fps": 31.9
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "53d54842": {
+      "authors": [
+        "Flexi"
+      ],
+      "names": [
+        "Flexi + Martin - dive"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.7,
+        "trebleEnergy": 0.625,
+        "complexity": 0.44999999999999996,
+        "beatSync": 0,
+        "fps": 21
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "71fffa22": {
+      "authors": [
+        "Flexi"
+      ],
+      "names": [
+        "Flexi + Martin - tunnel of supraschismatika"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.49999999999999994,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "b3f8b743": {
+      "authors": [
+        "flexi"
+      ],
+      "names": [
+        "flexi + nitorami - beat explorer (cn bc jelly 4)"
+      ],
+      "fingerprint": {
+        "energy": 0.65,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.625,
+        "complexity": 0.05,
+        "beatSync": 1,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "cd049aeb": {
+      "authors": [
+        "Flexi",
+        "Flexi, Rovastar"
+      ],
+      "names": [
+        "Flexi + Rovastar - Fractopia [lovecraft]",
+        "Flexi, Rovastar + Geiss - Fractopia vs bas relief"
+      ],
+      "fingerprint": {
+        "energy": 0.19999999999999998,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.3,
+        "beatSync": 0.5,
+        "fps": 47.5
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "5fb2550c": {
+      "authors": [
+        "flexi"
+      ],
+      "names": [
+        "flexi + stahlregen - jelly strike",
+        "flexi - color strike"
+      ],
+      "fingerprint": {
+        "energy": 0.65,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.625,
+        "complexity": 0,
+        "beatSync": 0.7,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "91a741ff": {
+      "authors": [
+        "Flexi"
+      ],
+      "names": [
+        "Flexi - blame hexcollie twice"
+      ],
+      "fingerprint": {
+        "energy": 0.65,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.625,
+        "complexity": 0.3,
+        "beatSync": 0.7,
+        "fps": 49.5
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "27c60aa4": {
+      "authors": [
+        "flexi"
+      ],
+      "names": [
+        "flexi - borderline imagery"
+      ],
+      "fingerprint": {
+        "energy": 0.65,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.625,
+        "complexity": 0.3,
+        "beatSync": 0.7,
+        "fps": 49.7
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "b598a543": {
+      "authors": [
+        "flexi"
+      ],
+      "names": [
+        "flexi - bouncing balls [illumination mix]"
+      ],
+      "fingerprint": {
+        "energy": 0.9,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0.875,
+        "complexity": 0.25,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ea70d419": {
+      "authors": [
+        "flexi"
+      ],
+      "names": [
+        "flexi - meta4free"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0.375,
+        "complexity": 0,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "f4add88e": {
+      "authors": [
+        "Flexi"
+      ],
+      "names": [
+        "Flexi - mindblob 2.0"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 0.5,
+        "complexity": 0.49999999999999994,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "30d3bcde": {
+      "authors": [
+        "Flexi"
+      ],
+      "names": [
+        "Flexi - reality tunnel"
+      ],
+      "fingerprint": {
+        "energy": 0.25,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.35,
+        "beatSync": 0,
+        "fps": 27.9
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "c9f2e653": {
+      "authors": [
+        "Flexi"
+      ],
+      "names": [
+        "Flexi - the distant point between derivative"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.375,
+        "complexity": 0.3,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "cb98b20c": {
+      "authors": [
+        "Flexi"
+      ],
+      "names": [
+        "Flexi - wild at range"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 0.5,
+        "complexity": 0.49999999999999994,
+        "beatSync": 0,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "64f4501f": {
+      "authors": [
+        "flexi, geiss and rovastar"
+      ],
+      "names": [
+        "flexi, geiss and rovastar - chaos layered sinewsed tokamak 2"
+      ],
+      "fingerprint": {
+        "energy": 0.5499999999999999,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.39999999999999997,
+        "beatSync": 0,
+        "fps": 46
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ba3b8308": {
+      "authors": [
+        "Flexi, Martin, Phat, Zylot"
+      ],
+      "names": [
+        "Flexi, Martin, Phat, Zylot + Eo.S - one way trip trap proof of concept [epileptic zoom tunnel edit]"
+      ],
+      "fingerprint": {
+        "energy": 0.5499999999999999,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.44999999999999996,
+        "beatSync": 0,
+        "fps": 32.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "03cad2f8": {
+      "authors": [
+        "Geiss"
+      ],
+      "names": [
+        "Geiss - Feedback 2"
+      ],
+      "fingerprint": {
+        "energy": 0.3,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "6764d39f": {
+      "authors": [
+        "Geiss"
+      ],
+      "names": [
+        "Geiss - Reaction Diffusion (Relief Mix)"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "8be6bee1": {
+      "authors": [
+        "Geiss"
+      ],
+      "names": [
+        "Geiss - Skin Dots 9"
+      ],
+      "fingerprint": {
+        "energy": 0.65,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "c114a5bd": {
+      "authors": [
+        "Hexcollie"
+      ],
+      "names": [
+        "Hexcollie - Cell division"
+      ],
+      "fingerprint": {
+        "energy": 0.8,
+        "bassEnergy": 0.5,
+        "trebleEnergy": 0.375,
+        "complexity": 0,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "d603ad57": {
+      "authors": [
+        "Hexcollie"
+      ],
+      "names": [
+        "Hexcollie - Nautalisk - mash0000 - but officer, my fingerprint always changes"
+      ],
+      "fingerprint": {
+        "energy": 0.8,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0,
+        "complexity": 0.39999999999999997,
+        "beatSync": 0,
+        "fps": 32.5
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "c6432bda": {
+      "authors": [
+        "Ishan"
+      ],
+      "names": [
+        "Ishan - Anuera"
+      ],
+      "fingerprint": {
+        "energy": 0.9,
+        "bassEnergy": 0.5,
+        "trebleEnergy": 0,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 52
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "3d4c5a34": {
+      "authors": [
+        "Krash & Rovastar"
+      ],
+      "names": [
+        "Krash & Rovastar - A Million Miles from Earth (Ripple Mix)"
+      ],
+      "fingerprint": {
+        "energy": 1,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 0,
+        "complexity": 0.39999999999999997,
+        "beatSync": 0,
+        "fps": 27.700000000000003
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "0f1c9a7c": {
+      "authors": [
+        "Krash"
+      ],
+      "names": [
+        "Krash + Illusion + Geiss - Spiral Movement (Reaction Diffusion mix)"
+      ],
+      "fingerprint": {
+        "energy": 1,
+        "bassEnergy": 0.5,
+        "trebleEnergy": 1,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "d72565cf": {
+      "authors": [
+        "Krash"
+      ],
+      "names": [
+        "Krash - War Machine (Shifting Complexity Mix)"
+      ],
+      "fingerprint": {
+        "energy": 0.95,
+        "bassEnergy": 1,
+        "trebleEnergy": 0,
+        "complexity": 0.39999999999999997,
+        "beatSync": 0.5,
+        "fps": 45.7
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "7f54582b": {
+      "authors": [
+        "LuxXx"
+      ],
+      "names": [
+        "LuxXx - Fuck Your Code ii"
+      ],
+      "fingerprint": {
+        "energy": 0.45000000000000007,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "28ff9a76": {
+      "authors": [
+        "LuxXx"
+      ],
+      "names": [
+        "LuxXx - GrindFace  225 mg dose  "
+      ],
+      "fingerprint": {
+        "energy": 0.7000000000000001,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.39999999999999997,
+        "beatSync": 0.5,
+        "fps": 37.9
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "3d80ec59": {
+      "authors": [
+        "LuxXx"
+      ],
+      "names": [
+        "LuxXx - iWhat Happened Right After I Ate That Toxic Waste beta ii"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "708611a1": {
+      "authors": [
+        "LuxXx"
+      ],
+      "names": [
+        "LuxXx - Subtle HipHopFlake"
+      ],
+      "fingerprint": {
+        "energy": 0.45000000000000007,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "e8d977b7": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - amandio c - a different view of the green machine"
+      ],
+      "fingerprint": {
+        "energy": 0.95,
+        "bassEnergy": 0.5,
+        "trebleEnergy": 0.875,
+        "complexity": 0.49999999999999994,
+        "beatSync": 1,
+        "fps": 37.7
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ef178a15": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - attack of the beast"
+      ],
+      "fingerprint": {
+        "energy": 0.15,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.25,
+        "beatSync": 0.8999999999999999,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "fdfba62b": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - basal ganglion"
+      ],
+      "fingerprint": {
+        "energy": 0.45000000000000007,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 56.1
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "214cee73": {
+      "authors": [
+        "Martin"
+      ],
+      "names": [
+        "Martin - cool morning"
+      ],
+      "fingerprint": {
+        "energy": 0.35,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.5,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "6a4522a5": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - crystal alley"
+      ],
+      "fingerprint": {
+        "energy": 0.15,
+        "bassEnergy": 0,
+        "trebleEnergy": 0,
+        "complexity": 0.15000000000000002,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "89e9ddbd": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - dark galaxy"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "0058a5c0": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - skywards"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "9c9b01ca": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - soma in pink"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 56.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "4cc73486": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - sparky caleidoscope"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 1,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 58.9
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "d3736759": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - starfield sectors"
+      ],
+      "fingerprint": {
+        "energy": 0.45000000000000007,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 57.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "2b4f3828": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - sunset over the river"
+      ],
+      "fingerprint": {
+        "energy": 0.75,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "115c9ae7": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - the forge of Isengard"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 1,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "b6e5b020": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - unholy amulet 2"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 54.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ecd2875e": {
+      "authors": [
+        "martin"
+      ],
+      "names": [
+        "martin - violet flash"
+      ],
+      "fingerprint": {
+        "energy": 0.45000000000000007,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0.75,
+        "complexity": 0.15000000000000002,
+        "beatSync": 1,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "a571979d": {
+      "authors": [
+        "Martin N AdamFX Infusion = Phat"
+      ],
+      "names": [
+        "Martin N AdamFX Infusion = Phat+Yin+Eo.S_Mandala Chaser Ft AdamFX n Martin - The Beast Mandala Chaser FX H"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.9,
+        "trebleEnergy": 1,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 55.1
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ab8fc7dd": {
+      "authors": [
+        "ORB"
+      ],
+      "names": [
+        "ORB - Blue Emotion"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.8,
+        "trebleEnergy": 0.625,
+        "complexity": 0.3,
+        "beatSync": 0.3,
+        "fps": 22.200000000000003
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "90107a8c": {
+      "authors": [
+        "ORB"
+      ],
+      "names": [
+        "ORB - Depth Charge 2"
+      ],
+      "fingerprint": {
+        "energy": 0.19999999999999998,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 0.375,
+        "complexity": 0.15000000000000002,
+        "beatSync": 0.3,
+        "fps": 59.1
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "a0e3dc33": {
+      "authors": [
+        "ORB"
+      ],
+      "names": [
+        "ORB - Fire and Fumes 2"
+      ],
+      "fingerprint": {
+        "energy": 0.65,
+        "bassEnergy": 0.5,
+        "trebleEnergy": 0.625,
+        "complexity": 0.1,
+        "beatSync": 0.3,
+        "fps": 53.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "5173a251": {
+      "authors": [
+        "ORB"
+      ],
+      "names": [
+        "ORB - Planetary Alignment Acid Burn"
+      ],
+      "fingerprint": {
+        "energy": 0.24999999999999997,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 0.625,
+        "complexity": 0.05,
+        "beatSync": 0.3,
+        "fps": 58.1
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "c2e828d5": {
+      "authors": [
+        "ORB"
+      ],
+      "names": [
+        "ORB - Sandblade"
+      ],
+      "fingerprint": {
+        "energy": 0.24999999999999997,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 0.625,
+        "complexity": 0.05,
+        "beatSync": 0.3,
+        "fps": 58.1
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "8d88b22d": {
+      "authors": [
+        "ORB"
+      ],
+      "names": [
+        "ORB - Solar Radiation"
+      ],
+      "fingerprint": {
+        "energy": 0.55,
+        "bassEnergy": 0.9,
+        "trebleEnergy": 0.625,
+        "complexity": 0.3,
+        "beatSync": 0.3,
+        "fps": 28.4
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "322aab1d": {
+      "authors": [
+        "Phat"
+      ],
+      "names": [
+        "Phat + Zylot + Eo.S. - work with lines"
+      ],
+      "fingerprint": {
+        "energy": 0.44999999999999996,
+        "bassEnergy": 0.5,
+        "trebleEnergy": 0.125,
+        "complexity": 0.44999999999999996,
+        "beatSync": 0,
+        "fps": 32.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "06852751": {
+      "authors": [
+        "Phat_Zylot_Eo.S."
+      ],
+      "names": [
+        "Phat_Zylot_Eo.S. spiral_Movements_Beatle"
+      ],
+      "fingerprint": {
+        "energy": 0.5499999999999999,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0,
+        "complexity": 0.44999999999999996,
+        "beatSync": 0,
+        "fps": 24.5
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "737ec40e": {
+      "authors": [
+        "Rovastar"
+      ],
+      "names": [
+        "Rovastar + Fvese - Mosaic Waves"
+      ],
+      "fingerprint": {
+        "energy": 0.9,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 0,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 52
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "8b455ad8": {
+      "authors": [
+        "Rovastar"
+      ],
+      "names": [
+        "Rovastar + Geiss - Hurricane Nightmare (Gold Chrome Mix)"
+      ],
+      "fingerprint": {
+        "energy": 0.85,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 0,
+        "complexity": 0.15000000000000002,
+        "beatSync": 0,
+        "fps": 55.4
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "6c27a46c": {
+      "authors": [
+        "Rovastar"
+      ],
+      "names": [
+        "Rovastar + Geiss - Hyperspace - kaleidoscope"
+      ],
+      "fingerprint": {
+        "energy": 0.8,
+        "bassEnergy": 0.8,
+        "trebleEnergy": 1,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 57.3
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "6e2c5046": {
+      "authors": [
+        "Rovastar"
+      ],
+      "names": [
+        "Rovastar - Harlequin′s Fractal Encounter - cancer of saints"
+      ],
+      "fingerprint": {
+        "energy": 1,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.35,
+        "beatSync": 0.7,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "b60f27d5": {
+      "authors": [
+        "Rovastar"
+      ],
+      "names": [
+        "Rovastar - Torrid Tales"
+      ],
+      "fingerprint": {
+        "energy": 0.9,
+        "bassEnergy": 0.6,
+        "trebleEnergy": 1,
+        "complexity": 0.35,
+        "beatSync": 0,
+        "fps": 47.6
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "d17df3fe": {
+      "authors": [
+        "Rozzor & Shreyas"
+      ],
+      "names": [
+        "Rozzor & Shreyas - Deeper Aesthetics"
+      ],
+      "fingerprint": {
+        "energy": 0.8,
+        "bassEnergy": 0.9,
+        "trebleEnergy": 1,
+        "complexity": 0.3,
+        "beatSync": 0.3,
+        "fps": 26.6
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "d2ff051b": {
+      "authors": [
+        "Stahlregen & flexi"
+      ],
+      "names": [
+        "Stahlregen & flexi + Geiss + Rovastar + Shifter - Fractal Feedback (for Hexcollie)"
+      ],
+      "fingerprint": {
+        "energy": 0.8,
+        "bassEnergy": 1,
+        "trebleEnergy": 1,
+        "complexity": 0.35,
+        "beatSync": 0.7,
+        "fps": 34.7
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "b87ea1ae": {
+      "authors": [
+        "Stahlregen"
+      ],
+      "names": [
+        "Stahlregen - Dots (Pixels - Blocky) (Jelly V2)"
+      ],
+      "fingerprint": {
+        "energy": 0.5499999999999999,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 0.625,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "3ced4326": {
+      "authors": [
+        "stahlregen"
+      ],
+      "names": [
+        "stahlregen - old school, baby (spiral ornament)"
+      ],
+      "fingerprint": {
+        "energy": 0.85,
+        "bassEnergy": 0.4,
+        "trebleEnergy": 0.125,
+        "complexity": 0.05,
+        "beatSync": 0.3,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "05ca3bbe": {
+      "authors": [
+        "Telek"
+      ],
+      "names": [
+        "Telek - City Helix Lattice"
+      ],
+      "fingerprint": {
+        "energy": 1,
+        "bassEnergy": 0.1,
+        "trebleEnergy": 0.625,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 60
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "ae144353": {
+      "authors": [
+        "Telek"
+      ],
+      "names": [
+        "Telek - Sine Wave"
+      ],
+      "fingerprint": {
+        "energy": 0.65,
+        "bassEnergy": 0.8,
+        "trebleEnergy": 1,
+        "complexity": 0.3,
+        "beatSync": 0.6,
+        "fps": 26
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "525e0c81": {
+      "authors": [
+        "Unchained"
+      ],
+      "names": [
+        "Unchained - All You Can Eat"
+      ],
+      "fingerprint": {
+        "energy": 1,
+        "bassEnergy": 0.9,
+        "trebleEnergy": 1,
+        "complexity": 0.35,
+        "beatSync": 0.3,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "4ad14036": {
+      "authors": [
+        "various artists"
+      ],
+      "names": [
+        "various artists - 1200774354134 - mash0000 - what the writer′s guild is doing with the extra money"
+      ],
+      "fingerprint": {
+        "energy": 0.4,
+        "bassEnergy": 0.3,
+        "trebleEnergy": 0.375,
+        "complexity": 0.49999999999999994,
+        "beatSync": 0.5,
+        "fps": 20
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "60e0b6ae": {
+      "authors": [
+        "Zylot"
+      ],
+      "names": [
+        "Zylot - Crossing Over (Paint Spatter mix)"
+      ],
+      "fingerprint": {
+        "energy": 0.55,
+        "bassEnergy": 0.5,
+        "trebleEnergy": 0.875,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 56.8
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "a0f156c8": {
+      "authors": [
+        "Zylot"
+      ],
+      "names": [
+        "Zylot - In death there is life (Geiss Layered Mix) (Jelly)"
+      ],
+      "fingerprint": {
+        "energy": 0.6,
+        "bassEnergy": 0.5,
+        "trebleEnergy": 0.5,
+        "complexity": 0.05,
+        "beatSync": 0,
+        "fps": 57.5
+      },
+      "pack": "butterchurnPresetsExtra2"
+    },
+    "6559a824": {
+      "authors": [
+        "Zylot"
+      ],
+      "names": [
+        "Zylot - True Visionary"
+      ],
+      "fingerprint": {
+        "energy": 0.65,
+        "bassEnergy": 0.2,
+        "trebleEnergy": 0,
+        "complexity": 0.1,
+        "beatSync": 0,
+        "fps": 51.1
+      },
+      "pack": "butterchurnPresetsExtra2"
+    }
+  },
+  "indices": {
+    "high": [
+      "38747828",
+      "98203958",
+      "ab11f184",
+      "317b8ff2",
+      "f8a32365",
+      "6a06d250",
+      "c58d4f18",
+      "ee7a5706",
+      "3870d23a",
+      "c0594d12",
+      "6d9b729f",
+      "5ec602be",
+      "bf3cf940",
+      "6976d09d",
+      "2037ad52",
+      "9eb3d4e6",
+      "3a7bbd38",
+      "83c58db4",
+      "cef273c5",
+      "61688fb6",
+      "b598a543",
+      "c114a5bd",
+      "d603ad57",
+      "c6432bda",
+      "3d4c5a34",
+      "0f1c9a7c",
+      "d72565cf",
+      "28ff9a76",
+      "e8d977b7",
+      "2b4f3828",
+      "737ec40e",
+      "8b455ad8",
+      "6c27a46c",
+      "6e2c5046",
+      "b60f27d5",
+      "d17df3fe",
+      "d2ff051b",
+      "3ced4326",
+      "05ca3bbe",
+      "525e0c81"
+    ],
+    "bass": [
+      "dbf62fef",
+      "ae337d8b",
+      "7dddd128",
+      "317b8ff2",
+      "6a06d250",
+      "f736ac3e",
+      "76cff618",
+      "114417c0",
+      "ca475d9c",
+      "2037ad52",
+      "c1a8e5d1",
+      "14b023d9",
+      "4f53f2e4",
+      "53d54842",
+      "71fffa22",
+      "cd049aeb",
+      "ba3b8308",
+      "d72565cf",
+      "28ff9a76",
+      "a571979d",
+      "ab8fc7dd",
+      "8d88b22d",
+      "6c27a46c",
+      "6e2c5046",
+      "d17df3fe",
+      "d2ff051b",
+      "ae144353",
+      "525e0c81"
+    ],
+    "calm": [
+      "f736ac3e",
+      "5c2783d7",
+      "c1a8e5d1",
+      "a31b101a",
+      "4f53f2e4",
+      "cd049aeb",
+      "30d3bcde",
+      "ef178a15",
+      "6a4522a5",
+      "90107a8c",
+      "5173a251",
+      "c2e828d5"
+    ],
+    "particle": [],
+    "fractal": [],
+    "geometric": [],
+    "organic": []
+  },
+  "authorIndex": {},
+  "nameIndex": {},
+  "stats": {
+    "totalFiles": 122,
+    "uniquePresets": 120,
+    "duplicatesFound": 2,
+    "authorsCount": 48,
+    "failedFiles": 0
+  }
+}

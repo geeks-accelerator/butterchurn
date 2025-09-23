@@ -1,0 +1,35 @@
+# .aiignore - Files Claude should not read automatically
+
+# Large preset source files (hundreds of KB to MB each)
+presets/*/*.js
+presets/*/*.min.js
+
+# Large preset JSON files (only needed when regenerating fingerprints)
+# Comment these out if you need Claude to regenerate fingerprints
+presets/*/butterchurnPresets*.json
+presets/*/alaskaButter.json
+
+# Archive and source directories
+presets/full-collection/archive/
+presets/full-collection/presets/
+
+# Keep fingerprint files readable (they're smaller and contain the analysis)
+# Fingerprint files are kept: *.fingerprints.json and *.fingerprints.min.json
+
+# Test audio files
+test/*.mp3
+
+# Large test fixtures
+test/fixtures/
+
+# Build outputs
+dist/
+coverage/
+.nyc_output/
+
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+**/.DS_Store
