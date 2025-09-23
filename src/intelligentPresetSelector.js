@@ -21,6 +21,8 @@ import { presetLogger } from './analysis/presetFailureLogger.js';
 import { emergencyManager } from './presets/emergencyPresetManager.js';
 import { blocklistManager } from './blocklist/blocklistManager.js';
 import config from './config/config.js';
+import { AdvancedAudioAnalyzer } from './audio/advancedAnalyzer.js';
+import { MultiSignalCrossover } from './audio/movingAverageCrossover.js';
 
 class IntelligentPresetSelector {
     constructor(butterchurn, fingerprintDatabase) {
@@ -33,11 +35,47 @@ class IntelligentPresetSelector {
         this.lastSwitch = 0;
         this.currentWarmupTime = 0; // Track warmup requirement for current preset
 
+        // Initialize audio analyzer with config
+        const analyzerConfig = (typeof config !== 'undefined' && config?.get) ? {
+            dropThreshold: config.get('audioAnalysis.dropThreshold', 0.7),
+            buildupThreshold: config.get('audioAnalysis.buildupThreshold', 0.5),
+            breakdownThreshold: config.get('audioAnalysis.breakdownThreshold', 0.3),
+            chillThreshold: config.get('audioAnalysis.chillThreshold', 0.3),
+            bassWeight: config.get('audioAnalysis.bassWeight', 0.6),
+            trebleWeight: config.get('audioAnalysis.trebleWeight', 0.3),
+            maxHistorySize: config.get('audioAnalysis.maxHistorySize', 30)
+        } : {};
+        this.audioAnalyzer = new AdvancedAudioAnalyzer(analyzerConfig);
+
         // Load timing configuration (config is optional - use defaults if not available)
         this.minSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
-            config.get('presetSelection.minSwitchInterval', 2000) : 2000;
+            config.get('presetSelection.minSwitchInterval', 4000) : 4000;  // Increased to 4 seconds minimum
         this.maxSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
-            config.get('presetSelection.maxSwitchInterval', 30000) : 30000;
+            config.get('presetSelection.maxSwitchInterval', 60000) : 60000;  // Increased to 60 seconds max
+
+        // Initialize MA Crossover system for intelligent switching
+        const crossoverConfig = (typeof config !== 'undefined' && config?.get) ? {
+            energyFast: config.get('crossover.energyFast', 5),
+            energySlow: config.get('crossover.energySlow', 20),
+            energyWeight: config.get('crossover.energyWeight', 0.5),
+            bassFast: config.get('crossover.bassFast', 3),
+            bassSlow: config.get('crossover.bassSlow', 15),
+            bassWeight: config.get('crossover.bassWeight', 0.3),
+            trebleFast: config.get('crossover.trebleFast', 7),
+            trebleSlow: config.get('crossover.trebleSlow', 25),
+            trebleWeight: config.get('crossover.trebleWeight', 0.2),
+            minCrossoverGap: config.get('crossover.minCrossoverGap', 2000),
+            signalThreshold: config.get('crossover.signalThreshold', 0.2),  // Changed from 0.4 to 0.2
+            consensusRequired: config.get('crossover.consensusRequired', 2)
+        } : {};
+        this.crossoverDetector = new MultiSignalCrossover(crossoverConfig);
+
+        // Fallback thresholds (kept for compatibility, but MA crossover is primary)
+        this.energyChangeThreshold = 0.25;  // Now just a fallback
+        this.bassChangeThreshold = 0.3;     // Now just a fallback
+        this.sceneScoreThreshold = 0.2;     // Now just a fallback - increased from 0.1
+        this.debugSceneChange = false;  // Enable debug output for scene change logic
+        this.debugMode = false;  // Enable debug mode to throw errors instead of swallowing them
 
         // Initialize analysis systems from imported modules
         this.frameAnalyzer = frameAnalyzer || null;
@@ -171,14 +209,19 @@ class IntelligentPresetSelector {
 
     /**
      * Update with current audio levels and potentially switch presets
+     * @param {Object} audioLevels - Current audio levels (bass, mid, treb)
+     * @param {Object} frameData - Optional frame data for analysis
+     * @returns {Object|null} Update result with current state and features
      */
     update(audioLevels, frameData = null) {
-        // Don't update if paused
-        if (this.isPaused) {
-            return null;
-        }
+        try {
+            // Don't update if paused
+            if (this.isPaused) {
+                console.log('[Update] Paused - returning null');
+                return null;
+            }
 
-        const now = performance.now();
+            const now = performance.now();
 
         // Check current frame for problems if we have frame data
         if (frameData && this.detectProblematic && now - this.lastFrameCheck > this.frameCheckInterval) {
@@ -200,15 +243,45 @@ class IntelligentPresetSelector {
         // Calculate audio features
         const features = this.calculateAudioFeatures();
 
+        // Initialize update count
+        if (this.updateCount === undefined) this.updateCount = 0;
+        this.updateCount++;
+
+        // Debug: Log features structure for first few updates
+        if (this.updateCount <= 3) {
+            console.log(`[calculateAudioFeatures] Features:`, {
+                hasEnergy: typeof features?.energy !== 'undefined',
+                hasBassEnergy: typeof features?.bassEnergy !== 'undefined',
+                hasTrebleEnergy: typeof features?.trebleEnergy !== 'undefined',
+                features: features
+            });
+        }
+
+        // If no features available, return early
+        if (!features) {
+            if (this.updateCount > 5 && this.updateCount < 10) {
+                console.log('[Update] No features available - returning early');
+            }
+            return {
+                currentPreset: this.currentHash,
+                features: null,
+                nextSwitch: 0,
+                selectionLogic: null,
+                isEmergencyMode: this.isEmergencyMode,
+                deviceTier: this.deviceTier,
+                noAudioData: true
+            };
+        }
+
         // Check if we should switch
         const timeSinceSwitch = now - this.lastSwitch;
         const shouldSwitch = this.shouldSwitchPreset(features, timeSinceSwitch);
 
-        // Debug logging for first few updates
-        if (this.updateCount === undefined) this.updateCount = 0;
-        this.updateCount++;
-        if (this.updateCount <= 5) {
+        // Debug logging
+        if (this.updateCount <= 10) {
             console.log(`[Update ${this.updateCount}] timeSinceSwitch: ${timeSinceSwitch}ms, shouldSwitch: ${shouldSwitch}, currentPreset: ${this.currentPreset}`);
+        } else if (this.updateCount === 11) {
+            console.log('[Update] Continuing past 10 updates...');
         }
 
         let selectionLogic = null;
@@ -251,6 +324,18 @@ class IntelligentPresetSelector {
             isEmergencyMode: this.isEmergencyMode,
             deviceTier: this.deviceTier
         };
+        } catch (error) {
+            console.error('[Update] Exception caught:', error);
+            return {
+                currentPreset: this.currentHash,
+                features: null,
+                nextSwitch: 0,
+                selectionLogic: null,
+                isEmergencyMode: this.isEmergencyMode,
+                deviceTier: this.deviceTier,
+                error: error.message
+            };
+        }
     }
 
     /**
@@ -275,94 +360,199 @@ class IntelligentPresetSelector {
     }
 
     /**
-     * Calculate audio features from history
+     * Calculate audio features using AdvancedAudioAnalyzer
      */
     calculateAudioFeatures() {
-        if (this.audioHistory.length === 0) {
-            return {
-                energy: 0.5,
-                bassEnergy: 0.5,
-                trebleEnergy: 0.5,
-                isDrop: false,
-                isBuildup: false,
-                trend: 'stable'
-            };
+        // Get the butterchurn audio instance
+        const audio = this.butterchurn?.audio;
+        if (!audio || !audio.freqArray || !audio.timeArray) {
+            // Return null to indicate no audio data available
+            if (this.debugSceneChange) {
+                console.log('[calculateAudioFeatures] No audio data available:',
+                    { hasAudio: !!audio, hasFreqArray: !!audio?.freqArray, hasTimeArray: !!audio?.timeArray });
+            }
+            return null;
         }
 
-        const recent = this.audioHistory.slice(-10);
-        const older = this.audioHistory.slice(0, 10);
+        // Use AdvancedAudioAnalyzer for feature extraction
+        const features = this.audioAnalyzer.calculateFeatures(
+            audio.freqArray,
+            audio.timeArray
+        );
 
-        // Current levels (average of recent)
-        const currentBass = recent.reduce((sum, h) => sum + (h.bass || 0), 0) / recent.length;
-        const currentMid = recent.reduce((sum, h) => sum + (h.mid || 0), 0) / recent.length;
-        const currentTreb = recent.reduce((sum, h) => sum + (h.treb || 0), 0) / recent.length;
-        const currentEnergy = (currentBass + currentMid + currentTreb) / 3;
+        // Debug: Log what AdvancedAudioAnalyzer returns
+        if (this.updateCount <= 10) {
+            console.log('[AdvancedAudioAnalyzer] Raw features:', features);
+            console.log('[Audio Data] freqArray sample:', Array.from(audio.freqArray.slice(0, 10)));
+            console.log('[Audio Data] timeArray sample:', Array.from(audio.timeArray.slice(0, 10)));
+        }
 
-        // Historical levels (for trend detection)
-        const oldBass = older.length > 0 ?
-            older.reduce((sum, h) => sum + (h.bass || 0), 0) / older.length : currentBass;
-        const oldEnergy = older.length > 0 ?
-            older.reduce((sum, h) => sum + (h.bass + h.mid + h.treb || 0), 0) / (older.length * 3) : currentEnergy;
+        // Detect musical events
+        const musicalEvent = this.audioAnalyzer.detectMusicalEvent(features);
 
-        // Detect drops and buildups
-        const energyChange = currentEnergy - oldEnergy;
-        const bassChange = currentBass - oldBass;
+        // Map to expected format while maintaining compatibility
+        // Calculate overall energy from available bands
+        const energy = (features.bass + features.mid + features.treble) / 3;
 
         return {
-            energy: currentEnergy,
-            bassEnergy: currentBass,
-            trebleEnergy: currentTreb,
-            isDrop: bassChange > 0.3 && currentBass > 0.7,
-            isBuildup: energyChange > 0.1 && currentEnergy > oldEnergy,
-            isChill: currentEnergy < 0.3 && Math.abs(energyChange) < 0.1,
-            trend: energyChange > 0.1 ? 'rising' : energyChange < -0.1 ? 'falling' : 'stable'
+            energy: energy,
+            bassEnergy: features.bass,
+            trebleEnergy: features.treble,
+            isDrop: musicalEvent === 'drop',
+            isBuildup: musicalEvent === 'buildup',
+            isChill: musicalEvent === 'chill',
+            isBreakdown: musicalEvent === 'breakdown',
+            trend: features.dynamicRange > 0.1 ? 'changing' : 'stable',
+            // Include raw features for advanced processing
+            rawFeatures: features,
+            musicalEvent: musicalEvent
         };
     }
 
     /**
-     * Determine if we should switch presets
+     * Calculate scene change based on SUDDEN changes, not accumulated drift
+     * Detects drops, buildups, verse changes - actual musical transitions
+     */
+    calculateSceneChange(features) {
+        // Add current features to history
+        this.recentFeatures.push({
+            energy: features.energy,
+            bass: features.bassEnergy,
+            treble: features.trebleEnergy,
+            timestamp: performance.now()
+        });
+
+        // Maintain rolling window
+        if (this.recentFeatures.length > this.historySize) {
+            this.recentFeatures.shift();
+        }
+
+        // Need enough history to detect changes
+        const minHistoryFrames = (typeof config !== 'undefined' && config?.get) ?
+            config.get('presetSelection.minHistoryFrames', 10) : 10;
+        if (this.recentFeatures.length < minHistoryFrames) {
+            if (this.updateCount <= 15) {
+                console.log(`[calculateSceneChange] Not enough history: ${this.recentFeatures.length} < ${minHistoryFrames}`);
+            }
+            return 0;
+        }
+
+        // Compare current to recent past (5-10 frames ago, ~0.1-0.2 sec)
+        const lookbackFrames = (typeof config !== 'undefined' && config?.get) ?
+            config.get('presetSelection.lookbackFrames', 10) : 10;
+        const recentPast = this.recentFeatures[Math.max(0, this.recentFeatures.length - lookbackFrames)];
+        const current = features;
+
+        // Validate we have valid data to compare
+        if (!recentPast || typeof recentPast.energy === 'undefined' ||
+            typeof recentPast.bass === 'undefined' || typeof recentPast.treble === 'undefined') {
+            if (this.updateCount <= 15) {
+                console.log(`[calculateSceneChange] Invalid data:`, {
+                    hasRecentPast: !!recentPast,
+                    hasEnergy: typeof recentPast?.energy !== 'undefined',
+                    hasBass: typeof recentPast?.bass !== 'undefined',
+                    hasTreble: typeof recentPast?.treble !== 'undefined'
+                });
+            }
+            return 0; // Not enough history yet
+        }
+
+        // Calculate rate of change (sudden changes)
+        const energyChange = Math.abs(current.energy - recentPast.energy);
+        const bassChange = Math.abs(current.bassEnergy - recentPast.bass);
+        const trebleChange = Math.abs(current.trebleEnergy - recentPast.treble);
+
+        // Also check for direction changes (e.g., drop = high to low)
+        // More lenient thresholds to catch real musical events
+        const energyDrop = recentPast.energy > 0.5 && current.energy < 0.35;
+        const bassDropIn = current.bassEnergy > 0.6 && recentPast.bass < 0.45;
+        const energyRise = current.energy > 0.5 && recentPast.energy < 0.35;
+        const significantChange = energyChange > 0.2 || bassChange > 0.25;
+
+        // Use custom weights if set
+        const weights = this.sceneWeights || {
+            energy: 0.5,
+            bass: 0.25,
+            treble: 0.25
+        };
+
+        // Calculate sudden change score
+        let sceneScore = (
+            energyChange * weights.energy +
+            bassChange * weights.bass +
+            trebleChange * weights.treble
+        );
+
+        // Boost score for specific musical events
+        if (energyDrop || bassDropIn || energyRise || significantChange) {
+            sceneScore *= 2.0;  // Double the score for clear transitions
+        }
+
+        // Debug output
+        if (this.debugSceneChange && !isNaN(sceneScore)) {
+            const presetName = this.currentPreset?.name || this.currentPreset || 'Unknown';
+            console.log(`[Scene Change] Preset: "${presetName}" | Score: ${sceneScore.toFixed(3)} | ` +
+                       `Energy Δ: ${energyChange.toFixed(3)} | ` +
+                       `Bass Δ: ${bassChange.toFixed(3)} | ` +
+                       `Treble Δ: ${trebleChange.toFixed(3)}` +
+                       (energyDrop ? ' [DROP!]' : '') +
+                       (bassDropIn ? ' [BASS IN!]' : '') +
+                       (energyRise ? ' [BUILD!]' : '') +
+                       (significantChange ? ' [BIG CHANGE!]' : ''));
+        }
+
+        return sceneScore;
+    }
+
+    /**
+     * Determine if we should switch presets (scene-based logic)
      */
     shouldSwitchPreset(features, timeSinceSwitch) {
-        // Respect warmup time - don't switch until preset has had time to build
+        // Minimum time acts as a debounce - prevent flicker
         const minimumTime = Math.max(
             this.minSwitchInterval,
             (this.currentWarmupTime || 0) * 1000 + 2000 // Add 2 sec buffer after warmup
         );
 
-        // Force switch if too long
-        if (timeSinceSwitch > this.maxSwitchInterval) {
-            return true;
-        }
-
-        // Don't switch before minimum time (including warmup)
+        // Don't switch before minimum time (safety rail)
+        // IMPORTANT: Check timing BEFORE updating crossover detector to prevent false triggers
         if (timeSinceSwitch < minimumTime) {
+            if (this.debugSceneChange) {
+                console.log(`[Switch Decision] Too soon: ${timeSinceSwitch}ms < ${minimumTime}ms minimum`);
+            }
+            // Still update the detector to track state, but don't act on it
+            this.crossoverDetector.update(features);
             return false;
         }
 
-        // Switch on musical events
-        if (features.isDrop) {
-            return true; // Always switch on drops for impact
-        }
+        // Update MA crossover detector with latest audio features
+        const crossoverResult = this.crossoverDetector.update(features);
 
-        if (features.isBuildup && timeSinceSwitch > this.minSwitchInterval * 0.7) {
-            return true; // Switch during buildups for anticipation
-        }
-
-        // Switch if energy changed significantly
-        if (this.currentHash) {
-            const currentFp = this.db.presets[this.currentHash]?.fingerprint;
-            if (currentFp) {
-                const energyMismatch = Math.abs(currentFp.energy - features.energy);
-                if (energyMismatch > 0.5) {
-                    return true;
-                }
+        // MA Crossover is the primary decision maker
+        if (crossoverResult.shouldSwitch) {
+            if (this.debugSceneChange) {
+                console.log(`[MA Crossover] Switch triggered: ${crossoverResult.switchReason}`);
+                console.log(`[MA Crossover] Blended score: ${crossoverResult.blended.score.toFixed(3)}, Direction: ${crossoverResult.blended.direction}`);
+                console.log(`[MA Crossover] Energy: ${this.crossoverDetector.energy.status}, Bass: ${this.crossoverDetector.bass.status}, Treble: ${this.crossoverDetector.treble.status}`);
             }
+            return true;
         }
 
-        // Random switch chance increases over time
-        const switchChance = (timeSinceSwitch - this.minSwitchInterval) /
-                           (this.maxSwitchInterval - this.minSwitchInterval);
-        return Math.random() < switchChance * 0.3;
+        // Force switch if too long (watchdog timer - prevents boredom)
+        if (timeSinceSwitch > this.maxSwitchInterval) {
+            if (this.debugSceneChange) {
+                console.log(`[Switch Decision] Max time exceeded: ${timeSinceSwitch}ms > ${this.maxSwitchInterval}ms`);
+            }
+            return true;
+        }
+
+        // Debug output for MA crossover state (first few updates)
+        if (this.updateCount <= 15 && this.debugSceneChange) {
+            const state = this.crossoverDetector.getDebugState();
+            console.log(`[MA Debug ${this.updateCount}] Energy: ${state.energy}, Bass: ${state.bass}, Treble: ${state.treble}`);
+        }
+
+        return false;
     }
 
     /**
@@ -461,25 +651,64 @@ class IntelligentPresetSelector {
     getCandidates(features, limit = 30) {
         let candidates = [];
 
-        // Select primary category based on features
-        if (features.isDrop || features.energy > 0.8) {
-            // High energy for drops
-            candidates = [...this.db.indices.high];
-        } else if (features.isChill || features.energy < 0.3) {
-            // Calm presets for chill moments
-            candidates = [...this.db.indices.calm];
-        } else if (features.bassEnergy > 0.7) {
-            // Bass-reactive for bass-heavy sections
-            candidates = [...this.db.indices.bass];
+        // Debug: Check database structure
+        if (this.updateCount <= 2) {
+            console.log('[getCandidates] Database structure:', {
+                hasIndices: !!this.db?.indices,
+                indicesKeys: this.db?.indices ? Object.keys(this.db.indices) : 'none',
+                hasPresets: !!this.db?.presets,
+                presetsCount: this.db?.presets ? Object.keys(this.db.presets).length : 0,
+                hasNameMapping: !!this.db?.namesToHashes,
+                nameMappingCount: this.db?.namesToHashes ? Object.keys(this.db.namesToHashes).length : 0
+            });
+        }
+
+        // FALLBACK: If no indices, use all preset hashes from database
+        if (!this.db?.indices) {
+            if (this.db?.presets) {
+                // Use preset hashes directly from presets object
+                const allHashes = Object.keys(this.db.presets);
+                console.log(`[getCandidates] No indices found, using all ${allHashes.length} preset hashes`);
+                candidates = [...allHashes];
+            } else if (this.db?.namesToHashes) {
+                // Use hashes from name mapping
+                const allHashes = Object.values(this.db.namesToHashes);
+                console.log(`[getCandidates] No presets object, using ${allHashes.length} hashes from name mapping`);
+                candidates = [...allHashes];
+            } else {
+                console.warn('[getCandidates] No usable database structure found');
+                return [];
+            }
         } else {
-            // Mix of different categories for variety
-            candidates = [
-                ...this.pickRandom(this.db.indices.high, 5),
-                ...this.pickRandom(this.db.indices.bass, 5),
-                ...this.pickRandom(this.db.indices.particle, 5),
-                ...this.pickRandom(this.db.indices.fractal, 5),
-                ...this.pickRandom(this.db.indices.organic, 5)
-            ];
+            // Use MA crossover signals for smarter preset selection
+            const crossoverState = this.crossoverDetector.getDebugState();
+
+            // Prioritize based on crossover signals
+            if (crossoverState.energy === 'golden' || features.energy > 0.8) {
+                // High energy state - use high energy presets
+                candidates = [...this.db.indices.high];
+            } else if (crossoverState.energy === 'death' || features.energy < 0.3) {
+                // Low energy state - use calm presets
+                candidates = [...this.db.indices.calm];
+            } else if (crossoverState.bass === 'golden' || features.bassEnergy > 0.7) {
+                // Bass-heavy state - use bass-reactive presets
+                candidates = [...this.db.indices.bass];
+            } else if (crossoverState.treble === 'golden') {
+                // Treble/melodic state - use fractal/organic presets
+                candidates = [
+                    ...this.pickRandom(this.db.indices.fractal, 10),
+                    ...this.pickRandom(this.db.indices.organic, 10)
+                ];
+            } else {
+                // Mixed state - variety of presets
+                candidates = [
+                    ...this.pickRandom(this.db.indices.high, 5),
+                    ...this.pickRandom(this.db.indices.bass, 5),
+                    ...this.pickRandom(this.db.indices.particle, 5),
+                    ...this.pickRandom(this.db.indices.fractal, 5),
+                    ...this.pickRandom(this.db.indices.organic, 5)
+                ];
+            }
         }
 
         // Filter out recently used presets
@@ -558,6 +787,11 @@ class IntelligentPresetSelector {
         // For now, we'll use the first name as the preset identifier
         const presetName = presetData.names[0];
 
+        // Mark transition start for aggressive black frame detection
+        if (this.frameAnalyzer && this.frameAnalyzer.markTransitionStart) {
+            this.frameAnalyzer.markTransitionStart();
+        }
+
         // Get warmup time from fingerprint
         this.currentWarmupTime = presetData.fingerprint.warmupTime || 0;
 
@@ -567,6 +801,13 @@ class IntelligentPresetSelector {
             console.log(`  Warmup time: ${this.currentWarmupTime}s (will display for at least ${this.currentWarmupTime + 2}s)`);
         }
 
+        // Schedule transition end notification (after blend completes)
+        setTimeout(() => {
+            if (this.frameAnalyzer && this.frameAnalyzer.markTransitionEnd) {
+                this.frameAnalyzer.markTransitionEnd();
+            }
+        }, 2500); // 2.5 seconds to cover most blend times
+
         // Schedule solid color detection after warmup
         if (this.detectSolidColor && !this.solidColorChecks.has(hash)) {
             setTimeout(() => {
@@ -574,17 +815,41 @@ class IntelligentPresetSelector {
             }, (this.currentWarmupTime + 1) * 1000);
         }
 
-        // Load the preset (this needs to be connected to actual Butterchurn loading)
+        // Load the preset with error handling
         if (this.butterchurn && this.butterchurn.loadPreset) {
-            // This would need the actual preset data, not just the name
-            // You'd need to implement preset loading from the hash
-            await this.loadPresetByHash(hash);
+            const loadSuccess = await this.loadPresetByHash(hash);
+            if (!loadSuccess) {
+                console.error(`[IntelligentSelector] Failed to load preset ${hash}, keeping current preset`);
+                return; // Don't update state if load failed
+            }
         }
 
         // Update state
         this.currentHash = hash;
         this.currentPreset = presetData;
         this.lastSwitch = performance.now();
+
+        // Clear recent features history after switch to avoid false positives
+        this.recentFeatures = [];
+
+        // Store audio state at switch time (for reference, though we now use rate-of-change)
+        const features = this.calculateAudioFeatures();
+        if (features) {
+            this.switchEnergy = features.energy;
+            this.switchBass = features.bassEnergy;
+            this.switchTreble = features.trebleEnergy;
+        } else {
+            // Use defaults if no audio available
+            this.switchEnergy = 0.5;
+            this.switchBass = 0.5;
+            this.switchTreble = 0.5;
+        }
+
+        // Debug output
+        if (this.debugSceneChange) {
+            console.log(`[Switch] Storing scene state after successful switch - Energy: ${this.switchEnergy.toFixed(3)}, ` +
+                       `Bass: ${this.switchBass.toFixed(3)}, Treble: ${this.switchTreble.toFixed(3)}`);
+        }
 
         // Add to recent presets
         this.recentPresets.push(hash);
@@ -639,6 +904,28 @@ class IntelligentPresetSelector {
         this.currentPreset = presetName;
         this.lastSwitch = performance.now();
 
+        // Clear recent features history after switch to avoid false positives
+        this.recentFeatures = [];
+
+        // Store audio state at switch time (for reference, though we now use rate-of-change)
+        const features = this.calculateAudioFeatures();
+        if (features) {
+            this.switchEnergy = features.energy;
+            this.switchBass = features.bassEnergy;
+            this.switchTreble = features.trebleEnergy;
+        } else {
+            // Use defaults if no audio available
+            this.switchEnergy = 0.5;
+            this.switchBass = 0.5;
+            this.switchTreble = 0.5;
+        }
+
+        // Debug output
+        if (this.debugSceneChange) {
+            console.log(`[Switch Pack] Storing scene state after successful switch - Energy: ${this.switchEnergy.toFixed(3)}, ` +
+                       `Bass: ${this.switchBass.toFixed(3)}, Treble: ${this.switchTreble.toFixed(3)}`);
+        }
+
         // Add to recent presets
         this.recentPresets.push(presetName);
         if (this.recentPresets.length > this.recentPresetsMax) {
@@ -677,7 +964,8 @@ class IntelligentPresetSelector {
             const context = {
                 audioLevel: this.audioHistory[this.audioHistory.length - 1]?.energy || 0,
                 fps: this.butterchurn?.fps || 60,
-                frameData: analysis
+                frameData: analysis,
+                previousHash: this.currentHash // Pass the problematic preset hash
             };
 
             // Log the failure
@@ -686,7 +974,9 @@ class IntelligentPresetSelector {
             }
 
             // Check if we should enter emergency mode
-            if (analysis.confidence > 0.8) {
+            // Be more aggressive during transitions
+            const confidenceThreshold = analysis.reason === 'black_frame_during_transition' ? 0.5 : 0.8;
+            if (analysis.confidence > confidenceThreshold) {
                 console.warn(`[IntelligentSelector] Detected ${analysis.reason} - entering emergency mode`);
                 this.enterEmergencyMode(context);
             }
@@ -708,16 +998,26 @@ class IntelligentPresetSelector {
         });
 
         if (emergency && emergency.preset) {
-            console.log(`[IntelligentSelector] Switching to emergency preset: ${emergency.key}`);
+            console.log(`[IntelligentSelector] EMERGENCY: Switching to emergency preset: ${emergency.key}`);
             this.isEmergencyMode = true;
             this.emergencyStartTime = performance.now();
 
-            // Load the emergency preset directly
+            // Load the emergency preset directly with IMMEDIATE transition
             if (this.butterchurn && typeof this.butterchurn.loadPreset === 'function') {
-                this.butterchurn.loadPreset(emergency.preset, 0.5); // Quick 0.5s transition
+                this.butterchurn.loadPreset(emergency.preset, 0.1); // Near-instant 0.1s transition
                 this.currentHash = emergency.preset.id;
                 this.currentPreset = emergency.preset.name;
-                this.lastSwitch = performance.now();
+                // CRITICAL: Force update lastSwitch to bypass timing constraints
+                // Set it to a time that makes it appear we switched long ago
+                this.lastSwitch = performance.now() - this.minSwitchInterval - 1000;
+                console.log('[IntelligentSelector] Forced timing bypass for emergency switch');
+            }
+
+            // Block the problematic preset if we have the hash
+            const problematicHash = context.previousHash || this.currentHash;
+            if (problematicHash && this.blocklistManager) {
+                this.blocklistManager.blockPreset(problematicHash, 'black_frame_emergency', context);
+                console.log(`[IntelligentSelector] Blocked preset ${problematicHash} due to black frames`);
             }
         }
     }
@@ -732,6 +1032,10 @@ class IntelligentPresetSelector {
 
         // Force a new preset selection
         const features = this.calculateAudioFeatures();
+        if (!features) {
+            console.warn('[IntelligentSelector] Cannot force switch - no audio features available');
+            return;
+        }
         const bestHash = this.selectBestPreset(features);
         if (bestHash) {
             this.switchToPreset(bestHash);
@@ -856,9 +1160,11 @@ class IntelligentPresetSelector {
                 // Switch to a different preset immediately
                 setTimeout(() => {
                     const features = this.calculateAudioFeatures();
-                    const bestHash = this.selectBestPreset(features);
-                    if (bestHash && bestHash !== hash) {
-                        this.switchToPreset(bestHash);
+                    if (features) {
+                        const bestHash = this.selectBestPreset(features);
+                        if (bestHash && bestHash !== hash) {
+                            this.switchToPreset(bestHash);
+                        }
                     }
                 }, 500);
             } else {
@@ -977,26 +1283,33 @@ class IntelligentPresetSelector {
     }
 
     /**
-     * Load preset data by hash (needs implementation based on your preset storage)
+     * Load preset data by hash with proper error handling
      */
     async loadPresetByHash(hash) {
-        // This is where you'd load the actual preset data
-        // For now, it's a placeholder that would need to be connected
-        // to your preset loading system
+        try {
+            // Validate hash exists in database
+            if (!this.db || !this.db.presets || !this.db.presets[hash]) {
+                throw new Error(`Preset hash ${hash} not found in database`);
+            }
 
-        // Option 1: Load from a preset pack using the name
-        const presetData = this.db.presets[hash];
-        const presetName = presetData.names[0];
+            const presetData = this.db.presets[hash];
+            const presetName = presetData.names[0];
 
-        // Option 2: Store preset data in the fingerprint database
-        // (would make the database larger but more self-contained)
+            if (!presetName) {
+                throw new Error(`No preset name found for hash ${hash}`);
+            }
 
-        // Option 3: Have a separate mapping from hash to preset location
+            console.log(`Loading preset: ${presetName}`);
 
-        console.log(`Loading preset: ${presetName}`);
+            // Check if we have a butterchurn instance and preset pack
+            if (!this.butterchurn || typeof this.butterchurn.loadPreset !== 'function') {
+                throw new Error('Butterchurn instance not available or loadPreset method not found');
+            }
 
-        // Actually load the preset
-        if (this.butterchurn && typeof this.butterchurn.loadPreset === 'function' && this.presetPack) {
+            if (!this.presetPack) {
+                throw new Error('Preset pack not loaded');
+            }
+
             // Search for preset by name in the presets object
             // Try different matching strategies since names may vary between database and pack
             let presetKey = Object.keys(this.presetPack).find(key => {
@@ -1012,34 +1325,79 @@ class IntelligentPresetSelector {
                 return simplifiedKey === simplifiedName;
             });
 
-            // If no match, try to pick a random preset as fallback
+            // If no match, check if we should fail fast (debug mode) or use fallback
             if (!presetKey) {
+                // In debug mode or test environment, fail immediately
+                if (this.debugMode) {
+                    throw new Error(`[CRITICAL] Preset not found in pack: "${presetName}". Database/pack mismatch!`);
+                }
+
+                // Production mode: try to use a fallback
                 const availablePresets = Object.keys(this.presetPack);
                 if (availablePresets.length > 0) {
-                    console.warn('[IntelligentSelector] Could not find preset, using random fallback:', presetName);
+                    console.error('[IntelligentSelector] ERROR: Could not find preset:', presetName);
+                    console.error('[IntelligentSelector] This indicates a database/pack mismatch!');
+
+                    // Use emergency preset if available instead of random
+                    if (this.emergencyManager) {
+                        const emergency = this.emergencyManager.getEmergencyPreset({
+                            deviceTier: this.deviceTier,
+                            audioLevel: 0.5
+                        });
+                        if (emergency && emergency.preset) {
+                            console.log('[IntelligentSelector] Using emergency preset instead');
+                            this.butterchurn.loadPreset(emergency.preset, 1.0);
+                            return true;
+                        }
+                    }
+
+                    // Last resort: random preset
                     presetKey = availablePresets[Math.floor(Math.random() * availablePresets.length)];
+                    console.warn('[IntelligentSelector] Using random fallback:', presetKey);
+                } else {
+                    throw new Error('No presets available in preset pack');
                 }
             }
 
-            if (presetKey && this.presetPack[presetKey]) {
-                const presetObj = this.presetPack[presetKey];
-
-                // Basic validation - ensure it's not a completely empty object
-                if (!presetObj || typeof presetObj !== 'object') {
-                    console.error('[IntelligentSelector] Invalid preset object:', presetKey);
-                    return;
-                }
-
-                console.log('[IntelligentSelector] Actually loading preset:', presetKey);
-                this.butterchurn.loadPreset(presetObj, 2.0); // 2 second blend
-                // Update current preset tracking
-                this.currentPreset = presetKey;
-                this.lastSwitch = performance.now();
-            } else {
-                console.warn('[IntelligentSelector] Could not find preset in collection:', presetName);
+            if (!presetKey || !this.presetPack[presetKey]) {
+                throw new Error(`Could not find preset in collection: ${presetName}`);
             }
-        } else {
-            console.warn('[IntelligentSelector] Cannot load - missing butterchurn or presetPack');
+
+            const presetObj = this.presetPack[presetKey];
+
+            // Basic validation - ensure it's not a completely empty object
+            if (!presetObj || typeof presetObj !== 'object') {
+                throw new Error(`Invalid preset object for key: ${presetKey}`);
+            }
+
+            console.log('[IntelligentSelector] Actually loading preset:', presetKey);
+            this.butterchurn.loadPreset(presetObj, 2.0); // 2 second blend
+
+            // Update current preset tracking
+            this.currentPreset = presetKey;
+            this.lastSwitch = performance.now();
+
+            return true; // Success
+
+        } catch (error) {
+            console.error('[IntelligentSelector] Error loading preset:', error.message);
+
+            // Attempt recovery with emergency presets if available
+            if (this.isEmergencyMode && emergencyManager) {
+                console.warn('[IntelligentSelector] Attempting emergency preset fallback');
+                try {
+                    const emergencyPreset = emergencyManager.getRandomEmergencyPreset();
+                    if (emergencyPreset) {
+                        this.butterchurn.loadPreset(emergencyPreset, 1.0);
+                        return true;
+                    }
+                } catch (emergencyError) {
+                    console.error('[IntelligentSelector] Emergency preset also failed:', emergencyError.message);
+                }
+            }
+
+            // Return false to indicate failure
+            return false;
         }
     }
 
@@ -1107,6 +1465,10 @@ class IntelligentPresetSelector {
      */
     nextPreset() {
         const features = this.calculateAudioFeatures();
+        if (!features) {
+            console.warn('[IntelligentSelector] Cannot select next preset - no audio features available');
+            return;
+        }
         const bestHash = this.selectBestPreset(features);
         if (bestHash) {
             this.switchToPreset(bestHash);
@@ -1118,6 +1480,52 @@ class IntelligentPresetSelector {
      */
     setWeights(weights) {
         this.weights = { ...this.weights, ...weights };
+    }
+
+    /**
+     * Enable/disable scene change debug output
+     */
+    setDebugSceneChange(enabled) {
+        this.debugSceneChange = enabled;
+        if (enabled) {
+            console.log('[Scene Debug] Enabled - will log scene change scores and switch decisions');
+            console.log(`[Scene Debug] Thresholds - Scene: ${this.sceneScoreThreshold}, ` +
+                       `Energy: ${this.energyChangeThreshold}, Bass: ${this.bassChangeThreshold}`);
+        }
+    }
+
+    /**
+     * Enable/disable debug mode (throws errors instead of swallowing them)
+     * CRITICAL: Use this on test pages to prevent silent error handling
+     */
+    setDebugMode(enabled) {
+        this.debugMode = enabled;
+        if (enabled) {
+            console.warn('🚨 [DEBUG MODE] ENABLED - Errors will be thrown instead of handled silently');
+            console.warn('🚨 This should ONLY be used in development/testing environments');
+        } else {
+            console.log('[DEBUG MODE] Disabled - Errors will be handled gracefully');
+        }
+    }
+
+    /**
+     * Update scene change thresholds
+     */
+    setSceneThresholds(thresholds) {
+        if (thresholds.sceneScore !== undefined) {
+            this.sceneScoreThreshold = thresholds.sceneScore;
+        }
+        if (thresholds.energyChange !== undefined) {
+            this.energyChangeThreshold = thresholds.energyChange;
+        }
+        if (thresholds.bassChange !== undefined) {
+            this.bassChangeThreshold = thresholds.bassChange;
+        }
+
+        if (this.debugSceneChange) {
+            console.log(`[Scene Debug] Updated thresholds - Scene: ${this.sceneScoreThreshold}, ` +
+                       `Energy: ${this.energyChangeThreshold}, Bass: ${this.bassChangeThreshold}`);
+        }
     }
 }
 

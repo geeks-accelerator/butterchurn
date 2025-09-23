@@ -21,6 +21,7 @@ const __dirname = dirname(__filename);
 
 class PresetFingerprintGenerator {
     constructor() {
+        this.baseDir = null;  // Store base directory for relative path conversion
         this.stats = {
             totalFiles: 0,
             uniquePresets: 0,
@@ -353,6 +354,16 @@ class PresetFingerprintGenerator {
     }
 
     /**
+     * Convert absolute path to relative path from base directory
+     */
+    getRelativePath(filePath) {
+        if (!this.baseDir) {
+            return filePath; // Fallback to absolute if no base dir set
+        }
+        return path.relative(this.baseDir, filePath);
+    }
+
+    /**
      * Process a single preset file
      */
     async processPresetFile(filePath) {
@@ -380,7 +391,7 @@ class PresetFingerprintGenerator {
                     names: [presetName],
                     firstSeen: author,
                     fingerprint: this.generateFingerprint(preset),
-                    files: [filePath]
+                    files: [this.getRelativePath(filePath)]
                 };
 
                 this.stats.uniquePresets++;
@@ -402,7 +413,7 @@ class PresetFingerprintGenerator {
                     this.database.nameIndex[presetName] = hash;
                 }
 
-                existing.files.push(filePath);
+                existing.files.push(this.getRelativePath(filePath));
                 this.stats.duplicatesFound++;
 
                 console.log(`♻️  ${hash} - Duplicate of "${existing.names[0].substring(0, 30)}..."`);
@@ -471,6 +482,9 @@ class PresetFingerprintGenerator {
      */
     async generateForDirectory(inputDir, options = {}) {
         console.log(`\n🔍 Scanning for presets in: ${inputDir}\n`);
+
+        // Store base directory for relative path conversion
+        this.baseDir = path.resolve(inputDir);
 
         let presetFiles = await this.findPresetFiles(inputDir);
         console.log(`📁 Found ${presetFiles.length} preset files\n`);

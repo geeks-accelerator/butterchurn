@@ -381,6 +381,10 @@ export default class Renderer {
       this.blendProgress = (this.time - this.blendStartTime) / this.blendDuration;
       if (this.blendProgress > 1.0) {
         this.blending = false;
+        // MEMORY FIX: Clean up previous preset to prevent memory leak
+        // The old preset continues running in background if not cleared
+        this.prevPreset = null;
+        this.prevPresetEquationRunner = null;
       }
     }
 
@@ -553,7 +557,7 @@ export default class Renderer {
             this.warpColor[offsetColor + 2] = 1;
             this.warpColor[offsetColor + 3] = 1 - mix2; // NEW preset fades IN (0→1)
 
-            // BLENDING FIX: Store previous preset alpha in separate buffer (NON-WASM fix)
+            // BLENDING FIX: Proper crossfade - old preset fades OUT
             this.prevWarpColor[offsetColor + 0] = 1;
             this.prevWarpColor[offsetColor + 1] = 1;
             this.prevWarpColor[offsetColor + 2] = 1;
@@ -623,7 +627,7 @@ export default class Renderer {
             this.warpColor[offsetColor + 2] = 1;
             this.warpColor[offsetColor + 3] = 1 - mix2; // NEW preset fades IN (0→1)
 
-            // BLENDING FIX: Store previous preset alpha in separate buffer (WASM fix)
+            // BLENDING FIX: Proper crossfade - old preset fades OUT (WASM path)
             this.prevWarpColor[offsetColor + 0] = 1;
             this.prevWarpColor[offsetColor + 1] = 1;
             this.prevWarpColor[offsetColor + 2] = 1;
@@ -813,7 +817,8 @@ export default class Renderer {
     };
 
     const prevGlobalVars = Object.assign({}, globalVars);
-    if (!this.prevPreset.useWASM) {
+    // Only access prevPreset if we're actually blending
+    if (this.blending && this.prevPreset && !this.prevPreset.useWASM) {
       prevGlobalVars.gmegabuf = this.prevPresetEquationRunner.gmegabuf;
     }
 
@@ -863,6 +868,7 @@ export default class Renderer {
 
     this.bindFrambufferAndSetViewport(this.targetFrameBuffer, this.texsizeX, this.texsizeY);
 
+    // Always clear to ensure clean render
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
     this.gl.enable(this.gl.BLEND);
     this.gl.blendEquation(this.gl.FUNC_ADD);
@@ -885,8 +891,11 @@ export default class Renderer {
         this.warpColor
       );
     } else {
+      // CROSSFADE FIX: Clear target before blending to ensure proper accumulation
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
       this.prevWarpShader.renderQuadTexture(
-        false,
+        false,  // CROSSFADE FIX: Don't use blending for first preset
         this.prevTexture,
         this.blurTexture1,
         this.blurTexture2,
@@ -898,6 +907,11 @@ export default class Renderer {
         this.warpUVs,
         this.prevWarpColor // Use separate alpha buffer for previous preset
       );
+
+      // CROSSFADE FIX: Keep alpha blending for proper crossfade (prevents fade to black)
+      // The first pass already rendered with correct alpha, second pass uses additive
+      // to blend the two presets together based on their alpha values
+      this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE);
 
       this.warpShader.renderQuadTexture(
         true,
@@ -912,6 +926,9 @@ export default class Renderer {
         this.warpUVs,
         this.warpColor
       );
+
+      // CROSSFADE FIX: Restore normal blending
+      this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     }
 
     if (this.numBlurPasses > 0) {
@@ -1068,6 +1085,9 @@ export default class Renderer {
         this.warpColor
       );
     } else {
+      // CROSSFADE FIX: Clear before rendering both presets
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
       this.prevCompShader.renderQuadTexture(
         false,
         this.targetTexture,
@@ -1081,6 +1101,11 @@ export default class Renderer {
         this.prevWarpColor // Use separate alpha buffer for previous preset
       );
 
+      // CROSSFADE FIX: Keep alpha blending for proper crossfade (prevents fade to black)
+      // The first pass already rendered with correct alpha, second pass uses additive
+      // to blend the two presets together based on their alpha values
+      this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE);
+
       this.compShader.renderQuadTexture(
         true,
         this.targetTexture,
@@ -1093,6 +1118,9 @@ export default class Renderer {
         this.presetEquationRunner.mdVSQAfterFrame,
         this.warpColor
       );
+
+      // CROSSFADE FIX: Restore normal blending
+      this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     }
 
     if (this.supertext.startTime >= 0) {

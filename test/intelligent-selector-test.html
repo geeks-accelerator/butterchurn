@@ -72,10 +72,7 @@
         .audio-bars {
             display: flex;
             justify-content: center;
-            margin: 15px auto 0;
-            height: 60px;
-            width: 720px;
-            max-width: 100%;
+            height: 100%;
         }
         .bar {
             flex: 1;
@@ -119,7 +116,7 @@
         /* Compact controls */
         .controls {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 8px;
             margin: 15px 0;
         }
@@ -260,16 +257,8 @@
         <!-- Mode control bar -->
         <div class="mode-controls">
             <div>
-                <span class="label">Current Preset:</span>
-                <span class="value" id="currentPreset">No audio loaded</span>
-            </div>
-            <div>
                 <span class="label">Presets in Database:</span>
                 <span class="value" id="presetCount">-</span>
-            </div>
-            <div>
-                <button id="autoBtn" disabled>Auto Mode: ON</button>
-                <button id="nextBtn" disabled>Next Preset</button>
             </div>
         </div>
 
@@ -281,10 +270,54 @@
                 <div id="audioStatus"></div>
             </div>
             <canvas id="canvas" width="720" height="405"></canvas>
-            <div class="audio-bars" id="audioBars"></div>
+            <div style="display: flex; width: 720px; max-width: 100%; margin: 15px auto 0; height: 60px;">
+                <div class="audio-bars" id="audioBars" style="flex: 0 0 66.66%; height: 100%;"></div>
+                <div class="live-audio-levels" id="liveAudioLevels" style="flex: 0 0 33.33%; padding-left: 15px; display: flex; flex-direction: column; justify-content: center; font-family: monospace;">
+                    <div style="color: #0f0; font-size: 0.85em; line-height: 1.3;">
+                        <div>Audio Energy: <span id="liveEnergy" style="color: #0ff;">0%</span></div>
+                        <div>Bass Energy: <span id="liveBass" style="color: #0ff;">0%</span></div>
+                        <div>Treble Energy: <span id="liveTreble" style="color: #0ff;">0%</span></div>
+                    </div>
+                </div>
+            </div>
             <div class="controls">
-                <button id="playBtn" disabled>Play/Pause</button>
-                <button id="nextBtn" disabled>Next Preset (Manual)</button>
+                <button id="playBtn" disabled>Play</button>
+                <button id="nextPresetBtn" disabled>Next Preset (Manual)</button>
+                <button id="autoBtn" disabled>Auto Mode: ON</button>
+            </div>
+
+            <!-- Scene Change Threshold Controls -->
+            <div class="threshold-controls" style="margin-top: 20px; padding: 10px; background: rgba(0,255,0,0.1); border: 1px solid #0f0; border-radius: 5px;">
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <h4 style="color: #0f0; margin: 0;">🎚️ Thresholds:</h4>
+
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label style="color: #0f0; font-size: 0.9em;">Energy:</label>
+                        <input type="number" id="energyWeight" value="0.5" min="0" max="1" step="0.05" style="width: 50px; background: #000; color: #0f0; border: 1px solid #0f0; padding: 2px;">
+                        <span style="color: #888; font-size: 0.85em;">(50%)</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label style="color: #0f0; font-size: 0.9em;">Bass:</label>
+                        <input type="number" id="bassWeight" value="0.25" min="0" max="1" step="0.05" style="width: 50px; background: #000; color: #0f0; border: 1px solid #0f0; padding: 2px;">
+                        <span style="color: #888; font-size: 0.85em;">(25%)</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label style="color: #0f0; font-size: 0.9em;">Treble:</label>
+                        <input type="number" id="trebleWeight" value="0.25" min="0" max="1" step="0.05" style="width: 50px; background: #000; color: #0f0; border: 1px solid #0f0; padding: 2px;">
+                        <span style="color: #888; font-size: 0.85em;">(25%)</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label style="color: #0f0; font-size: 0.9em;">Scene:</label>
+                        <input type="number" id="sceneThreshold" value="0.1" min="0" max="1" step="0.01" style="width: 50px; background: #000; color: #0f0; border: 1px solid #0f0; padding: 2px;">
+                        <span style="color: #888; font-size: 0.85em;">(10%)</span>
+                    </div>
+
+                    <button id="updateThresholds" style="background: #0f0; color: #000; border: none; padding: 3px 12px; cursor: pointer; font-size: 0.9em;">Update</button>
+                    <span id="thresholdStatus" style="color: #0f0; font-size: 0.85em;"></span>
+                </div>
             </div>
         </div>
 
@@ -564,6 +597,10 @@
         let animationId;
         let selector;
         let fingerprintDb;
+        let advancedAnalyzer; // Instance of AdvancedAudioAnalyzer
+
+        // 🚨 CRITICAL: Debug flag to prevent silent error handling
+        const TEST_PAGE_DEBUG_MODE = true;
 
         // Performance tracking
         let frameCount = 0;
@@ -580,12 +617,18 @@
 
         // Audio bars will be created in init() after canvas is ready
 
-        // IntelligentPresetSelector is now included in the butterchurn bundle
-        // Access it from the butterchurn exports
+        // Access classes from the butterchurn bundle
         const IntelligentPresetSelector = (typeof butterchurn !== 'undefined' && butterchurn.IntelligentPresetSelector) ||
                                           (typeof butterchurn !== 'undefined' && butterchurn.default && butterchurn.default.IntelligentPresetSelector) ||
                                           window.IntelligentPresetSelector;
-        // No need for inline implementation - using authoritative version
+
+        const AdvancedAudioAnalyzer = (typeof butterchurn !== 'undefined' && butterchurn.AdvancedAudioAnalyzer) ||
+                                      (typeof butterchurn !== 'undefined' && butterchurn.default && butterchurn.default.AdvancedAudioAnalyzer) ||
+                                      window.AdvancedAudioAnalyzer;
+
+        const DeviceCapabilities = (typeof butterchurn !== 'undefined' && butterchurn.DeviceCapabilities) ||
+                                   (typeof butterchurn !== 'undefined' && butterchurn.default && butterchurn.default.DeviceCapabilities) ||
+                                   window.DeviceCapabilities;
 
         function showError(message) {
             document.getElementById('audioStatus').innerHTML = `<div class="error">${message}</div>`;
@@ -634,8 +677,12 @@
         }
 
         function updatePresetInfo(presetName) {
-            document.getElementById('currentPreset').textContent = presetName.substring(0, 50) +
-                (presetName.length > 50 ? '...' : '');
+            // Update currentPreset element if it exists (we removed it from the UI)
+            const currentPresetEl = document.getElementById('currentPreset');
+            if (currentPresetEl) {
+                currentPresetEl.textContent = presetName.substring(0, 50) +
+                    (presetName.length > 50 ? '...' : '');
+            }
 
             // Track preference learning
             const now = Date.now();
@@ -678,72 +725,65 @@
             updatePreferenceLearning();
         }
 
-        function detectDeviceCapabilities() {
-            // Memory detection
-            const memory = navigator.deviceMemory || 'Unknown';
-            document.getElementById('deviceMemory').textContent =
-                memory === 'Unknown' ? 'Unknown' : `${memory} GB`;
-
-            // CPU cores detection
-            const cores = navigator.hardwareConcurrency || 'Unknown';
-            document.getElementById('deviceCores').textContent =
-                cores === 'Unknown' ? 'Unknown' : cores.toString();
-
-            // GPU detection
-            detectGPU().then(gpu => {
-                document.getElementById('deviceGPU').textContent = gpu;
-            });
-
-            // Device tier calculation (similar to IntelligentSelector logic)
-            const isMobile = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent);
-            let tier;
-
-            if (isMobile) {
-                tier = '📱 Mobile';
-            } else if (memory >= 8 && cores >= 4) {
-                tier = '🖥️ High-end';
-            } else if (memory <= 4 && cores <= 2) {
-                tier = '💻 Low-end';
-            } else {
-                tier = '🖥️ Mid-range';
+        async function detectDeviceCapabilities() {
+            if (!butterchurn.DeviceCapabilities) {
+                console.warn('DeviceCapabilities not available in butterchurn');
+                return;
             }
 
-            document.getElementById('deviceTier').textContent = tier;
-
-            console.log(`[Device] Detected: ${tier}, Memory: ${memory}GB, Cores: ${cores}, Mobile: ${isMobile}`);
-        }
-
-        async function detectGPU() {
             try {
-                // Try to get WebGL context for GPU info
-                const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                const capabilities = await butterchurn.DeviceCapabilities.detect();
 
-                if (!gl) {
-                    return 'WebGL not supported';
-                }
+                // Update UI with detected capabilities
+                document.getElementById('deviceMemory').textContent =
+                    capabilities.memory.available === 'unknown' ? 'Unknown' : `${capabilities.memory.available} GB`;
 
-                // Get GPU renderer info
-                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                if (debugInfo) {
-                    const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                document.getElementById('deviceCores').textContent =
+                    capabilities.cpu.cores === 'unknown' ? 'Unknown' : capabilities.cpu.cores.toString();
 
+                // Format GPU display
+                let gpuText = capabilities.gpu.renderer;
+                if (gpuText !== 'unknown') {
                     // Simplify common GPU names
-                    if (renderer.includes('NVIDIA')) {
-                        return '🔥 NVIDIA ' + renderer.split('NVIDIA')[1].trim();
-                    } else if (renderer.includes('AMD') || renderer.includes('Radeon')) {
-                        return '🔴 AMD ' + renderer.split(/AMD|Radeon/)[1].trim();
-                    } else if (renderer.includes('Intel')) {
-                        return '🔵 Intel ' + renderer.split('Intel')[1].trim();
-                    } else if (renderer.includes('Apple')) {
-                        return '🍎 Apple GPU';
+                    if (gpuText.includes('NVIDIA')) {
+                        gpuText = '🔥 NVIDIA ' + gpuText.split('NVIDIA')[1].trim();
+                    } else if (gpuText.includes('AMD') || gpuText.includes('Radeon')) {
+                        gpuText = '🔴 AMD ' + gpuText.split(/AMD|Radeon/)[1].trim();
+                    } else if (gpuText.includes('Intel')) {
+                        gpuText = '🔵 Intel ' + gpuText.split('Intel')[1].trim();
+                    } else if (gpuText.includes('Apple')) {
+                        gpuText = '🍎 Apple GPU';
                     } else {
                         // Truncate long GPU names
-                        return renderer.length > 30 ? renderer.substring(0, 30) + '...' : renderer;
+                        gpuText = gpuText.length > 30 ? gpuText.substring(0, 30) + '...' : gpuText;
                     }
-                } else {
-                    return 'GPU info restricted';
                 }
+                document.getElementById('deviceGPU').textContent = gpuText;
+
+                // Display tier
+                const tierMap = {
+                    'high': '🖥️ High-end',
+                    'medium': '🖥️ Mid-range',
+                    'low': '💻 Low-end'
+                };
+                const tier = tierMap[capabilities.tier] || '🖥️ Mid-range';
+                document.getElementById('deviceTier').textContent = tier;
+
+                console.log('[Device] Detected:', capabilities);
+            } catch (error) {
+                console.error('Error detecting device capabilities:', error);
+            }
+        }
+
+        // GPU detection is now handled by DeviceCapabilities module
+        // Keeping as a stub for compatibility
+        async function detectGPU() {
+            try {
+                if (butterchurn.DeviceCapabilities) {
+                    const capabilities = await butterchurn.DeviceCapabilities.detect();
+                    return capabilities.gpu.renderer;
+                }
+                return 'Unknown';
             } catch (error) {
                 console.warn('GPU detection failed:', error);
                 return 'Detection failed';
@@ -836,6 +876,17 @@
                 }
                 selector = new IntelligentPresetSelector(visualizer, fingerprintDb || {});
 
+                // Make selector globally available for debugging
+                window.intelligentSelector = selector;
+
+                // 🚨 CRITICAL: Enable debug mode to prevent silent error handling
+                selector.setDebugMode(true);
+                console.log('[Test Page] DEBUG MODE enabled - errors will be thrown');
+
+                // Enable debug mode by default
+                selector.setDebugSceneChange(true);
+                console.log('[Test Page] Scene change debug mode enabled by default');
+
                 // Combine all preset packs into one collection
                 const allPresets = {};
 
@@ -909,6 +960,13 @@
             } catch (error) {
                 console.error('Failed to initialize:', error);
                 showError('Failed to initialize: ' + error.message);
+
+                // 🚨 CRITICAL: In debug mode, re-throw errors instead of swallowing them
+                if (TEST_PAGE_DEBUG_MODE) {
+                    console.error('🚨 TEST PAGE DEBUG MODE: Re-throwing error to prevent silent failure');
+                    console.error('🚨 This prevents bugs like spending 2 hours debugging silent errors');
+                    throw error;
+                }
             }
         }
 
@@ -959,7 +1017,6 @@
 
             // Enable controls
             document.getElementById('playBtn').disabled = false;
-            document.getElementById('nextBtn').disabled = false;
             document.getElementById('autoBtn').disabled = false;
 
             // Enable emergency preset test buttons
@@ -974,94 +1031,58 @@
         }
 
         // Calculate advanced audio features
+        // Advanced audio feature calculation is now handled by AdvancedAudioAnalyzer module
         function calculateAdvancedFeatures(dataArray, timeByteArray) {
-            const features = {};
-
-            // Beat detection - look for sudden amplitude changes
-            let maxAmp = 0;
-            let beatThreshold = 0;
-            for (let i = 0; i < dataArray.length; i++) {
-                if (dataArray[i] > maxAmp) maxAmp = dataArray[i];
-                beatThreshold += dataArray[i];
+            if (!advancedAnalyzer && butterchurn.AdvancedAudioAnalyzer) {
+                advancedAnalyzer = new butterchurn.AdvancedAudioAnalyzer();
             }
-            beatThreshold = beatThreshold / dataArray.length * 1.5;
-            features.beatDetected = maxAmp > beatThreshold;
-            features.beatStrength = Math.min(1.0, maxAmp / 255);
 
-            // Spectral centroid - brightness indicator
-            let weightedSum = 0;
-            let magnitudeSum = 0;
-            for (let i = 0; i < dataArray.length; i++) {
-                weightedSum += i * dataArray[i];
-                magnitudeSum += dataArray[i];
+            if (advancedAnalyzer) {
+                return advancedAnalyzer.calculateFeatures(dataArray, timeByteArray);
             }
-            features.spectralCentroid = magnitudeSum > 0 ?
-                (weightedSum / magnitudeSum) / dataArray.length : 0;
 
-            // Zero crossing rate - percussive content detector
-            let zeroCrossings = 0;
-            for (let i = 1; i < timeByteArray.length; i++) {
-                const prev = timeByteArray[i - 1] - 128;
-                const curr = timeByteArray[i] - 128;
-                if ((prev < 0 && curr >= 0) || (prev >= 0 && curr < 0)) {
-                    zeroCrossings++;
-                }
-            }
-            features.zeroCrossingRate = zeroCrossings / timeByteArray.length;
-
-            // Dynamic range
-            let min = 255, max = 0;
-            for (let i = 0; i < dataArray.length; i++) {
-                if (dataArray[i] < min) min = dataArray[i];
-                if (dataArray[i] > max) max = dataArray[i];
-            }
-            features.dynamicRange = (max - min) / 255;
-
-            return features;
+            // Fallback if module not available
+            return {
+                beatDetected: false,
+                beatStrength: 0,
+                spectralCentroid: 0,
+                zeroCrossingRate: 0,
+                dynamicRange: 0
+            };
         }
 
-        // Detect musical events based on audio features
+        // Musical event detection is now handled by AdvancedAudioAnalyzer module
         function detectMusicalEvent(features) {
-            const event = {
+            if (!advancedAnalyzer && butterchurn.AdvancedAudioAnalyzer) {
+                advancedAnalyzer = new butterchurn.AdvancedAudioAnalyzer();
+            }
+
+            if (advancedAnalyzer) {
+                const event = advancedAnalyzer.detectMusicalEvent(features);
+
+                // Map event types to emoji representations for display
+                const typeMap = {
+                    'Drop': '🔥 DROP!',
+                    'Buildup': '📈 Building...',
+                    'Breakdown': '📉 Breakdown',
+                    'Ambient': '🌊 Ambient',
+                    'Peak': '🎆 Peak Energy',
+                    'Steady': '➡️ Steady'
+                };
+
+                return {
+                    type: typeMap[event.type] || event.type,
+                    intensity: event.confidence || 0.5,
+                    upcoming: event.details ? JSON.stringify(event.details) : null
+                };
+            }
+
+            // Fallback if module not available
+            return {
                 type: 'Steady',
                 intensity: 0,
                 upcoming: null
             };
-
-            // High energy detection
-            if (features.bass > 0.8 && features.vol > 0.7) {
-                event.type = '🔥 DROP!';
-                event.intensity = 1.0;
-            } else if (features.bass > 0.6 && features.trend > 0.5) {
-                event.type = '📈 Building...';
-                event.intensity = 0.7;
-                event.upcoming = 'Drop expected';
-            } else if (features.vol < 0.2) {
-                event.type = '🌊 Ambient';
-                event.intensity = 0.2;
-            } else if (features.bass < 0.3 && features.trend < -0.3) {
-                event.type = '📉 Breakdown';
-                event.intensity = 0.3;
-                event.upcoming = 'Buildup expected';
-            } else if (features.mid > 0.6 && features.treb > 0.5) {
-                event.type = '🎵 Melodic';
-                event.intensity = 0.5;
-            } else if (features.bass > 0.5 && features.vol > 0.4) {
-                event.type = '🎸 Groove';
-                event.intensity = 0.6;
-            } else if (Math.abs(features.trend) < 0.1) {
-                event.type = '➡️ Steady';
-                event.intensity = 0.4;
-            }
-
-            // Detect upcoming transitions based on patterns
-            if (features.trend > 0.6 && features.vol > 0.5 && !event.upcoming) {
-                event.upcoming = 'Peak approaching';
-            } else if (features.trend < -0.5 && features.vol < 0.4 && !event.upcoming) {
-                event.upcoming = 'Quiet section';
-            }
-
-            return event;
         }
 
         function animate() {
@@ -1142,6 +1163,14 @@
 
             // CRITICAL FIX: Only process audio and render when audio is actually playing
             if (isPlaying && audioElement && !audioElement.paused && !audioElement.ended) {
+                // Update live audio display (always)
+                if (document.getElementById('liveEnergy')) {
+                    const overallEnergy = (bass + mid + treb) / 3;
+                    document.getElementById('liveEnergy').textContent = `${Math.round(overallEnergy * 100)}%`;
+                    document.getElementById('liveBass').textContent = `${Math.round(bass * 100)}%`;
+                    document.getElementById('liveTreble').textContent = `${Math.round(treb * 100)}%`;
+                }
+
                 // Update selector with real audio data (only if auto mode is on)
                 if (selector && autoMode) {
                     const result = selector.update(audioLevels);
@@ -1150,14 +1179,22 @@
                         document.getElementById('bassEnergy').textContent = bass.toFixed(2);
                         document.getElementById('midEnergy').textContent = mid.toFixed(2);
                         document.getElementById('trebleEnergy').textContent = treb.toFixed(2);
-                        document.getElementById('overallEnergy').textContent =
-                            result.features.energy.toFixed(2);
 
-                        // Track energy preferences from live audio (works without fingerprint DB)
-                        energyPreferences.push(result.features.energy);
-                        if (energyPreferences.length > 20) energyPreferences.shift();
-                        document.getElementById('beatDetect').textContent =
-                            result.features.trend;
+                        // Check if features exist (they might be null if no audio data)
+                        if (result.features && typeof result.features.energy !== 'undefined') {
+                            document.getElementById('overallEnergy').textContent =
+                                result.features.energy.toFixed(2);
+
+                            // Track energy preferences from live audio (works without fingerprint DB)
+                            energyPreferences.push(result.features.energy);
+                            if (energyPreferences.length > 20) energyPreferences.shift();
+                            document.getElementById('beatDetect').textContent =
+                                result.features.trend || 'stable';
+                        } else {
+                            // No audio data available or features incomplete
+                            document.getElementById('overallEnergy').textContent = '0.00';
+                            document.getElementById('beatDetect').textContent = result.noAudioData ? 'No Audio' : 'Loading';
+                        }
 
                         // Calculate and display advanced audio features
                         const advancedFeatures = calculateAdvancedFeatures(dataArray, timeByteArray);
@@ -1173,8 +1210,8 @@
                         document.getElementById('dynamicRange').textContent =
                             `${(advancedFeatures.dynamicRange * 100).toFixed(0)}% range`;
 
-                        // Update musical event detection display
-                        const musicalEvent = detectMusicalEvent(result.features);
+                        // Update musical event detection display (only if features exist)
+                        const musicalEvent = result.features ? detectMusicalEvent(result.features) : { type: 'No Audio' };
                         document.getElementById('musicalEvent').textContent = musicalEvent.type;
 
                         // Show next transition timing based on musical context
@@ -1475,25 +1512,20 @@
             if (isPlaying) {
                 audioElement.pause();
                 document.getElementById('playBtn').textContent = 'Play';
+                document.getElementById('nextPresetBtn').disabled = true;  // Disable Next button when paused
                 isPlaying = false;
             } else {
                 // Play audio with promise handling
                 try {
                     await audioElement.play();
                     document.getElementById('playBtn').textContent = 'Pause';
+                    document.getElementById('nextPresetBtn').disabled = false;  // Enable Next button when playing
                     isPlaying = true;
                     console.log('Audio playing, volume:', audioElement.volume, 'muted:', audioElement.muted);
                 } catch (err) {
                     console.error('Error playing audio:', err);
                     showError('Failed to play audio: ' + err.message);
                 }
-            }
-        });
-
-        document.getElementById('nextBtn').addEventListener('click', () => {
-            if (selector) {
-                selector.selectRandomPreset();
-                updatePresetInfo(selector.currentPreset || 'Unknown');
             }
         });
 
@@ -1510,6 +1542,80 @@
                 showSuccess('Auto mode enabled - presets will switch automatically');
             }
         });
+
+        // Add event listener for the Next Preset button (next to Play button)
+        document.getElementById('nextPresetBtn').addEventListener('click', () => {
+            if (selector) {
+                selector.selectRandomPreset();
+                updatePresetInfo(selector.currentPreset || 'Unknown');
+            }
+        });
+
+        // Add event listener for threshold update button
+        setTimeout(() => {
+            const updateBtn = document.getElementById('updateThresholds');
+            if (updateBtn) {
+                updateBtn.addEventListener('click', () => {
+                    if (!window.intelligentSelector) {
+                        document.getElementById('thresholdStatus').textContent = 'Selector not initialized';
+                        setTimeout(() => { document.getElementById('thresholdStatus').textContent = ''; }, 2000);
+                        return;
+                    }
+
+                    // Get weight values
+                    let energyWeight = parseFloat(document.getElementById('energyWeight').value) || 0;
+                    let bassWeight = parseFloat(document.getElementById('bassWeight').value) || 0;
+                    let trebleWeight = parseFloat(document.getElementById('trebleWeight').value) || 0;
+
+                    // Normalize weights to sum to 1
+                    const sum = energyWeight + bassWeight + trebleWeight;
+                    if (sum <= 0) {
+                        document.getElementById('thresholdStatus').textContent = 'Weights cannot all be zero';
+                        setTimeout(() => { document.getElementById('thresholdStatus').textContent = ''; }, 2000);
+                        return;
+                    }
+
+                    // Normalize
+                    energyWeight = energyWeight / sum;
+                    bassWeight = bassWeight / sum;
+                    trebleWeight = trebleWeight / sum;
+
+                    // Update display values
+                    document.getElementById('energyWeight').value = energyWeight.toFixed(2);
+                    document.getElementById('bassWeight').value = bassWeight.toFixed(2);
+                    document.getElementById('trebleWeight').value = trebleWeight.toFixed(2);
+
+                    // Update percentage displays
+                    document.getElementById('energyWeight').nextElementSibling.textContent = `(${Math.round(energyWeight * 100)}%)`;
+                    document.getElementById('bassWeight').nextElementSibling.textContent = `(${Math.round(bassWeight * 100)}%)`;
+                    document.getElementById('trebleWeight').nextElementSibling.textContent = `(${Math.round(trebleWeight * 100)}%)`;
+
+                    // Get scene threshold
+                    const sceneThreshold = parseFloat(document.getElementById('sceneThreshold').value) || 0.3;
+
+                    // Update the selector with new thresholds
+                    window.intelligentSelector.setSceneThresholds({
+                        sceneScore: sceneThreshold,
+                        energyChange: 0.25,
+                        bassChange: 0.3
+                    });
+
+                    // Store weights for custom calculation (we'll need to update calculateSceneChange to use these)
+                    window.intelligentSelector.sceneWeights = {
+                        energy: energyWeight,
+                        bass: bassWeight,
+                        treble: trebleWeight
+                    };
+
+                    document.getElementById('thresholdStatus').textContent = '✓ Updated';
+                    console.log(`[Thresholds] Updated - Energy: ${Math.round(energyWeight * 100)}%, Bass: ${Math.round(bassWeight * 100)}%, Treble: ${Math.round(trebleWeight * 100)}%, Scene: ${sceneThreshold}`);
+
+                    setTimeout(() => {
+                        document.getElementById('thresholdStatus').textContent = '';
+                    }, 2000);
+                });
+            }
+        }, 100);
 
         // Initialize on load
         window.addEventListener('load', init);
