@@ -1,0 +1,240 @@
+body {
+    margin: 0;
+    padding: 10px;
+    background: #000;
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.header h1 {
+    margin: 0;
+    font-size: 1.5em;
+}
+.header p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+/* Main layout grid */
+.viz-container {
+    display: grid;
+    grid-template-areas:
+        "mode-bar mode-bar"
+        "canvas-area control-sidebar"
+        "analysis-grid analysis-grid";
+    grid-template-columns: 2fr 1fr;
+    gap: 15px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Mode control bar */
+.mode-controls {
+    grid-area: mode-bar;
+    background: #111;
+    border: 1px solid #0f0;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Canvas area */
+.canvas-area {
+    grid-area: canvas-area;
+    background: #111;
+    border: 1px solid #0f0;
+    padding: 15px;
+    text-align: center;
+}
+#canvas {
+    border: 1px solid #0f0;
+    max-width: 100%;
+    height: auto;
+    width: 720px;
+    height: 405px;
+}
+.audio-bars {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+}
+.bar {
+    flex: 1;
+    background: #0f0;
+    margin: 0 1px;
+    transition: height 0.1s;
+    align-self: flex-end;
+    min-width: 2px;
+    max-width: 8px;
+}
+
+/* Control sidebar */
+.control-sidebar {
+    grid-area: control-sidebar;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Analysis grid */
+.analysis-grid {
+    grid-area: analysis-grid;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+/* Card styling */
+.info {
+    background: #111;
+    padding: 12px;
+    border: 1px solid #0f0;
+    border-radius: 4px;
+}
+.info h3 {
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    color: #0f0;
+}
+
+/* Compact controls */
+.controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 15px 0;
+}
+.controls input[type="file"] {
+    grid-column: 1 / -1;
+}
+
+/* Emergency controls grid */
+.emergency-controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+/* Buttons */
+button, input[type="file"] {
+    background: #0f0;
+    color: #000;
+    border: none;
+    padding: 8px 12px;
+    font-family: inherit;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+button:hover {
+    background: #0a0;
+}
+button:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* Preset info layout */
+.preset-info {
+    margin: 6px 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85em;
+}
+.label {
+    color: #999;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+.value {
+    color: #0f0;
+    text-align: right;
+    word-break: break-word;
+}
+
+/* Scrollable content for tall sections */
+.scrollable {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Status messages */
+.error {
+    color: #f00;
+    background: #300;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #f00;
+    border-radius: 2px;
+    font-size: 0.85em;
+}
+.success {
+    color: #0f0;
+    background: #030;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #0f0;
+    border-radius: 2px;
+    font-size: 0.85em;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .viz-container {
+        grid-template-areas:
+            "mode-bar"
+            "canvas-area"
+            "control-sidebar"
+            "analysis-grid";
+        grid-template-columns: 1fr;
+    }
+    #canvas {
+        width: 600px;
+        height: 338px;
+    }
+    .audio-bars {
+        width: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+    }
+    .viz-container {
+        gap: 10px;
+    }
+    #canvas {
+        width: 480px;
+        height: 270px;
+    }
+    .audio-bars {
+        height: 40px;
+        width: 480px;
+    }
+    .analysis-grid {
+        grid-template-columns: 1fr;
+    }
+    .controls {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+    #canvas {
+        width: 360px;
+        height: 203px;
+    }
+    .audio-bars {
+        width: 360px;
+    }
+}

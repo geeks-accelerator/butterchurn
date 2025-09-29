@@ -14,6 +14,7 @@ export class LiveFrameAnalyzer {
     // Thresholds for detection (in frames)
     this.thresholds = {
       blackFrame: options.blackFrameThreshold || 60, // 1 second at 60fps
+      blackFrameDuringTransition: options.blackFrameDuringTransitionThreshold || 3, // 3 frames during transition
       stuckFrame: options.stuckFrameThreshold || 120, // 2 seconds at 60fps
       solidColor: options.solidColorThreshold || 180, // 3 seconds at 60fps
       ...options.thresholds,
@@ -22,10 +23,15 @@ export class LiveFrameAnalyzer {
     // Detection sensitivity
     this.sensitivity = {
       blackThreshold: options.blackThreshold || 0.95, // 95% of pixels must be black
+      blackThresholdDuringTransition: options.blackThresholdDuringTransition || 0.85, // More sensitive during transitions
       colorVariance: options.colorVariance || 10, // Max variance for solid color
       frameChangeThreshold: options.changeThreshold || 0.01, // 1% change minimum
       ...options.sensitivity,
     };
+
+    // Track transition state
+    this.isInTransition = false;
+    this.transitionStartTime = 0;
 
     // Frame history for multi-frame validation
     this.frameHistory = [];
@@ -44,6 +50,24 @@ export class LiveFrameAnalyzer {
     // Performance optimization - sample pixels instead of checking all
     this.sampleSize = options.sampleSize || 1000; // Sample 1000 pixels per frame
     this.sampleIndices = null;
+  }
+
+  /**
+   * Mark that a transition has started
+   */
+  markTransitionStart() {
+    this.isInTransition = true;
+    this.transitionStartTime = Date.now();
+    this.state.blackFrameCount = 0; // Reset counters for fresh detection
+    console.log('[LiveFrameAnalyzer] Transition started - using aggressive black frame detection');
+  }
+
+  /**
+   * Mark that a transition has ended
+   */
+  markTransitionEnd() {
+    this.isInTransition = false;
+    console.log('[LiveFrameAnalyzer] Transition ended - reverting to normal detection');
   }
 
   /**
@@ -73,14 +97,42 @@ export class LiveFrameAnalyzer {
       details: {},
     };
 
-    // Check for black frames
-    if (this.isBlackFrame(metrics)) {
+    // Check for black frames (more aggressive during transitions)
+    const blackThreshold = this.isInTransition ?
+      this.sensitivity.blackThresholdDuringTransition :
+      this.sensitivity.blackThreshold;
+
+    if (this.isBlackFrame(metrics, blackThreshold)) {
       this.state.blackFrameCount++;
-      if (this.state.blackFrameCount >= this.thresholds.blackFrame) {
+
+      // Log when we first detect a black frame during transition
+      if (this.isInTransition && this.state.blackFrameCount === 1) {
+        console.log('[FrameAnalyzer] BLACK FRAME START during transition!', {
+          blackPixelRatio: (metrics.blackPixelRatio * 100).toFixed(1) + '%',
+          avgBrightness: metrics.averageBrightness.toFixed(1),
+          dominantColor: `rgb(${metrics.dominantColor.r}, ${metrics.dominantColor.g}, ${metrics.dominantColor.b})`,
+          threshold: blackThreshold
+        });
+      }
+
+      // Use different threshold during transitions for faster detection
+      const threshold = this.isInTransition ?
+        this.thresholds.blackFrameDuringTransition :
+        this.thresholds.blackFrame;
+
+      if (this.state.blackFrameCount >= threshold) {
         analysis.isProblematic = true;
-        analysis.reason = 'black_frame';
-        analysis.confidence = this.state.blackFrameCount / this.thresholds.blackFrame;
+        analysis.reason = this.isInTransition ? 'black_frame_during_transition' : 'black_frame';
+        analysis.confidence = Math.min(1.0, this.state.blackFrameCount / threshold);
         analysis.details.blackFrameCount = this.state.blackFrameCount;
+        analysis.details.isInTransition = this.isInTransition;
+
+        console.warn(`[FrameAnalyzer] BLACK FRAME CONFIRMED ${this.isInTransition ? 'DURING TRANSITION' : ''}!`, {
+          frameCount: this.state.blackFrameCount,
+          threshold: threshold,
+          confidence: analysis.confidence.toFixed(2),
+          action: 'Will trigger emergency preset switch'
+        });
       }
     } else {
       this.state.blackFrameCount = 0; // Reset counter if not black
@@ -276,8 +328,9 @@ export class LiveFrameAnalyzer {
   /**
    * Check if frame is predominantly black
    */
-  isBlackFrame(metrics) {
-    return metrics.blackPixelRatio > this.sensitivity.blackThreshold || metrics.brightness < 5;
+  isBlackFrame(metrics, threshold = null) {
+    const blackThreshold = threshold || this.sensitivity.blackThreshold;
+    return metrics.blackPixelRatio > blackThreshold || metrics.brightness < 5;
   }
 
   /**

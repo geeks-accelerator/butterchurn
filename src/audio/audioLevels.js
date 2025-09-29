@@ -11,10 +11,15 @@ export default class AudioLevels {
 
     const bucketHz = sampleRate / this.audio.fftSize;
 
-    const bassLow = Math.clamp(Math.round(20 / bucketHz) - 1, 0, this.audio.numSamps - 1);
-    const bassHigh = Math.clamp(Math.round(320 / bucketHz) - 1, 0, this.audio.numSamps - 1);
-    const midHigh = Math.clamp(Math.round(2800 / bucketHz) - 1, 0, this.audio.numSamps - 1);
-    const trebHigh = Math.clamp(Math.round(11025 / bucketHz) - 1, 0, this.audio.numSamps - 1);
+    // Use the actual number of frequency bins from the FFT output
+    // The freqArray length is determined by audioProcessor.numFreqBins
+    // Default to 512 if not available (for backwards compatibility)
+    const maxFreqBin = (this.audio.numFreqBins !== undefined ? this.audio.numFreqBins : 512) - 1;
+
+    const bassLow = Math.clamp(Math.round(20 / bucketHz) - 1, 0, maxFreqBin);
+    const bassHigh = Math.clamp(Math.round(320 / bucketHz) - 1, 0, maxFreqBin);
+    const midHigh = Math.clamp(Math.round(2800 / bucketHz) - 1, 0, maxFreqBin);
+    const trebHigh = Math.clamp(Math.round(11025 / bucketHz) - 1, 0, maxFreqBin);
 
     this.starts = [bassLow, bassHigh, midHigh];
     this.stops = [bassHigh, midHigh, trebHigh];

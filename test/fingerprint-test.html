@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Butterchurn Fingerprint System Test</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: monospace;
+            background: #1a1a1a;
+            color: #0f0;
+        }
+        #canvas {
+            width: 800px;
+            height: 600px;
+            border: 1px solid #0f0;
+            display: block;
+            margin: 20px auto;
+        }
+        #controls {
+            text-align: center;
+            margin: 20px;
+        }
+        button {
+            background: #333;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        button:hover {
+            background: #0f0;
+            color: #000;
+        }
+        #status {
+            background: #111;
+            border: 1px solid #0f0;
+            padding: 10px;
+            margin: 20px;
+            height: 200px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 2px 0;
+        }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+        .info { color: #ff0; }
+        #stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px;
+        }
+        .stat-card {
+            background: #111;
+            border: 1px solid #0f0;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Butterchurn Fingerprint System Test</h1>
+
+    <div id="stats">
+        <div class="stat-card">
+            <h3>Database Status</h3>
+            <div id="db-status">Not loaded</div>
+        </div>
+        <div class="stat-card">
+            <h3>Current Preset</h3>
+            <div id="current-preset">None</div>
+        </div>
+        <div class="stat-card">
+            <h3>Performance</h3>
+            <div id="performance">FPS: 0</div>
+        </div>
+    </div>
+
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <div id="controls">
+        <button onclick="loadFingerprints()">Load Fingerprints</button>
+        <button onclick="testRandomPreset()">Test Random Preset</button>
+        <button onclick="testHighEnergyPreset()">Test High Energy</button>
+        <button onclick="testCalmPreset()">Test Calm</button>
+        <button onclick="testBassPreset()">Test Bass Heavy</button>
+        <button onclick="startMicTest()">Use Microphone</button>
+        <button onclick="document.getElementById('audioFile').click()">Load Audio File</button>
+        <input type="file" id="audioFile" accept="audio/*" style="display:none" onchange="loadAudioFile(this)">
+        <button onclick="showStats()">Show Stats</button>
+        <div id="audioControls" style="display:none; margin-top: 10px;">
+            <button onclick="playPause()">Play/Pause</button>
+            <button onclick="stopAudio()">Stop</button>
+            <audio id="audioElement" controls style="margin-top: 10px;"></audio>
+        </div>
+    </div>
+
+    <div id="status"></div>
+
+    <!-- Load libraries -->
+    <script src="../dist/butterchurn.min.js"></script>
+
+    <!-- Load preset packs -->
+    <script src="/presets/full-collection/butterchurnPresets.min.js"></script>
+    <script src="/presets/full-collection/butterchurnPresetsExtra.min.js"></script>
+    <script src="/presets/full-collection/butterchurnPresetsExtra2.min.js"></script>
+    <script src="/presets/full-collection/butterchurnPresetsMD1.min.js"></script>
+    <script src="/presets/full-collection/butterchurnPresetsMinimal.min.js"></script>
+    <script src="/presets/full-collection/butterchurnPresetsNonMinimal.min.js"></script>
+
+    <script type="module">
+        // Import our new modules
+        import FingerprintLoader from '../src/fingerprintLoader.js';
+        import FingerprintAdapter from '../src/fingerprintAdapter.js';
+
+        // Make them globally available
+        window.FingerprintLoader = FingerprintLoader;
+        window.FingerprintAdapter = FingerprintAdapter;
+
+        // Initialize
+        window.loader = null;
+        window.adapter = null;
+        window.db = null;
+        window.visualizer = null;
+        window.presetPacks = {};
+
+        // Collect all loaded preset packs
+        const packNames = [
+            'butterchurnPresets',
+            'butterchurnPresetsExtra',
+            'butterchurnPresetsExtra2',
+            'butterchurnPresetsMD1',
+            'butterchurnPresetsMinimal',
+            'butterchurnPresetsNonMinimal'
+        ];
+
+        for (const packName of packNames) {
+            if (window[packName]) {
+                window.presetPacks[packName] = window[packName].getPresets();
+                log(`Loaded pack: ${packName} with ${Object.keys(window.presetPacks[packName]).length} presets`, 'success');
+            }
+        }
+
+        // Wait for butterchurn to be available and initialize
+        function initializeVisualizer() {
+            const canvas = document.getElementById('canvas');
+
+            if (typeof butterchurn === 'undefined') {
+                log('Waiting for Butterchurn to load...', 'info');
+                setTimeout(initializeVisualizer, 100);
+                return;
+            }
+
+            try {
+                // Create a single audio context for everything
+                visualizerAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                audioContext = visualizerAudioContext; // Use the same context everywhere
+
+                // Check if butterchurn is the class (has createVisualizer as static method)
+                if (butterchurn && butterchurn.createVisualizer) {
+                    window.visualizer = butterchurn.createVisualizer(visualizerAudioContext, canvas, {
+                        width: 800,
+                        height: 600
+                    });
+                }
+                // Or if butterchurn is the default export wrapper
+                else if (butterchurn && butterchurn.default && butterchurn.default.createVisualizer) {
+                    window.visualizer = butterchurn.default.createVisualizer(visualizerAudioContext, canvas, {
+                        width: 800,
+                        height: 600
+                    });
+                }
+                // Or try direct instantiation if it's a constructor
+                else if (typeof butterchurn === 'function') {
+                    window.visualizer = new butterchurn(visualizerAudioContext, canvas, {
+                        width: 800,
+                        height: 600
+                    });
+                } else {
+                    throw new Error('Could not find Butterchurn createVisualizer method');
+                }
+
+                log('Butterchurn visualizer initialized successfully', 'success');
+            } catch (error) {
+                log(`Error initializing visualizer: ${error.message}`, 'error');
+                console.error(error);
+                console.log('butterchurn object:', butterchurn);
+            }
+        }
+
+        // Initialize after a short delay to ensure everything is loaded
+        setTimeout(initializeVisualizer, 500);
+    </script>
+
+    <script>
+        function log(message, type = 'info') {
+            const status = document.getElementById('status');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            status.appendChild(entry);
+            status.scrollTop = status.scrollHeight;
+            console.log(message);
+        }
+
+        async function loadFingerprints() {
+            try {
+                log('Loading fingerprint database...');
+
+                // Create loader and adapter
+                window.loader = new FingerprintLoader();
+                window.adapter = new FingerprintAdapter(loader);
+
+                // Load all fingerprints
+                await loader.loadAllFingerprints();
+
+                // Build adapted database
+                window.db = await adapter.buildDatabase();
+
+                // Update status
+                document.getElementById('db-status').innerHTML = `
+                    Loaded: ${db.stats.totalPresets} presets<br>
+                    Packs: ${db.stats.totalPacks}<br>
+                    Categories: ${Object.keys(db.indices).join(', ')}
+                `;
+
+                log(`Database loaded: ${db.stats.totalPresets} presets from ${db.stats.totalPacks} packs`, 'success');
+
+                // Show pack breakdown
+                for (const [pack, count] of Object.entries(loader.stats.packStats)) {
+                    log(`  ${pack}: ${count} presets`, 'info');
+                }
+
+            } catch (error) {
+                log(`Error loading fingerprints: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        function testRandomPreset() {
+            if (!db) {
+                log('Database not loaded', 'error');
+                return;
+            }
+
+            const hashes = Object.keys(db.presets);
+            const randomHash = hashes[Math.floor(Math.random() * hashes.length)];
+            loadPresetByHash(randomHash);
+        }
+
+        function testHighEnergyPreset() {
+            testCategoryPreset('high');
+        }
+
+        function testCalmPreset() {
+            testCategoryPreset('calm');
+        }
+
+        function testBassPreset() {
+            testCategoryPreset('bass');
+        }
+
+        function testCategoryPreset(category) {
+            if (!db) {
+                log('Database not loaded', 'error');
+                return;
+            }
+
+            const hashes = db.indices[category];
+            if (!hashes || hashes.length === 0) {
+                log(`No presets in category: ${category}`, 'error');
+                return;
+            }
+
+            const randomHash = hashes[Math.floor(Math.random() * hashes.length)];
+            loadPresetByHash(randomHash);
+        }
+
+        function loadPresetByHash(hash) {
+            if (!window.visualizer) {
+                log('Visualizer not initialized yet. Please wait...', 'error');
+                return;
+            }
+
+            const presetData = db.presets[hash];
+            if (!presetData) {
+                log(`Preset not found: ${hash}`, 'error');
+                return;
+            }
+
+            const presetName = presetData.names?.[0];
+            const packName = presetData.pack;
+
+            log(`Loading preset: ${presetName} from ${packName} (${hash})`, 'info');
+
+            // Find the preset in the loaded packs
+            const pack = window.presetPacks[packName];
+            if (!pack) {
+                log(`Pack not loaded: ${packName}`, 'error');
+                return;
+            }
+
+            const preset = pack[presetName];
+            if (!preset) {
+                log(`Preset not found in pack: ${presetName}`, 'error');
+                return;
+            }
+
+            // Load into visualizer
+            try {
+                const presetObj = typeof preset === 'string' ? JSON.parse(preset) : preset;
+                window.visualizer.loadPreset(presetObj, 0.5); // 0.5 second transition
+
+                // Update display
+                document.getElementById('current-preset').innerHTML = `
+                    ${presetName}<br>
+                    <small>Hash: ${hash}<br>
+                    Energy: ${presetData.fingerprint.energy.toFixed(2)}<br>
+                    Bass: ${presetData.fingerprint.bassEnergy.toFixed(2)}<br>
+                    FPS: ${presetData.fingerprint.fps.toFixed(1)}</small>
+                `;
+
+                log(`Preset loaded successfully`, 'success');
+            } catch (error) {
+                log(`Error loading preset: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        function showStats() {
+            if (!db) {
+                log('Database not loaded', 'error');
+                return;
+            }
+
+            log('=== Database Statistics ===', 'info');
+            log(`Total Presets: ${db.stats.totalPresets}`, 'info');
+            log(`Total Packs: ${db.stats.totalPacks}`, 'info');
+
+            log('Category counts:', 'info');
+            for (const [cat, hashes] of Object.entries(db.indices)) {
+                log(`  ${cat}: ${hashes.length} presets`, 'info');
+            }
+
+            log('Pack breakdown:', 'info');
+            for (const [pack, count] of Object.entries(loader.stats.packStats)) {
+                log(`  ${pack}: ${count} presets`, 'info');
+            }
+        }
+
+        let audioContext = null;
+        let audioSource = null;
+        let renderLoop = null;
+        let visualizerAudioContext = null; // Store the visualizer's audio context
+
+        function startRenderLoop() {
+            if (renderLoop) return; // Already running
+
+            let lastTime = performance.now();
+            let frameCount = 0;
+
+            function render() {
+                visualizer.render();
+
+                frameCount++;
+                const now = performance.now();
+                if (now - lastTime > 1000) {
+                    const fps = frameCount / ((now - lastTime) / 1000);
+                    document.getElementById('performance').textContent = `FPS: ${fps.toFixed(1)}`;
+                    frameCount = 0;
+                    lastTime = now;
+                }
+
+                renderLoop = requestAnimationFrame(render);
+            }
+            render();
+        }
+
+        function stopRenderLoop() {
+            if (renderLoop) {
+                cancelAnimationFrame(renderLoop);
+                renderLoop = null;
+            }
+        }
+
+        async function loadAudioFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (!window.visualizer) {
+                log('Visualizer not initialized yet. Please wait and try again.', 'error');
+                return;
+            }
+
+            log(`Loading audio file: ${file.name}`, 'info');
+
+            try {
+                // Use the shared audio context
+                if (!audioContext) {
+                    log('Audio context not initialized', 'error');
+                    return;
+                }
+
+                // Resume audio context if suspended (happens due to browser autoplay policy)
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                    log('Audio context resumed', 'success');
+                }
+
+                // Load file into audio element
+                const audioElement = document.getElementById('audioElement');
+                const url = URL.createObjectURL(file);
+                audioElement.src = url;
+
+                // Show audio controls
+                document.getElementById('audioControls').style.display = 'block';
+
+                // Connect audio to visualizer
+                if (audioSource) {
+                    audioSource.disconnect();
+                }
+
+                // Create source from audio element (only once per element)
+                if (!audioElement.audioSource) {
+                    audioSource = audioContext.createMediaElementSource(audioElement);
+                    audioElement.audioSource = audioSource; // Store reference to prevent recreating
+
+                    // Connect to both the visualizer AND speakers
+                    audioSource.connect(audioContext.destination); // Connect to speakers
+                    window.visualizer.connectAudio(audioSource); // Connect to visualizer
+                } else {
+                    // Reuse existing source
+                    audioSource = audioElement.audioSource;
+                }
+
+                log(`Audio file loaded: ${file.name}`, 'success');
+                log('Click play to start visualization!', 'info');
+
+                // Start render loop when audio plays
+                audioElement.addEventListener('play', async () => {
+                    // Resume audio context if suspended
+                    if (audioContext.state === 'suspended') {
+                        await audioContext.resume();
+                        log('Audio context resumed', 'success');
+                    }
+                    startRenderLoop();
+                    log('Visualization started', 'success');
+                });
+
+                audioElement.addEventListener('pause', () => {
+                    log('Audio paused', 'info');
+                });
+
+            } catch (error) {
+                log(`Error loading audio file: ${error.message}`, 'error');
+            }
+        }
+
+        async function startMicTest() {
+            if (!window.visualizer) {
+                log('Visualizer not initialized yet. Please wait and try again.', 'error');
+                return;
+            }
+
+            log('Starting microphone test...', 'info');
+
+            try {
+                // Use the shared audio context
+                if (!audioContext) {
+                    log('Audio context not initialized', 'error');
+                    return;
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                if (audioSource) {
+                    audioSource.disconnect();
+                }
+
+                audioSource = audioContext.createMediaStreamSource(stream);
+                window.visualizer.connectAudio(audioSource);
+
+                log('Microphone connected - speak or play music!', 'success');
+                startRenderLoop();
+
+            } catch (error) {
+                log(`Error starting microphone: ${error.message}`, 'error');
+            }
+        }
+
+        async function playPause() {
+            const audioElement = document.getElementById('audioElement');
+
+            // Resume audio context if suspended
+            if (audioContext && audioContext.state === 'suspended') {
+                await audioContext.resume();
+                log('Audio context resumed', 'success');
+            }
+
+            if (audioElement.paused) {
+                try {
+                    await audioElement.play();
+                } catch (error) {
+                    log(`Error playing audio: ${error.message}`, 'error');
+                }
+            } else {
+                audioElement.pause();
+            }
+        }
+
+        function stopAudio() {
+            const audioElement = document.getElementById('audioElement');
+            audioElement.pause();
+            audioElement.currentTime = 0;
+            stopRenderLoop();
+            log('Audio stopped', 'info');
+        }
+
+        // Auto-load on page load
+        window.addEventListener('load', () => {
+            setTimeout(loadFingerprints, 100);
+        });
+    </script>
+</body>
+</html>

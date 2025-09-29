@@ -435,9 +435,34 @@ export default class Visualizer {
     return bytes.buffer;
   }
 
+  deepClonePreset(obj) {
+    if (obj === null || typeof obj !== 'object') return obj;
+    if (obj instanceof Date) return new Date(obj.getTime());
+    if (obj instanceof Array) return obj.map(item => this.deepClonePreset(item));
+    if (typeof obj === 'function') return obj; // Preserve functions
+
+    const clonedObj = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        clonedObj[key] = this.deepClonePreset(obj[key]);
+      }
+    }
+    return clonedObj;
+  }
+
+  getCurrentPreset() {
+    // Return the current preset from the renderer
+    // Returns null if no preset is loaded or if it's the blank preset
+    if (this.renderer && this.renderer.preset && this.renderer.preset !== this.renderer.blankPreset) {
+      return this.renderer.preset;
+    }
+    return null;
+  }
+
   async loadPreset(presetMap, blendTime = 0) {
     try {
-      const preset = JSON.parse(JSON.stringify(presetMap));
+      // Deep clone that preserves functions
+      const preset = this.deepClonePreset(presetMap);
       preset.baseVals = Visualizer.overrideDefaultVars(
         this.baseValsDefaults,
         preset.baseVals
@@ -711,6 +736,8 @@ export default class Visualizer {
     // If init_eqs is already a function, it means we've already prepared the preset to run
     if (typeof preset.init_eqs !== "function") {
       /* eslint-disable no-param-reassign, no-new-func */
+      // IMPORTANT: Keep the original _str versions for future use
+      // Only add function versions, don't remove string versions
       preset.init_eqs = new Function("a", `${preset.init_eqs_str} return a;`);
       preset.frame_eqs = new Function("a", `${preset.frame_eqs_str} return a;`);
       if (preset.pixel_eqs_str && preset.pixel_eqs_str !== "") {
@@ -796,14 +823,34 @@ export default class Visualizer {
   }
 
   render(opts) {
-    // PHASE 1 IMPROVEMENT: Direct rendering, no Canvas 2D copy!
-    // This eliminates the expensive drawImage operation
-    const renderOutput = this.renderer.render(opts);
+    try {
+      // PHASE 1 IMPROVEMENT: Direct rendering, no Canvas 2D copy!
+      // This eliminates the expensive drawImage operation
+      const renderOutput = this.renderer.render(opts);
 
-    // The renderer now draws directly to the output canvas
-    // No copy operation needed - massive performance gain!
+      // The renderer now draws directly to the output canvas
+      // No copy operation needed - massive performance gain!
 
-    return renderOutput;
+      return renderOutput;
+    } catch (error) {
+      console.error('[Visualizer] RENDER FAILED:', {
+        currentPreset: this.currentPreset?.name || 'unknown',
+        error: error.message,
+        audioProvided: opts?.audioLevels ? 'yes' : 'no'
+      });
+
+      // Log to PresetFailureLogger if available
+      if (this.presetFailureLogger && this.currentPreset?.name) {
+        this.presetFailureLogger.logFailure(
+          this.currentPreset.name,
+          'render_error',
+          { error: error.message }
+        );
+      }
+
+      // Don't re-throw - try to continue with next frame
+      return null;
+    }
   }
 
   launchSongTitleAnim(text) {

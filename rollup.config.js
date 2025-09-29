@@ -34,6 +34,7 @@ const configs = [
         name: 'butterchurn',
         sourcemap: true,
         exports: 'named',
+        inlineDynamicImports: true, // Fix for UMD code-splitting issue
       },
     ],
     plugins: [

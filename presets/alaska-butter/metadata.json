@@ -1,0 +1,20 @@
+{
+  "name": "Alaska Butter",
+  "description": "The ultimate Butterchurn preset collection - All 553 unique presets combined",
+  "version": "1.0.0",
+  "created": "2025-09-24T19:31:04.058Z",
+  "totalPresets": 359,
+  "duplicatesRemoved": 145,
+  "sourcePacks": [
+    "butterchurnPresets",
+    "butterchurnPresetsExtra",
+    "butterchurnPresetsExtra2",
+    "butterchurnPresetsMD1",
+    "butterchurnPresetsMinimal",
+    "butterchurnPresetsNonMinimal"
+  ],
+  "stats": {
+    "butterchurnPresets": 76,
+    "totalAuthors": 139
+  }
+}
