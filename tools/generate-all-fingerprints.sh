@@ -41,3 +41,32 @@ echo "=== Fingerprint Generation Complete ==="
 echo
 echo "Each preset pack now has its own fingerprint file:"
 ls -la presets/full-collection/*.fingerprints.json 2>/dev/null || echo "No fingerprint files found"
+
+echo
+echo "=== Creating Alaska Butter Collection ==="
+echo
+echo "Step 1: Combining all presets into Alaska Butter..."
+node tools/create-alaska-butter.js
+
+if [ $? -eq 0 ]; then
+    echo "  ✓ Alaska Butter collection created"
+    echo
+    echo "Step 2: Generating fingerprints for Alaska Butter..."
+    node tools/generate-fingerprints.js \
+        --input presets/alaska-butter/alaskaButter.json \
+        --output presets/alaska-butter/alaskaButter.fingerprints.json
+
+    if [ $? -eq 0 ]; then
+        echo "  ✓ Alaska Butter fingerprints generated"
+        echo
+        echo "Alaska Butter files:"
+        ls -la presets/alaska-butter/alaskaButter*.json presets/alaska-butter/alaskaButter*.js 2>/dev/null
+    else
+        echo "  ✗ Failed to generate Alaska Butter fingerprints"
+    fi
+else
+    echo "  ✗ Failed to create Alaska Butter collection"
+fi
+
+echo
+echo "=== All Processing Complete ==="

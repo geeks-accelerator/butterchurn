@@ -13,6 +13,9 @@ presets/*/alaskaButter.json
 presets/full-collection/archive/
 presets/full-collection/presets/
 
+# Experiments directory
+experiments/
+
 # Keep fingerprint files readable (they're smaller and contain the analysis)
 # Fingerprint files are kept: *.fingerprints.json and *.fingerprints.min.json
 

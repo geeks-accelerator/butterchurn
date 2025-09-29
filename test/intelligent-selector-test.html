@@ -4,248 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Butterchurn Intelligent Preset Selector Test</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 10px;
-            background: #000;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            min-height: 100vh;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 1.5em;
-        }
-        .header p {
-            margin: 5px 0;
-            font-size: 0.9em;
-        }
-
-        /* Main layout grid */
-        .viz-container {
-            display: grid;
-            grid-template-areas:
-                "mode-bar mode-bar"
-                "canvas-area control-sidebar"
-                "analysis-grid analysis-grid";
-            grid-template-columns: 2fr 1fr;
-            gap: 15px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Mode control bar */
-        .mode-controls {
-            grid-area: mode-bar;
-            background: #111;
-            border: 1px solid #0f0;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        /* Canvas area */
-        .canvas-area {
-            grid-area: canvas-area;
-            background: #111;
-            border: 1px solid #0f0;
-            padding: 15px;
-            text-align: center;
-        }
-        #canvas {
-            border: 1px solid #0f0;
-            max-width: 100%;
-            height: auto;
-            width: 720px;
-            height: 405px;
-        }
-        .audio-bars {
-            display: flex;
-            justify-content: center;
-            height: 100%;
-        }
-        .bar {
-            flex: 1;
-            background: #0f0;
-            margin: 0 1px;
-            transition: height 0.1s;
-            align-self: flex-end;
-            min-width: 2px;
-            max-width: 8px;
-        }
-
-        /* Control sidebar */
-        .control-sidebar {
-            grid-area: control-sidebar;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        /* Analysis grid */
-        .analysis-grid {
-            grid-area: analysis-grid;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-        }
-
-        /* Card styling */
-        .info {
-            background: #111;
-            padding: 12px;
-            border: 1px solid #0f0;
-            border-radius: 4px;
-        }
-        .info h3 {
-            margin: 0 0 10px 0;
-            font-size: 1em;
-            color: #0f0;
-        }
-
-        /* Compact controls */
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            margin: 15px 0;
-        }
-        .controls input[type="file"] {
-            grid-column: 1 / -1;
-        }
-
-        /* Emergency controls grid */
-        .emergency-controls {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-        }
-
-        /* Buttons */
-        button, input[type="file"] {
-            background: #0f0;
-            color: #000;
-            border: none;
-            padding: 8px 12px;
-            font-family: inherit;
-            cursor: pointer;
-            font-size: 0.85em;
-        }
-        button:hover {
-            background: #0a0;
-        }
-        button:disabled {
-            background: #333;
-            color: #666;
-            cursor: not-allowed;
-        }
-
-        /* Preset info layout */
-        .preset-info {
-            margin: 6px 0;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85em;
-        }
-        .label {
-            color: #999;
-            flex-shrink: 0;
-            margin-right: 10px;
-        }
-        .value {
-            color: #0f0;
-            text-align: right;
-            word-break: break-word;
-        }
-
-        /* Scrollable content for tall sections */
-        .scrollable {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        /* Status messages */
-        .error {
-            color: #f00;
-            background: #300;
-            padding: 8px;
-            margin: 8px 0;
-            border: 1px solid #f00;
-            border-radius: 2px;
-            font-size: 0.85em;
-        }
-        .success {
-            color: #0f0;
-            background: #030;
-            padding: 8px;
-            margin: 8px 0;
-            border: 1px solid #0f0;
-            border-radius: 2px;
-            font-size: 0.85em;
-        }
-
-        /* Responsive design */
-        @media (max-width: 1200px) {
-            .viz-container {
-                grid-template-areas:
-                    "mode-bar"
-                    "canvas-area"
-                    "control-sidebar"
-                    "analysis-grid";
-                grid-template-columns: 1fr;
-            }
-            #canvas {
-                width: 600px;
-                height: 338px;
-            }
-            .audio-bars {
-                width: 600px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 5px;
-            }
-            .viz-container {
-                gap: 10px;
-            }
-            #canvas {
-                width: 480px;
-                height: 270px;
-            }
-            .audio-bars {
-                height: 40px;
-                width: 480px;
-            }
-            .analysis-grid {
-                grid-template-columns: 1fr;
-            }
-            .controls {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 520px) {
-            #canvas {
-                width: 360px;
-                height: 203px;
-            }
-            .audio-bars {
-                width: 360px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="intelligent-selector-test.css">
 </head>
 <body>
     <div class="header">
@@ -256,18 +15,35 @@
     <div class="viz-container">
         <!-- Mode control bar -->
         <div class="mode-controls">
-            <div>
-                <span class="label">Presets in Database:</span>
-                <span class="value" id="presetCount">-</span>
-            </div>
+            <!-- Preset count removed - now dynamically managed by preset pack selector -->
         </div>
 
         <!-- Canvas area -->
         <div class="canvas-area">
             <div class="info">
-                <h3>📁 Audio File</h3>
-                <input type="file" id="fileInput" accept="audio/*" />
+                <div style="display: flex; width: 100%; gap: 20px; margin-bottom: 10px;">
+                    <!-- Audio File Section (50%) -->
+                    <div style="flex: 1; display: flex; align-items: center; gap: 15px;">
+                        <h3 style="margin: 0;">📁 Audio File</h3>
+                        <input type="file" id="fileInput" accept="audio/*" />
+                    </div>
+
+                    <!-- Preset Pack Selection (50%) -->
+                    <div style="flex: 1; display: flex; align-items: center; gap: 15px;">
+                        <h3 style="margin: 0;">🎨 Preset Pack</h3>
+                        <select id="presetPackSelect" style="background: #111; color: #0f0; border: 1px solid #0f0; padding: 5px; font-family: inherit;">
+                            <option value="alaska-butter">Alaska Butter (359 unique)</option>
+                            <option value="butterchurnPresets">Butterchurn Presets (88)</option>
+                            <option value="butterchurnPresetsExtra">Butterchurn Presets Extra (133)</option>
+                            <option value="butterchurnPresetsExtra2">Butterchurn Presets Extra2 (111)</option>
+                            <option value="butterchurnPresetsMD1">Butterchurn Presets MD1 (81)</option>
+                            <option value="butterchurnPresetsMinimal">Butterchurn Presets Minimal (25)</option>
+                            <option value="butterchurnPresetsNonMinimal">Butterchurn Presets Non-Minimal (66)</option>
+                        </select>
+                    </div>
+                </div>
                 <div id="audioStatus"></div>
+                <div id="presetPackStatus" style="color: #0ff; font-size: 0.9em; margin-top: 5px;"></div>
             </div>
             <canvas id="canvas" width="720" height="405"></canvas>
             <div style="display: flex; width: 720px; max-width: 100%; margin: 15px auto 0; height: 60px;">
@@ -556,8 +332,16 @@
     </div>
 
     <!-- Load our local improved Butterchurn build (UMD format with Phase 1 improvements) -->
-    <script src="../dist/butterchurn.min.js"></script>
+    <!-- Using NON-MINIFIED version for debugging with console logs -->
+    <script>
+        // Dynamic cache busting for butterchurn.js
+        const cacheBuster = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        document.write('<script src="../dist/butterchurn.js?v=' + cacheBuster + '"><\/script>');
+        console.log('Loading butterchurn.js with cache buster:', cacheBuster);
+    </script>
     <!-- Load presets from CDN -->
+    <!-- Load Alaska Butter first (primary preset pack) -->
+    <script src="../presets/alaska-butter/alaskaButter.min.js"></script>
     <!-- Load multiple preset packs for full collection -->
     <script src="../presets/full-collection/butterchurnPresets.min.js"></script>
     <script src="../presets/full-collection/butterchurnPresetsExtra.min.js"></script>
@@ -772,22 +556,21 @@
                 console.log('[Device] Detected:', capabilities);
             } catch (error) {
                 console.error('Error detecting device capabilities:', error);
+                if (TEST_PAGE_DEBUG_MODE) {
+                    throw error;
+                }
             }
         }
 
         // GPU detection is now handled by DeviceCapabilities module
         // Keeping as a stub for compatibility
         async function detectGPU() {
-            try {
-                if (butterchurn.DeviceCapabilities) {
-                    const capabilities = await butterchurn.DeviceCapabilities.detect();
-                    return capabilities.gpu.renderer;
-                }
-                return 'Unknown';
-            } catch (error) {
-                console.warn('GPU detection failed:', error);
-                return 'Detection failed';
+            // NO TRY-CATCH - FAIL FAST IN TEST PAGE
+            if (butterchurn.DeviceCapabilities) {
+                const capabilities = await butterchurn.DeviceCapabilities.detect();
+                return capabilities.gpu.renderer;
             }
+            return 'Unknown';
         }
 
         async function init() {
@@ -835,37 +618,28 @@
                 }
 
                 // Create visualizer with audio context and canvas
+                // Enable debug mode for troubleshooting
+                window.BUTTERCHURN_DEBUG = true;
+
                 visualizer = Butterchurn.createVisualizer(audioContext, canvas, {
                     width: canvas.width,
-                    height: canvas.height
+                    height: canvas.height,
+                    debugMode: true  // Enable debug mode in visualizer
                 });
 
-                // Load fingerprint database - optional, will fail with CORS if opened as file://
+                // Load fingerprints for the default pack (Alaska Butter)
                 try {
-                    // Try to load from same directory first (test directory)
-                    const response = await fetch('./fingerprints.json');
+                    const response = await fetch('../presets/alaska-butter/alaskaButter.fingerprints.json');
                     if (response.ok) {
                         fingerprintDb = await response.json();
-                        document.getElementById('presetCount').textContent =
-                            `${Object.keys(fingerprintDb.presets).length} unique`;
-                        console.log('✅ Fingerprint database loaded');
+                        console.log('✅ Loaded Alaska Butter fingerprints at startup');
                     } else {
-                        console.warn('Fingerprint database not found, using presets without deduplication');
-                        document.getElementById('presetCount').textContent = 'No database';
+                        fingerprintDb = null;
                     }
                 } catch (err) {
-                    // CORS error when opened as file:// - this is expected
-                    if (err.message.includes('CORS') || err.message.includes('Failed to fetch')) {
-                        console.info('Note: Fingerprint database unavailable due to CORS (normal when opening file directly)');
-                        console.info('To use fingerprints, either:');
-                        console.info('1. Serve via local server: python3 -m http.server 8000');
-                        console.info('2. Or open from a web server');
-                    } else {
-                        console.warn('Could not load fingerprint database:', err);
-                    }
-                    document.getElementById('presetCount').textContent = 'CORS blocked (normal)';
-                    // Continue without database - the app still works
+                    console.warn('Failed to load default fingerprints:', err);
                     fingerprintDb = null;
+                    throw err;
                 }
 
                 // Initialize selector
@@ -875,6 +649,8 @@
                     return;
                 }
                 selector = new IntelligentPresetSelector(visualizer, fingerprintDb || {});
+                selector.debugMode = true;  // Enable debug mode for intelligent selector
+                console.log('[Test] Debug mode enabled for IntelligentPresetSelector');
 
                 // Make selector globally available for debugging
                 window.intelligentSelector = selector;
@@ -887,7 +663,29 @@
                 selector.setDebugSceneChange(true);
                 console.log('[Test Page] Scene change debug mode enabled by default');
 
-                // Combine all preset packs into one collection
+                // Initialize managers manually if not loaded or if they're classes
+                setTimeout(() => {
+                    // Handle emergency manager
+                    if (!selector.emergencyManager) {
+                        console.log('[Test Page] Emergency manager not auto-loaded, initializing manually...');
+                        selector.initializeEmergencyManager();
+                    } else if (typeof selector.emergencyManager === 'function') {
+                        // It's a class, need to instantiate it
+                        console.log('[Test Page] Emergency manager is a class, instantiating...');
+                        selector.emergencyManager = new selector.emergencyManager();
+                        console.log('[Test Page] Emergency manager instantiated, presets available:',
+                            Object.keys(selector.emergencyManager.emergencyPresets || {}));
+                    }
+
+                    // Handle blocklist manager
+                    if (selector.blocklistManager && typeof selector.blocklistManager === 'function') {
+                        console.log('[Test Page] Blocklist manager is a class, instantiating...');
+                        selector.blocklistManager = new selector.blocklistManager();
+                        console.log('[Test Page] Blocklist manager instantiated');
+                    }
+                }, 1000);
+
+                // Load ALL presets for availability
                 const allPresets = {};
 
                 // Add all available preset packs
@@ -912,8 +710,13 @@
                     console.log('✓ Loaded butterchurnPresetsNonMinimal');
                 }
 
-                console.log(`📦 Combined preset collection: ${Object.keys(allPresets).length} total presets`);
-                selector.setPresetPack(allPresets);
+                console.log(`📦 All presets loaded: ${Object.keys(allPresets).length} total`);
+
+                // Store all presets globally for pack switching
+                window.allAvailablePresets = allPresets;
+
+                // Don't set the preset pack here - wait for the dropdown handler to load the correct pack
+                // The dropdown will default to alaska-butter and load the matching presets + fingerprints
 
                 const presetNames = Object.keys(allPresets);
                 if (presetNames.length > 0) {
@@ -932,18 +735,20 @@
                         firstValidPreset = presetNames[0]; // Fallback to first anyway
                     }
 
-                    console.log('[INIT] Loading first preset:', firstValidPreset);
+                    console.log('[INIT] Found first valid preset:', firstValidPreset);
                     console.log('[INIT] First preset object structure:', {
                         hasBaseVals: !!allPresets[firstValidPreset].baseVals,
                         hasFrameEqs: !!allPresets[firstValidPreset].frame_eqs_str,
                         presetKeys: Object.keys(allPresets[firstValidPreset]).slice(0, 10)
                     });
-                    console.log('[INIT] All 395 presets are loaded and available for selection');
-                    visualizer.loadPreset(allPresets[firstValidPreset], 0); // No blending for first preset
-                    updatePresetInfo(firstValidPreset);
+                    console.log(`[INIT] All ${Object.keys(allPresets).length} presets loaded, waiting for Alaska Butter pack to be selected...`);
+                    // Don't load a preset yet - wait for Alaska Butter pack to be loaded first
+                    // The handlePresetPackChange will load the first preset from the correct pack
+                    // visualizer.loadPreset(allPresets[firstValidPreset], 0); // No blending for first preset
+                    // updatePresetInfo(firstValidPreset);
 
-                    // Update selector state for first preset
-                    selector.currentPreset = firstValidPreset;
+                    // Don't update selector state yet - wait for Alaska Butter pack
+                    // The handlePresetPackChange function will properly initialize everything
                     selector.lastSwitch = performance.now();
                     console.log('[INIT] First preset loaded successfully');
                 } else {
@@ -956,6 +761,13 @@
                 document.getElementById('testMinimalBtn').disabled = false;
                 document.getElementById('testReactiveBtn').disabled = false;
                 document.getElementById('testCrowdBtn').disabled = false;
+
+                // Automatically load Alaska Butter pack to match the default dropdown selection
+                // This ensures the presets match the loaded fingerprints
+                setTimeout(() => {
+                    console.log('[INIT] Auto-loading Alaska Butter pack to match fingerprints...');
+                    document.getElementById('presetPackSelect').dispatchEvent(new Event('change'));
+                }, 500);
 
             } catch (error) {
                 console.error('Failed to initialize:', error);
@@ -1030,6 +842,170 @@
             }
         }
 
+        // Handle preset pack selection changes
+        async function handlePresetPackChange(e) {
+            const selectedPack = e.target.value;
+            const statusDiv = document.getElementById('presetPackStatus');
+            statusDiv.textContent = `Loading ${selectedPack}...`;
+
+            // Load fingerprints for this pack
+            let fingerprintUrl = '';
+            if (selectedPack === 'alaska-butter') {
+                fingerprintUrl = '../presets/alaska-butter/alaskaButter.fingerprints.json';
+            } else {
+                fingerprintUrl = `../presets/full-collection/${selectedPack}.fingerprints.json`;
+            }
+
+            try {
+                const response = await fetch(fingerprintUrl);
+                if (response.ok) {
+                    fingerprintDb = await response.json();
+                    console.log(`✅ Loaded fingerprints for ${selectedPack}`);
+
+                    // Update selector with new fingerprints if it exists
+                    if (selector) {
+                        selector.updateFingerprintDatabase(fingerprintDb);
+                    }
+
+                    // Also store globally for reference
+                    window.currentFingerprintDb = fingerprintDb;
+                } else {
+                    console.warn(`Fingerprints not found for ${selectedPack}`);
+                    fingerprintDb = {};
+                }
+            } catch (err) {
+                console.warn(`Failed to load fingerprints for ${selectedPack}:`, err);
+                fingerprintDb = {};
+                if (TEST_PAGE_DEBUG_MODE) {
+                    throw err;
+                }
+            }
+
+            try {
+                let presets = {};
+                let packName = '';
+
+                if (selectedPack === 'alaska-butter') {
+                    // Load Alaska Butter collection
+                    if (typeof alaskaButter !== 'undefined') {
+                        presets = alaskaButter.getPresets();
+                        packName = 'Alaska Butter';
+                        console.log('[Preset Pack] Alaska Butter already loaded, using it directly');
+                    } else {
+                        console.warn('[Preset Pack] Alaska Butter not found, attempting dynamic load...');
+                        // Dynamically load Alaska Butter if not already loaded
+                        const script = document.createElement('script');
+                        script.src = '../presets/alaska-butter/alaskaButter.min.js';
+                        document.head.appendChild(script);
+
+                        await new Promise((resolve, reject) => {
+                            script.onload = resolve;
+                            script.onerror = reject;
+                        });
+
+                        if (typeof alaskaButter !== 'undefined') {
+                            presets = alaskaButter.getPresets();
+                            packName = 'Alaska Butter';
+                            console.log('[Preset Pack] Alaska Butter dynamically loaded successfully');
+                        } else {
+                            // Fallback: use the all presets but warn
+                            console.error('[Preset Pack] Alaska Butter failed to load! Using fallback presets');
+                            presets = window.allAvailablePresets || {};
+                            packName = 'Alaska Butter (Fallback)';
+                        }
+                    }
+                } else {
+                    // Load individual preset pack
+                    const packVariable = window[selectedPack];
+                    if (packVariable && typeof packVariable.getPresets === 'function') {
+                        presets = packVariable.getPresets();
+                        packName = selectedPack;
+                    } else {
+                        // Dynamically load the preset pack if not already loaded
+                        const script = document.createElement('script');
+                        script.src = `../presets/full-collection/${selectedPack}.min.js`;
+                        document.head.appendChild(script);
+
+                        await new Promise((resolve, reject) => {
+                            script.onload = resolve;
+                            script.onerror = reject;
+                        });
+
+                        const loadedPack = window[selectedPack];
+                        if (loadedPack && typeof loadedPack.getPresets === 'function') {
+                            presets = loadedPack.getPresets();
+                            packName = selectedPack;
+                        }
+                    }
+                }
+
+                if (Object.keys(presets).length === 0) {
+                    throw new Error(`No presets found in ${selectedPack}`);
+                }
+
+                // Update the selector with new preset collection
+                if (selector) {
+                    // For Alaska Butter, we already have the fingerprints loaded
+                    // Don't re-initialize which would try to load individual pack fingerprints
+                    if (selectedPack !== 'alaska-butter') {
+                        // For other packs, initialize if needed
+                        const basePath = '/presets/full-collection/';
+                        await selector.initialize({
+                            basePath: basePath,
+                            autoLoadPacks: false  // We're loading specific pack
+                        });
+                    }
+
+                    // Set the specific preset pack
+                    selector.setPresetPack(presets);
+
+                    // Load the first valid preset from this pack if no preset is currently loaded
+                    if (!selector.currentPreset || !visualizer.getCurrentPreset()) {
+                        const presetNames = Object.keys(presets);
+                        let firstValidPreset = null;
+                        for (const name of presetNames) {
+                            const preset = presets[name];
+                            if (preset.baseVals && preset.frame_eqs_str) {
+                                firstValidPreset = name;
+                                break;
+                            }
+                        }
+
+                        if (firstValidPreset) {
+                            console.log(`[Preset Pack] Loading first preset from ${packName}:`, firstValidPreset);
+                            visualizer.loadPreset(presets[firstValidPreset], 0);
+                            selector.currentPreset = firstValidPreset;
+
+                            // Set the hash from fingerprint database if available
+                            if (fingerprintDb && fingerprintDb.nameIndex && fingerprintDb.nameIndex[firstValidPreset]) {
+                                selector.currentHash = fingerprintDb.nameIndex[firstValidPreset];
+                            } else {
+                                selector.currentHash = firstValidPreset; // Fallback
+                            }
+                            selector.lastSwitch = performance.now();
+                            updatePresetInfo(firstValidPreset);
+                        }
+                    }
+
+                    statusDiv.textContent = `✅ Loaded ${packName} (${Object.keys(presets).length} presets)`;
+                    statusDiv.style.color = '#0f0';
+
+                    console.log(`[Preset Pack] Switched to ${packName} with ${Object.keys(presets).length} presets`);
+                } else {
+                    statusDiv.textContent = '⚠️ Selector not initialized yet';
+                    statusDiv.style.color = '#ff0';
+                }
+
+            } catch (error) {
+                console.error('[Preset Pack] Error loading pack:', error);
+                statusDiv.textContent = `❌ Error loading ${selectedPack}: ${error.message}`;
+                statusDiv.style.color = '#f00';
+                if (TEST_PAGE_DEBUG_MODE) {
+                    throw error;
+                }
+            }
+        }
+
         // Calculate advanced audio features
         // Advanced audio feature calculation is now handled by AdvancedAudioAnalyzer module
         function calculateAdvancedFeatures(dataArray, timeByteArray) {
@@ -1086,7 +1062,9 @@
         }
 
         function animate() {
+            // console.log('[Animate] Frame start'); // Too verbose - commenting out
             if (!analyser) {
+                // console.log('[Animate] No analyser, continuing animation loop');
                 animationId = requestAnimationFrame(animate);
                 return;
             }
@@ -1096,23 +1074,83 @@
             const dataArray = new Uint8Array(bufferLength);
             analyser.getByteFrequencyData(dataArray);
 
+            // Debug: Log array info every 2 seconds
+            if (frameCount % 120 === 0) {
+                const trebSliceStart = Math.floor(bufferLength * 0.5);
+                const trebData = dataArray.slice(trebSliceStart);
+                console.log('[Audio Debug] Data array info:', {
+                    bufferLength: bufferLength,
+                    dataArrayLength: dataArray.length,
+                    trebSliceStart: trebSliceStart,
+                    trebSliceLength: trebData.length,
+                    // Show the actual treble data values
+                    trebFirst20: Array.from(trebData.slice(0, 20)),
+                    trebLast20: Array.from(trebData.slice(-20)),
+                    // Check for issues
+                    trebMin: Math.min(...trebData),
+                    trebMax: Math.max(...trebData),
+                    trebSum: Array.from(trebData).reduce((a, b) => a + b, 0),
+                    hasNaN: Array.from(trebData).some(v => isNaN(v)),
+                    hasUndefined: Array.from(trebData).some(v => v === undefined),
+                    // Show full frequency spectrum sample
+                    fullSpectrumSample: {
+                        bass: Array.from(dataArray.slice(0, 10)),
+                        mid: Array.from(dataArray.slice(Math.floor(bufferLength * 0.25), Math.floor(bufferLength * 0.25) + 10)),
+                        treb: Array.from(dataArray.slice(Math.floor(bufferLength * 0.75), Math.floor(bufferLength * 0.75) + 10))
+                    }
+                });
+            }
+
             // Get time domain data for Butterchurn (this is what makes it react to music!)
             const timeBufferLength = analyser.fftSize;
             const timeByteArray = new Uint8Array(timeBufferLength);
             analyser.getByteTimeDomainData(timeByteArray);
+
+            // Debug: Check if we're getting any audio data
+            const hasFreqData = dataArray.some(v => v > 0);
+            const hasTimeData = timeByteArray.some(v => v !== 128); // 128 is silence in time domain
+
+            // Log once every second (assuming 60fps)
+            if (frameCount % 60 === 0) {
+                if (!hasFreqData && !hasTimeData) {
+                    console.log('[Audio Debug] No audio data detected!');
+                    console.log('[Audio Debug] AudioContext state:', audioContext?.state);
+                    console.log('[Audio Debug] Audio element paused:', audioElement?.paused);
+                    console.log('[Audio Debug] Audio element volume:', audioElement?.volume);
+                    console.log('[Audio Debug] Audio element muted:', audioElement?.muted);
+                    console.log('[Audio Debug] Audio element currentTime:', audioElement?.currentTime);
+                } else {
+                    console.log('[Audio Debug] Audio data detected - freq:', hasFreqData, 'time:', hasTimeData);
+                }
+            }
 
             // Calculate audio levels
             const bass = dataArray.slice(0, Math.floor(bufferLength * 0.1))
                 .reduce((a, b) => a + b, 0) / (bufferLength * 0.1 * 255);
             const mid = dataArray.slice(Math.floor(bufferLength * 0.1), Math.floor(bufferLength * 0.5))
                 .reduce((a, b) => a + b, 0) / (bufferLength * 0.4 * 255);
-            const treb = dataArray.slice(Math.floor(bufferLength * 0.5))
-                .reduce((a, b) => a + b, 0) / (bufferLength * 0.5 * 255);
+            const trebData = dataArray.slice(Math.floor(bufferLength * 0.5));
+            const trebSum = trebData.reduce((a, b) => a + b, 0);
+            const treb = trebSum / (bufferLength * 0.5 * 255);
+
+            // Debug NaN issue
+            if (isNaN(treb)) {
+                console.error('[Audio] Treble calculation produced NaN:', {
+                    trebDataLength: trebData.length,
+                    trebSum: trebSum,
+                    bufferLength: bufferLength,
+                    divisor: bufferLength * 0.5 * 255,
+                    sampleValues: trebData.slice(0, 5)
+                });
+            }
 
             const audioLevels = {
                 bass: bass,
+                bass_att: bass,  // Attack/smoothed value - using same as instant for now
                 mid: mid,
+                mid_att: mid,
                 treb: treb,
+                treb_att: treb,
                 vol: (bass + mid + treb) / 3,
                 // CRITICAL: Add time domain data for Butterchurn to actually react to music!
                 timeByteArray: timeByteArray,
@@ -1162,7 +1200,9 @@
             }
 
             // CRITICAL FIX: Only process audio and render when audio is actually playing
+            // console.log('[Animate] Audio check - isPlaying:', isPlaying, 'paused:', audioElement?.paused, 'ended:', audioElement?.ended);
             if (isPlaying && audioElement && !audioElement.paused && !audioElement.ended) {
+                // console.log('[Animate] Processing audio data');
                 // Update live audio display (always)
                 if (document.getElementById('liveEnergy')) {
                     const overallEnergy = (bass + mid + treb) / 3;
@@ -1172,10 +1212,27 @@
                 }
 
                 // Update selector with real audio data (only if auto mode is on)
+                // console.log('[Animate] Updating selector - autoMode:', autoMode, 'selector:', !!selector);
                 if (selector && autoMode) {
-                    const result = selector.update(audioLevels);
+                    // console.log('[Animate] Calling selector.update()');
+                    // console.log('[Animate] audioLevels being passed:', audioLevels);
+                    let result;
+                    try {
+                        // console.log('[Animate] About to call selector.update()...');
+                        result = selector.update(audioLevels);
+                        // console.log('[Animate] selector.update() returned, result is:', result);
+                        // console.log('[Animate] selector.update() completed successfully');
+                    } catch (error) {
+                        console.error('[Animate] ERROR in selector.update():', error);
+                        console.error('[Animate] Error stack:', error.stack);
+                        // Re-throw to stop animation and see the error
+                        throw error;
+                    }
+                    // console.log('[Animate] selector.update() result:', result);
+                    // console.log('[Animate] About to process result');
 
                     if (result) {
+                        // console.log('[Animate] Result exists, processing UI updates');
                         document.getElementById('bassEnergy').textContent = bass.toFixed(2);
                         document.getElementById('midEnergy').textContent = mid.toFixed(2);
                         document.getElementById('trebleEnergy').textContent = treb.toFixed(2);
@@ -1236,15 +1293,32 @@
                             document.getElementById('selectionReason').textContent =
                                 logic.reason || 'Waiting...';
                         }
+                        // console.log('[Animate] Finished processing result');
                     }
+                    // console.log('[Animate] After result processing block');
                 }
+                // console.log('[Animate] After selector update block');
 
                 // Render visualization with real audio data
+                // console.log('[Animate] Checking visualizer:', !!visualizer);
                 if (visualizer) {
+                    // console.log('[Animate] Rendering visualization with audio data');
+                    // Log the audio levels being passed to visualizer (once every 2 seconds)
+                    if (frameCount % 120 === 0) {
+                        console.log('[Animate] audioLevels for visualizer:', {
+                            bass: audioLevels.bass,
+                            mid: audioLevels.mid,
+                            treb: audioLevels.treb,
+                            vol: audioLevels.vol,
+                            hasTimeByteArray: !!audioLevels.timeByteArray,
+                            timeByteArraySample: audioLevels.timeByteArray ? Array.from(audioLevels.timeByteArray.slice(0, 10)) : null
+                        });
+                    }
                     // Track render performance
                     const renderStart = performance.now();
                     visualizer.render({ audioLevels: audioLevels });
                     const renderEnd = performance.now();
+                    // console.log('[Animate] Render complete, time:', renderEnd - renderStart, 'ms');
                     const renderTime = renderEnd - renderStart;
 
                     // Update performance metrics
@@ -1252,7 +1326,7 @@
                     if (renderTimes.length > 60) renderTimes.shift();
 
                     // Perform frame analysis
-                    if (selector && selector.frameAnalyzer && canvas) {
+                    if (selector && selector.frameAnalyzer && typeof selector.frameAnalyzer.analyzeFrame === 'function' && canvas) {
                         try {
                             const gl = canvas.getContext('webgl') || canvas.getContext('webgl2');
                             if (gl) {
@@ -1290,6 +1364,9 @@
                             }
                         } catch (e) {
                             console.error('Frame analysis error:', e);
+                            if (TEST_PAGE_DEBUG_MODE) {
+                                throw e;
+                            }
                         }
                     }
 
@@ -1357,11 +1434,16 @@
                 }
             }
 
+            // console.log('[Animate] Requesting next frame');
             animationId = requestAnimationFrame(animate);
+            // console.log('[Animate] Frame end');
         }
 
         // Event handlers
         document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        // Preset pack selection handler
+        document.getElementById('presetPackSelect').addEventListener('change', handlePresetPackChange);
 
         // Emergency preset button handlers
         document.getElementById('emergencyBtn').addEventListener('click', () => {
@@ -1389,7 +1471,15 @@
             console.log('selector.emergencyManager:', selector?.emergencyManager);
 
             if (selector && selector.emergencyManager) {
-                const preset = selector.emergencyManager.emergencyPresets.minimal;
+                // Check if emergencyManager is a class or instance
+                let manager = selector.emergencyManager;
+                if (typeof manager === 'function') {
+                    // It's a class, need to instantiate it
+                    console.log('Emergency manager is a class, instantiating...');
+                    manager = new manager();
+                    selector.emergencyManager = manager; // Replace with instance
+                }
+                const preset = manager.emergencyPresets.minimal;
                 console.log('Minimal preset:', preset);
 
                 if (preset && visualizer) {
@@ -1417,7 +1507,15 @@
         document.getElementById('testReactiveBtn').addEventListener('click', () => {
             console.log('Test Reactive button clicked');
             if (selector && selector.emergencyManager) {
-                const preset = selector.emergencyManager.emergencyPresets.basic_reactive;
+                // Check if emergencyManager is a class or instance
+                let manager = selector.emergencyManager;
+                if (typeof manager === 'function') {
+                    // It's a class, need to instantiate it
+                    console.log('Emergency manager is a class, instantiating...');
+                    manager = new manager();
+                    selector.emergencyManager = manager; // Replace with instance
+                }
+                const preset = manager.emergencyPresets.basic_reactive;
                 console.log('Reactive preset:', preset);
 
                 if (preset && visualizer) {
@@ -1445,7 +1543,15 @@
         document.getElementById('testCrowdBtn').addEventListener('click', () => {
             console.log('Test Crowd Pleaser button clicked');
             if (selector && selector.emergencyManager) {
-                const preset = selector.emergencyManager.emergencyPresets.crowd_pleaser;
+                // Check if emergencyManager is a class or instance
+                let manager = selector.emergencyManager;
+                if (typeof manager === 'function') {
+                    // It's a class, need to instantiate it
+                    console.log('Emergency manager is a class, instantiating...');
+                    manager = new manager();
+                    selector.emergencyManager = manager; // Replace with instance
+                }
+                const preset = manager.emergencyPresets.crowd_pleaser;
                 console.log('Crowd Pleaser preset:', preset);
 
                 if (preset && visualizer) {
@@ -1473,11 +1579,21 @@
         // Blocklist management buttons
         document.getElementById('showBlocklistBtn').addEventListener('click', () => {
             if (selector && selector.blocklistManager) {
-                // Initialize UI if not already done
-                if (!selector.blocklistManager.uiContainer) {
-                    selector.blocklistManager.initializeUI();
+                // Check if blocklistManager is a class or instance
+                let manager = selector.blocklistManager;
+                if (typeof manager === 'function') {
+                    // It's a class, need to instantiate it
+                    console.log('Blocklist manager is a class, instantiating...');
+                    manager = new manager();
+                    selector.blocklistManager = manager; // Replace with instance
                 }
-                selector.blocklistManager.show();
+                // Initialize UI if not already done
+                if (!manager.uiContainer) {
+                    manager.initializeUI();
+                }
+                manager.show();
+            } else {
+                showError('Blocklist manager not available');
             }
         });
 
@@ -1516,15 +1632,22 @@
                 isPlaying = false;
             } else {
                 // Play audio with promise handling
+                console.log('[Play] Starting audio playback...');
+                console.log('[Play] Animation loop running:', !!animationId);
+                console.log('[Play] Visualizer exists:', !!visualizer);
                 try {
                     await audioElement.play();
                     document.getElementById('playBtn').textContent = 'Pause';
                     document.getElementById('nextPresetBtn').disabled = false;  // Enable Next button when playing
                     isPlaying = true;
+                    console.log('[Play] Audio playing successfully');
                     console.log('Audio playing, volume:', audioElement.volume, 'muted:', audioElement.muted);
                 } catch (err) {
                     console.error('Error playing audio:', err);
                     showError('Failed to play audio: ' + err.message);
+                    if (TEST_PAGE_DEBUG_MODE) {
+                        throw err;
+                    }
                 }
             }
         });

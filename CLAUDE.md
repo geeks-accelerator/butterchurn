@@ -124,15 +124,15 @@ npm test                          # All tests
 npm run test:visual               # Visual regression (critical!)
 npm run test:visual:update        # Update snapshots (verify changes first)
 npm run test:visual:view          # View test diffs
-npm run serve:test                # Start test server on port 8192
-# Then open http://localhost:8192/intelligent-selector-test.html
+python3 -m http.server 8192       # Start server from PROJECT ROOT (not test dir!)
+# Then open http://localhost:8192/test/intelligent-selector-test.html
 ```
 
 ### Pre-commit Procedure
 1. Run `npm run analyze` (lint + typecheck + GLSL)
 2. Run `npm run test:visual` (ensure no visual regressions)
-3. Test performance: `npm run build && npm run serve:test`
-4. Test intelligent selection: http://localhost:8192/intelligent-selector-test.html
+3. Test performance: `npm run build && python3 -m http.server 8192`
+4. Test intelligent selection: http://localhost:8192/test/intelligent-selector-test.html
 5. Update CDN if needed: `npm run deploy:cdn`
 
 ### Commit Message Convention
@@ -148,6 +148,26 @@ npm run serve:test                # Start test server on port 8192
 3. **Audio unresponsiveness**: Verify `audioLevels` parameter passed to render
 4. **Test failures**: Enable deterministic mode, check RNG seeding
 5. **Build errors**: Check WASM toolchain versions, clear node_modules
+
+### Enabling Debug Mode
+```javascript
+// Method 1: Set global flag before initializing
+window.BUTTERCHURN_DEBUG = true;
+
+// Method 2: Pass debugMode in options
+const visualizer = butterchurn.createVisualizer(context, canvas, {
+  debugMode: true
+});
+
+// Method 3: For IntelligentSelector
+selector.debugMode = true;
+```
+
+Debug mode enables:
+- Detailed blending state logs in renderer
+- Transition compatibility warnings
+- Frame-by-frame alpha channel diagnostics
+- Preset switching decision logs
 
 ## CLAUDE.MD MAINTENANCE INSTRUCTIONS
 

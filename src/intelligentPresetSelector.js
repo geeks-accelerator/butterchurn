@@ -18,23 +18,46 @@
 // Import working modules only
 import FingerprintLoader from './fingerprintLoader.js';
 import FingerprintAdapter from './fingerprintAdapter.js';
+import PresetCompatibilityChecker from './utils/presetCompatibilityChecker.js';
 
 // Advanced modules (optional - will be disabled if not available)
 let frameAnalyzer, presetLogger, emergencyManager, blocklistManager, config, AdvancedAudioAnalyzer, MultiSignalCrossover;
-try {
-    const modules = await Promise.all([
-        import('./analysis/liveFrameAnalyzer.js').catch(() => null),
-        import('./analysis/presetFailureLogger.js').catch(() => null),
-        import('./presets/emergencyPresetManager.js').catch(() => null),
-        import('./blocklist/blocklistManager.js').catch(() => null),
-        import('./config/config.js').catch(() => null),
-        import('./audio/advancedAnalyzer.js').catch(() => null),
-        import('./audio/movingAverageCrossover.js').catch(() => null)
-    ]);
-    [frameAnalyzer, presetLogger, emergencyManager, blocklistManager, config, AdvancedAudioAnalyzer, MultiSignalCrossover] = modules.map(m => m?.default || m);
-} catch (e) {
-    console.log('[IntelligentSelector] Advanced modules not available, using fallback mode');
-}
+
+// Load advanced modules asynchronously without blocking the main thread
+const loadAdvancedModules = async () => {
+    try {
+        const modules = await Promise.all([
+            import('./analysis/liveFrameAnalyzer.js').catch(() => null),
+            import('./analysis/presetFailureLogger.js').catch(() => null),
+            import('./presets/emergencyPresetManager.js').catch(() => null),
+            import('./blocklist/blocklistManager.js').catch(() => null),
+            import('./config/config.js').catch(() => null),
+            import('./audio/advancedAnalyzer.js').catch(() => null),
+            import('./audio/movingAverageCrossover.js').catch(() => null)
+        ]);
+        [frameAnalyzer, presetLogger, emergencyManager, blocklistManager, config, AdvancedAudioAnalyzer, MultiSignalCrossover] = modules.map((m, i) => {
+            // Special handling for presetFailureLogger - we want the named export 'presetLogger'
+            if (i === 1 && m) { // presetFailureLogger is at index 1
+                return m.presetLogger || m.default || m;
+            }
+            return m?.default || m;
+        });
+        console.log('[IntelligentSelector] Advanced modules loaded:', {
+            frameAnalyzer: !!frameAnalyzer,
+            presetLogger: !!presetLogger,
+            emergencyManager: !!emergencyManager,
+            blocklistManager: !!blocklistManager,
+            config: !!config,
+            AdvancedAudioAnalyzer: !!AdvancedAudioAnalyzer,
+            MultiSignalCrossover: !!MultiSignalCrossover
+        });
+    } catch (e) {
+        console.log('[IntelligentSelector] Advanced modules not available, using fallback mode');
+    }
+};
+
+// Start loading modules but don't block
+loadAdvancedModules();
 
 class IntelligentPresetSelector {
     constructor(butterchurn, fingerprintDatabase) {
@@ -71,9 +94,9 @@ class IntelligentPresetSelector {
 
         // Load timing configuration (config is optional - use defaults if not available)
         this.minSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
-            config.get('presetSelection.minSwitchInterval', 4000) : 4000;  // Increased to 4 seconds minimum
+            config.get('presetSelection.minSwitchInterval', 4000) : 4000;  // 4 seconds minimum
         this.maxSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
-            config.get('presetSelection.maxSwitchInterval', 60000) : 60000;  // Increased to 60 seconds max
+            config.get('presetSelection.maxSwitchInterval', 60000) : 60000;  // 60 seconds max
 
         // Initialize MA Crossover system for intelligent switching
         const crossoverConfig = (typeof config !== 'undefined' && config?.get) ? {
@@ -104,15 +127,20 @@ class IntelligentPresetSelector {
         this.debugSceneChange = false;  // Enable debug output for scene change logic
         this.debugMode = false;  // Enable debug mode to throw errors instead of swallowing them
 
-        // Initialize analysis systems from imported modules
+        // Initialize analysis systems from imported modules (may be null initially)
         this.frameAnalyzer = frameAnalyzer || null;
         this.presetLogger = presetLogger || null;
         this.emergencyManager = emergencyManager || null;
         this.blocklistManager = blocklistManager || null;
 
+        // Set up a check to initialize modules when they become available
+        this.setupModuleInitialization();
+
         // Device detection for performance optimization
         this.deviceTier = this.detectDeviceTier();
-        if (this.frameAnalyzer) {
+        console.log('[IntelligentSelector] frameAnalyzer available:', !!this.frameAnalyzer);
+        console.log('[IntelligentSelector] adjustForDevice available:', this.frameAnalyzer && typeof this.frameAnalyzer.adjustForDevice === 'function');
+        if (this.frameAnalyzer && typeof this.frameAnalyzer.adjustForDevice === 'function') {
             this.frameAnalyzer.adjustForDevice(this.deviceTier);
         }
 
@@ -161,6 +189,71 @@ class IntelligentPresetSelector {
         // Recently used presets (avoid repetition)
         this.recentPresets = [];
         this.recentPresetsMax = 10;
+
+        // Initialize compatibility checker for transition analysis
+        this.compatibilityChecker = new PresetCompatibilityChecker({
+            minSafeDecay: 0.1,
+            lowDecayWarning: 0.9,
+            maxAlphaVariance: 0.5
+        });
+
+        // Throttle switch checking to reduce log spam
+        this.lastSwitchCheck = 0;
+        this.switchCheckInterval = 100; // Only check for switches every 100ms (10fps)
+
+        // Transition state tracking
+        this.isTransitioning = false;
+        this.transitionStartTime = 0;
+    }
+
+    /**
+     * Set up module initialization when async modules become available
+     */
+    setupModuleInitialization() {
+        // Check periodically if modules have loaded
+        const checkModules = () => {
+            if (frameAnalyzer && !this.frameAnalyzer) {
+                // frameAnalyzer is already an instance (singleton), not a class
+                this.frameAnalyzer = frameAnalyzer;
+                if (typeof this.frameAnalyzer.adjustForDevice === 'function') {
+                    this.frameAnalyzer.adjustForDevice(this.deviceTier);
+                }
+                console.log('[IntelligentSelector] Frame analyzer initialized');
+            }
+            if (presetLogger && !this.presetLogger) {
+                // presetLogger is already an instance (singleton), not a class
+                this.presetLogger = presetLogger;
+                console.log('[IntelligentSelector] Preset logger initialized');
+            }
+            if (emergencyManager && !this.emergencyManager) {
+                try {
+                    // EmergencyPresetManager is a class, needs instantiation
+                    this.emergencyManager = new emergencyManager();
+                    console.log('[IntelligentSelector] Emergency manager initialized');
+                    console.log('[IntelligentSelector] Emergency presets available:', Object.keys(this.emergencyManager.emergencyPresets || {}));
+                } catch (e) {
+                    console.error('[IntelligentSelector] Failed to initialize emergency manager:', e);
+                }
+            }
+            if (blocklistManager && !this.blocklistManager) {
+                // BlocklistManager is a class, needs instantiation
+                this.blocklistManager = new blocklistManager();
+                console.log('[IntelligentSelector] Blocklist manager initialized');
+            }
+        };
+
+        // Check immediately and then periodically
+        checkModules();
+        const moduleCheckInterval = setInterval(() => {
+            checkModules();
+            // Stop checking once all modules are loaded or after 10 seconds
+            if ((frameAnalyzer && presetLogger && emergencyManager && blocklistManager) ||
+                Date.now() - this.startTime > 10000) {
+                clearInterval(moduleCheckInterval);
+            }
+        }, 100);
+
+        this.startTime = Date.now();
     }
 
     /**
@@ -170,6 +263,57 @@ class IntelligentPresetSelector {
         this.presetPack = presets;
 
         console.log('Preset pack loaded with', Object.keys(presets).length, 'presets');
+    }
+
+    /**
+     * Update the fingerprint database (e.g., when switching preset packs)
+     * @param {Object} newFingerprintDb - The new fingerprint database
+     */
+    updateFingerprintDatabase(newFingerprintDb) {
+        if (!newFingerprintDb) {
+            console.warn('[IntelligentSelector] No fingerprint database provided');
+            return;
+        }
+
+        // Update the main database reference
+        this.db = newFingerprintDb;
+        console.log(`[IntelligentSelector] Updated database with ${Object.keys(newFingerprintDb.presets || {}).length} presets`);
+
+        // Update the fingerprint loader if it exists
+        if (this.fingerprintLoader) {
+            this.fingerprintLoader.database = newFingerprintDb;
+        }
+
+        // Update the fingerprint adapter if it exists
+        if (this.adapter) {
+            this.adapter = new FingerprintAdapter(newFingerprintDb);
+            // Rebuild the adapted database
+            if (this.adapter.buildDatabase) {
+                this.adapter.buildDatabase().then(db => {
+                    this.db = db;
+                    console.log('[IntelligentSelector] Rebuilt adapted database');
+                });
+            }
+        }
+
+        // Clear any cached fingerprint data
+        this.fingerprintCache = {};
+
+        // Reset current preset tracking to force re-evaluation
+        if (this.currentHash && newFingerprintDb.presets) {
+            // Check if current preset exists in new database
+            const currentExists = Object.values(newFingerprintDb.presets).some(p =>
+                p.hash === this.currentHash || p.id === this.currentHash
+            );
+
+            if (!currentExists) {
+                console.log('[IntelligentSelector] Current preset not in new fingerprint database, will switch on next update');
+                this.currentHash = null;
+                this.currentPreset = null;
+            }
+        }
+
+        console.log('[IntelligentSelector] Fingerprint database updated successfully');
     }
 
     /**
@@ -271,7 +415,18 @@ class IntelligentPresetSelector {
         }
 
         // Parse if string
-        return typeof preset === 'string' ? JSON.parse(preset) : preset;
+        let presetObj = typeof preset === 'string' ? JSON.parse(preset) : preset;
+
+        // IMPORTANT: Always return a fresh copy to prevent cache corruption
+        // This ensures the cached version stays pristine with _str fields intact
+        presetObj = JSON.parse(JSON.stringify(presetObj));
+
+        // Add the preset name so compatibility checker can identify it
+        if (!presetObj.name && !presetObj.desc) {
+            presetObj.name = presetName;
+        }
+
+        return presetObj;
     }
 
     /**
@@ -280,6 +435,25 @@ class IntelligentPresetSelector {
     async loadPresetByHash(hash, transitionTime = 0.5) {
         try {
             const preset = await this.getPresetByHash(hash);
+
+            // Check compatibility and adjust transition if needed
+            const currentPreset = this.butterchurn.getCurrentPreset ? this.butterchurn.getCurrentPreset() : null;
+            const compatibility = this.compatibilityChecker.checkTransitionCompatibility(currentPreset, preset);
+
+            if (compatibility.type === 'cut') {
+                // Force cut transition for incompatible presets
+                transitionTime = 0;
+                if (this.debugMode) {
+                    console.warn('[IntelligentSelector] Forcing cut transition:', compatibility.reason);
+                }
+            } else if (compatibility.duration !== undefined) {
+                // Use recommended duration from compatibility checker
+                transitionTime = compatibility.duration;
+                if (this.debugMode) {
+                    console.log('[IntelligentSelector] Using blend duration:', transitionTime, 'reason:', compatibility.reason);
+                }
+            }
+
             this.butterchurn.loadPreset(preset, transitionTime);
 
             const fingerprint = this.loader.getPresetFingerprint(hash);
@@ -334,7 +508,17 @@ class IntelligentPresetSelector {
 
         console.log('[IntelligentSelector] Initializing...');
 
-        // Initialize loader and adapter
+        // Initialize loader and adapter (required modules)
+        if (!FingerprintLoader) {
+            throw new Error('[IntelligentSelector] FingerprintLoader is required but not available');
+        }
+        if (!FingerprintAdapter) {
+            throw new Error('[IntelligentSelector] FingerprintAdapter is required but not available');
+        }
+        if (!PresetCompatibilityChecker) {
+            throw new Error('[IntelligentSelector] PresetCompatibilityChecker is required but not available');
+        }
+
         this.loader = new FingerprintLoader();
         this.adapter = new FingerprintAdapter(this.loader);
 
@@ -389,10 +573,19 @@ class IntelligentPresetSelector {
      * @returns {Object|null} Update result with current state and features
      */
     update(audioLevels, frameData = null) {
+        // Add recursion check
+        if (this._updateInProgress) {
+            console.error('[Update] RECURSION DETECTED! Already in update()');
+            return { error: 'Recursion detected' };
+        }
+        this._updateInProgress = true;
+
+        let finalResult = null;
         try {
             // Don't update if paused
             if (this.isPaused) {
                 console.log('[Update] Paused - returning null');
+                this._updateInProgress = false;  // MUST clear flag before early return!
                 return null;
             }
 
@@ -437,6 +630,7 @@ class IntelligentPresetSelector {
             if (this.updateCount > 5 && this.updateCount < 10) {
                 console.log('[Update] No features available - returning early');
             }
+            this._updateInProgress = false;  // MUST clear flag before early return!
             return {
                 currentPreset: this.currentHash,
                 features: null,
@@ -448,9 +642,15 @@ class IntelligentPresetSelector {
             };
         }
 
-        // Check if we should switch
+        // Throttle switch checking to reduce CPU usage and log spam
+        const timeSinceLastCheck = now - this.lastSwitchCheck;
         const timeSinceSwitch = now - this.lastSwitch;
-        const shouldSwitch = this.shouldSwitchPreset(features, timeSinceSwitch);
+
+        let shouldSwitch = false;
+        if (timeSinceLastCheck >= this.switchCheckInterval) {
+            this.lastSwitchCheck = now;
+            shouldSwitch = this.shouldSwitchPreset(features, timeSinceSwitch);
+        }
 
         // Debug logging
         if (this.updateCount <= 10) {
@@ -459,8 +659,17 @@ class IntelligentPresetSelector {
             console.log('[Update] Continuing past 10 updates...');
         }
 
+        // console.log('[Update] After debug log, about to check shouldSwitch');
         let selectionLogic = null;
         if (shouldSwitch) {
+            // console.log('[Update] shouldSwitch is true, processing switch logic');
+            // Check if this is an emergency bypass situation
+            const isEmergencyBypass = this.checkForEmergencyBypass();
+            if (isEmergencyBypass && this.currentHash) {
+                console.warn(`[EMERGENCY] Marking current preset ${this.currentHash} as problematic due to black frames`);
+                this.markProblematic(this.currentHash);
+            }
+
             // Check if we're in emergency mode
             if (this.isEmergencyMode) {
                 const emergencyDuration = now - this.emergencyStartTime;
@@ -478,7 +687,9 @@ class IntelligentPresetSelector {
                 const selectionResult = this.selectBestPresetWithLogic(features);
                 if (selectionResult && selectionResult.bestHash !== this.currentHash) {
                     // Check if preset is blocked
-                    const blockStatus = this.blocklistManager?.isBlocked(selectionResult.bestHash) || { blocked: false };
+                    const blockStatus = (this.presetLogger && typeof this.presetLogger.isBlocked === 'function')
+                        ? this.presetLogger.isBlocked(selectionResult.bestHash)
+                        : { blocked: false };
                     if (!blockStatus.blocked) {
                         this.switchToPreset(selectionResult.bestHash);
                         selectionLogic = selectionResult.logic;
@@ -491,7 +702,8 @@ class IntelligentPresetSelector {
             }
         }
 
-        return {
+        // console.log('[Update] About to return result object');
+        const resultObject = {
             currentPreset: this.currentHash,
             features: features,
             nextSwitch: Math.max(0, this.minSwitchInterval - timeSinceSwitch),
@@ -499,8 +711,24 @@ class IntelligentPresetSelector {
             isEmergencyMode: this.isEmergencyMode,
             deviceTier: this.deviceTier
         };
+        // console.log('[Update] Result object created:', resultObject);
+        // console.log('[Update] About to return from update() method');
+        // console.log('[Update] Type of resultObject:', typeof resultObject);
+        // console.log('[Update] Keys of resultObject:', Object.keys(resultObject));
+
+        // Store result to return after try-catch
+        finalResult = resultObject;
+        // console.log('[Update] Stored result for return after try-catch');
+
         } catch (error) {
             console.error('[Update] Exception caught:', error);
+
+            // In debug mode, re-throw the error to surface problems
+            if (this.debugMode) {
+                console.error('[Update] DEBUG MODE - Re-throwing error to surface the problem');
+                throw error;
+            }
+
             return {
                 currentPreset: this.currentHash,
                 features: null,
@@ -511,6 +739,13 @@ class IntelligentPresetSelector {
                 error: error.message
             };
         }
+
+        // Return the stored result after try-catch completes
+        // console.log('[Update] After try-catch, returning finalResult');
+        this._updateInProgress = false;  // Clear the flag before returning
+        const returnValue = finalResult || { error: 'No result to return' };
+        // console.log('[Update] Actually returning now with value:', returnValue);
+        return returnValue;
     }
 
     /**
@@ -701,10 +936,31 @@ class IntelligentPresetSelector {
             (this.currentWarmupTime || 0) * 1000 + 2000 // Add 2 sec buffer after warmup
         );
 
-        // Don't switch before minimum time (safety rail)
+        // Don't switch if currently transitioning
+        if (this.isTransitioning) {
+            const transitionTime = performance.now() - this.transitionStartTime;
+            if (transitionTime < 3000) { // Allow 3 seconds for transitions
+                if (this.debugSceneChange && Math.random() < 0.01) { // Only log 1% of the time to reduce spam
+                    console.log(`[Switch Decision] Transitioning: ${transitionTime.toFixed(0)}ms elapsed`);
+                }
+                // Still update the detector to track state, but don't act on it (if available)
+                if (this.crossoverDetector) {
+                    this.crossoverDetector.update(features);
+                }
+                return false;
+            } else {
+                // Transition complete
+                this.isTransitioning = false;
+            }
+        }
+
+        // EMERGENCY BYPASS: Allow immediate switch if black frames detected
+        const isEmergencyBypass = this.checkForEmergencyBypass();
+
+        // Don't switch before minimum time (safety rail) UNLESS emergency
         // IMPORTANT: Check timing BEFORE updating crossover detector to prevent false triggers
-        if (timeSinceSwitch < minimumTime) {
-            if (this.debugSceneChange) {
+        if (timeSinceSwitch < minimumTime && !isEmergencyBypass) {
+            if (this.debugSceneChange && Math.random() < 0.02) { // Only log 2% of the time to reduce spam
                 console.log(`[Switch Decision] Too soon: ${timeSinceSwitch}ms < ${minimumTime}ms minimum`);
             }
             // Still update the detector to track state, but don't act on it (if available)
@@ -714,10 +970,21 @@ class IntelligentPresetSelector {
             return false;
         }
 
+        // If emergency bypass triggered, log it
+        if (isEmergencyBypass) {
+            console.warn(`[EMERGENCY BYPASS] Black frames detected - forcing immediate switch after ${timeSinceSwitch.toFixed(0)}ms`);
+        }
+
         // Update MA crossover detector with latest audio features (if available)
         let crossoverResult = { shouldSwitch: false, reason: 'no_crossover_detector' };
         if (this.crossoverDetector) {
             crossoverResult = this.crossoverDetector.update(features);
+        }
+
+        // EMERGENCY: Force switch if black frames detected (highest priority)
+        if (isEmergencyBypass) {
+            console.warn(`[EMERGENCY] Forcing switch due to black frames - bypassing all other conditions`);
+            return true;
         }
 
         // MA Crossover is the primary decision maker
@@ -744,6 +1011,37 @@ class IntelligentPresetSelector {
         if (this.updateCount <= 15 && this.debugSceneChange && this.crossoverDetector) {
             const state = this.crossoverDetector.getDebugState();
             console.log(`[MA Debug ${this.updateCount}] Energy: ${state.energy}, Bass: ${state.bass}, Treble: ${state.treble}`);
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if emergency bypass should be triggered due to black frames
+     */
+    checkForEmergencyBypass() {
+        // Check if frame analyzer has detected black frames recently
+        if (this.frameAnalyzer && typeof this.frameAnalyzer.getState === 'function') {
+            try {
+                const frameState = this.frameAnalyzer.getState();
+                const lastAnalysis = frameState.lastAnalysis;
+
+                if (lastAnalysis && lastAnalysis.isProblematic) {
+                    // Check if the black frame detection is recent (within last 500ms)
+                    const timeSinceDetection = performance.now() - (lastAnalysis.timestamp || 0);
+                    if (timeSinceDetection < 500 && lastAnalysis.reason.includes('black_frame')) {
+                        return true;
+                    }
+                }
+            } catch (e) {
+                // Frame analyzer not ready yet
+                console.log('[IntelligentSelector] Frame analyzer not ready:', e.message);
+            }
+        }
+
+        // Check local problematic preset tracking
+        if (this.currentHash && this.problematicPresets.has(this.currentHash)) {
+            return true;
         }
 
         return false;
@@ -971,6 +1269,21 @@ class IntelligentPresetSelector {
     }
 
     /**
+     * AUDIO TRANSITION FIX: Ensure both presets get live audio during blending
+     *
+     * Problem identified: New presets were initialized with whatever audio was playing
+     * when loadPreset() was called, but this could be different from the live audio
+     * during the actual transition blending.
+     *
+     * Solution implemented in renderer.js lines 830-843:
+     * - During blending, force refresh of audio variables in the new preset's base state
+     * - This ensures both old and new presets use current live audio data
+     * - Eliminates black frames caused by stale initialization-time audio values
+     *
+     * The renderer now properly splits live audio to both presets during transitions.
+     */
+
+    /**
      * Switch to a new preset
      */
     async switchToPreset(hash) {
@@ -984,6 +1297,10 @@ class IntelligentPresetSelector {
         // For now, we'll use the first name as the preset identifier
         const presetName = presetData.names[0];
 
+        // Mark transition start to prevent rapid switching
+        this.isTransitioning = true;
+        this.transitionStartTime = performance.now();
+
         // Mark transition start for aggressive black frame detection
         if (this.frameAnalyzer && this.frameAnalyzer.markTransitionStart) {
             this.frameAnalyzer.markTransitionStart();
@@ -993,7 +1310,15 @@ class IntelligentPresetSelector {
         this.currentWarmupTime = presetData.fingerprint.warmupTime || 0;
 
         console.log(`Switching to preset ${hash}: ${presetName.substring(0, 40)}...`);
-        console.log(`  Energy: ${presetData.fingerprint.energy.toFixed(2)}, Bass: ${presetData.fingerprint.bass.toFixed(2)}, FPS: ${presetData.fingerprint.fps}`);
+        // Check for both naming conventions (bass vs bassEnergy)
+        const bassValue = presetData.fingerprint.bass !== undefined ?
+            presetData.fingerprint.bass : presetData.fingerprint.bassEnergy;
+
+        if (presetData.fingerprint.energy !== undefined && bassValue !== undefined) {
+            console.log(`  Energy: ${presetData.fingerprint.energy.toFixed(2)}, Bass: ${bassValue.toFixed(2)}, FPS: ${presetData.fingerprint.fps}`);
+        } else {
+            console.log(`  No fingerprint data available for this preset`);
+        }
         if (this.currentWarmupTime > 0) {
             console.log(`  Warmup time: ${this.currentWarmupTime}s (will display for at least ${this.currentWarmupTime + 2}s)`);
         }
@@ -1014,9 +1339,11 @@ class IntelligentPresetSelector {
 
         // Load the preset with error handling
         if (this.butterchurn && this.butterchurn.loadPreset) {
-            const loadSuccess = await this.loadPresetByHash(hash);
+            const loadSuccess = await this.loadPresetByHash(hash, 2.0); // Standard blend time
             if (!loadSuccess) {
                 console.error(`[IntelligentSelector] Failed to load preset ${hash}, keeping current preset`);
+                // Clear transition state on failure
+                this.isTransitioning = false;
                 return; // Don't update state if load failed
             }
         }
@@ -1060,6 +1387,10 @@ class IntelligentPresetSelector {
      */
     switchToPresetPack(presetName) {
         if (!this.presetPack || !this.presetPack[presetName]) return;
+
+        // Mark transition start to prevent rapid switching
+        this.isTransitioning = true;
+        this.transitionStartTime = performance.now();
 
         // Get warmup time from fingerprint database if available
         if (this.db && this.db.nameIndex && this.db.nameIndex[presetName]) {
@@ -1212,8 +1543,8 @@ class IntelligentPresetSelector {
 
             // Block the problematic preset if we have the hash
             const problematicHash = context.previousHash || this.currentHash;
-            if (problematicHash && this.blocklistManager) {
-                this.blocklistManager.blockPreset(problematicHash, 'black_frame_emergency', context);
+            if (problematicHash && this.presetLogger && typeof this.presetLogger.blockPreset === 'function') {
+                this.presetLogger.blockPreset(problematicHash, 'black_frame_emergency', context);
                 console.log(`[IntelligentSelector] Blocked preset ${problematicHash} due to black frames`);
             }
         }
@@ -1246,7 +1577,9 @@ class IntelligentPresetSelector {
         const candidates = this.getCandidates(features, 50); // Get more candidates
 
         for (const hash of candidates) {
-            const blockStatus = this.blocklistManager?.isBlocked(hash) || { blocked: false };
+            const blockStatus = (this.presetLogger && typeof this.presetLogger.isBlocked === 'function')
+                ? this.presetLogger.isBlocked(hash)
+                : { blocked: false };
             if (!blockStatus.blocked) {
                 console.log(`[IntelligentSelector] Using alternative preset: ${hash}`);
                 this.switchToPreset(hash);
@@ -1264,8 +1597,8 @@ class IntelligentPresetSelector {
      */
     isProblematic(hash) {
         // Check blocklist first
-        if (this.blocklistManager) {
-            const blockStatus = this.blocklistManager.isBlocked(hash);
+        if (this.presetLogger && typeof this.presetLogger.isBlocked === 'function') {
+            const blockStatus = this.presetLogger.isBlocked(hash);
             if (blockStatus && blockStatus.blocked) {
                 return true;
             }
@@ -1702,6 +2035,27 @@ class IntelligentPresetSelector {
             console.warn('🚨 This should ONLY be used in development/testing environments');
         } else {
             console.log('[DEBUG MODE] Disabled - Errors will be handled gracefully');
+        }
+    }
+
+    /**
+     * Manually initialize emergency manager for testing
+     */
+    initializeEmergencyManager() {
+        try {
+            // Try to import and instantiate directly
+            import('./presets/emergencyPresetManager.js').then(module => {
+                const EmergencyPresetManager = module.default || module.EmergencyPresetManager;
+                if (EmergencyPresetManager) {
+                    this.emergencyManager = new EmergencyPresetManager();
+                    console.log('[IntelligentSelector] Emergency manager manually initialized');
+                    console.log('[IntelligentSelector] Emergency presets available:', Object.keys(this.emergencyManager.emergencyPresets || {}));
+                }
+            }).catch(e => {
+                console.error('[IntelligentSelector] Failed to manually load emergency manager:', e);
+            });
+        } catch (e) {
+            console.error('[IntelligentSelector] Error initializing emergency manager:', e);
         }
     }
 
