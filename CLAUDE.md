@@ -135,6 +135,20 @@ python3 -m http.server 8192       # Start server from PROJECT ROOT (not test dir
 4. Test intelligent selection: http://localhost:8192/test/intelligent-selector-test.html
 5. Update CDN if needed: `npm run deploy:cdn`
 
+### TODO: Improve Linting Configuration
+Current linters still miss basic undefined variable errors. Need to:
+1. **Enable stricter ESLint rules:**
+   ```json
+   "no-use-before-define": "error",
+   "no-undef": "error",
+   "block-scoped-var": "error"
+   ```
+2. **Consider TypeScript migration** - TS type checker catches scope/flow issues that ESLint misses
+3. **Add "use strict"** directive for more aggressive runtime checking
+4. **Run linter in CI** - Catch issues before they reach the repo
+
+Note: Current setup let undefined variables slip through (e.g., compatibility checker bugs), causing runtime errors that should have been caught at lint time.
+
 ### Commit Message Convention
 - `feat:` new features
 - `fix:` bug fixes
