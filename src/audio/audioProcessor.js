@@ -7,11 +7,14 @@ export default class AudioProcessor {
     this.numSamps = 2048;
     this.fftSize = this.numSamps * 2;
 
+    // Number of frequency bins output by FFT (downsampled for performance)
+    this.numFreqBins = 512;
+
     // PHASE 1 IMPROVEMENT: Add temporal smoothing factor
     this.smoothingFactor = 0.8; // Reduces jitter in visualizations
     this.prevTimeArray = null;
 
-    this.fft = new FFT(this.fftSize, 512, true);
+    this.fft = new FFT(this.fftSize, this.numFreqBins, true);
 
     if (context) {
       this.audioContext = context;

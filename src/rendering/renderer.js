@@ -19,11 +19,15 @@ import ResampleShader from './shaders/resample';
 import BlurShader from './shaders/blur/blur';
 import TitleText from './text/titleText';
 import BlendPattern from './blendPattern';
+import PresetCompatibilityChecker from '../utils/presetCompatibilityChecker.js';
 
 export default class Renderer {
   constructor(gl, audio, opts) {
     this.gl = gl;
     this.audio = audio;
+
+    // Debug flag - set via opts or environment variable
+    this.debugMode = (opts && opts.debugMode) || (typeof window !== 'undefined' && window.BUTTERCHURN_DEBUG);
 
     this.frameNum = 0;
     this.fps = 30;
@@ -185,9 +189,60 @@ export default class Renderer {
     console.log('[loadPreset] New preset has desc?', preset.desc ? `Yes: ${preset.desc}` : 'No');
 
     // Check if preset is valid - allow explicit blank preset but warn about empty presets
-    const isEmptyPreset = !preset.frame_eqs_str && !preset.pixel_eqs_str && !preset.comp_eqs_str;
+    // Check both string and function versions since loadJSPreset converts strings to functions
+    const hasEquations = (preset.frame_eqs_str || preset.frame_eqs) ||
+                        (preset.pixel_eqs_str || preset.pixel_eqs) ||
+                        (preset.comp_eqs_str || preset.comp_eqs);
+    const isEmptyPreset = !hasEquations;
     if (isEmptyPreset && preset !== this.blankPreset) {
-      console.warn('[loadPreset] WARNING: Preset appears to be empty (no equations). Loading anyway...');
+      console.warn('[loadPreset] WARNING: Preset appears to be empty (no equations). Loading anyway...', {
+        name: preset.name || preset.desc || 'unknown',
+        hasBaseVals: !!preset.baseVals,
+        hasShapes: !!preset.shapes,
+        hasWaves: !!preset.waves,
+        keys: Object.keys(preset),
+        // Check for common equation property variations
+        hasFrameEqs: !!preset.frame_eqs,
+        hasPixelEqs: !!preset.pixel_eqs,
+        hasCompEqs: !!preset.comp_eqs,
+        hasInitEqs: !!preset.init_eqs_str || !!preset.init_eqs
+      });
+    }
+
+    // Dynamically check preset compatibility and adjust transition
+    if (this.preset && blendTime > 0 && this.preset !== this.blankPreset) {
+      // Create compatibility checker if not exists
+      if (!this.compatibilityChecker) {
+        this.compatibilityChecker = new PresetCompatibilityChecker();
+      }
+
+      const compatibility = this.compatibilityChecker.checkTransitionCompatibility(this.preset, preset);
+
+      // Log the analysis for debugging
+      const fromName = (this.preset && (this.preset.desc || this.preset.name)) || 'unknown';
+      const toName = (preset && (preset.desc || preset.name)) || 'unknown';
+
+      console.log('[Renderer] Preset compatibility check:', {
+        from: fromName,
+        to: toName,
+        result: compatibility.type,
+        originalBlendTime: blendTime,
+        recommendedDuration: compatibility.duration,
+        reason: compatibility.reason
+      });
+
+      // Override blend time based on compatibility
+      if (compatibility.type === 'cut') {
+        blendTime = 0;
+        console.warn('[Renderer] ⚠️ Using HARD CUT due to preset incompatibility:', compatibility.reason);
+      } else if (compatibility.duration < blendTime) {
+        const oldBlendTime = blendTime;
+        blendTime = compatibility.duration;
+        console.warn(`[Renderer] ⚠️ Reduced blend time from ${oldBlendTime}s to ${blendTime}s due to:`, compatibility.reason);
+      }
+
+      // Store transition type for blend pattern selection
+      this.transitionType = compatibility.type;
     }
 
     this.blendPattern.createBlendPattern();
@@ -207,16 +262,22 @@ export default class Renderer {
 
     this.presetTime = this.time;
 
+    // Sanitize audio values early to prevent NaN propagation
+    const sanitizeAudio = (val, defaultVal = 1) => {
+      if (isNaN(val) || !isFinite(val)) return defaultVal;
+      return val;
+    };
+
     const globalVars = {
       frame: this.frameNum,
       time: this.time,
       fps: this.fps,
-      bass: this.audioLevels.bass,
-      bass_att: this.audioLevels.bass_att,
-      mid: this.audioLevels.mid,
-      mid_att: this.audioLevels.mid_att,
-      treb: this.audioLevels.treb,
-      treb_att: this.audioLevels.treb_att,
+      bass: sanitizeAudio(this.audioLevels.bass),
+      bass_att: sanitizeAudio(this.audioLevels.bass_att),
+      mid: sanitizeAudio(this.audioLevels.mid),
+      mid_att: sanitizeAudio(this.audioLevels.mid_att),
+      treb: sanitizeAudio(this.audioLevels.treb),
+      treb_att: sanitizeAudio(this.audioLevels.treb_att),
     };
     const params = {
       pixelRatio: this.pixelRatio,
@@ -404,6 +465,19 @@ export default class Renderer {
   }
 
   runPixelEquations(presetEquationRunner, mdVSFrame, globalVars, blending) {
+    // Debug: Track which preset and what blending state
+    if (this.debugMode && this.blending && this.frameNum % 30 === 0) {
+      console.log('[runPixelEquations] Called with:', {
+        isForPrevPreset: blending,
+        actualBlendingState: this.blending,
+        blendProgress: this.blendProgress,
+        preset: blending ? (this.prevPreset ? this.prevPreset.desc : undefined) : (this.preset ? this.preset.desc : undefined),
+        hasPrevPreset: !!this.prevPreset,
+        hasPreset: !!this.preset,
+        prevPresetDesc: (this.prevPreset && this.prevPreset.desc) || 'NO PREV PRESET',
+        currentPresetDesc: (this.preset && this.preset.desc) || 'NO CURRENT PRESET'
+      });
+    }
     const gridX = this.mesh_width;
     const gridZ = this.mesh_height;
 
@@ -427,6 +501,10 @@ export default class Renderer {
     let offset = 0;
     let offsetColor = 0;
     if (!presetEquationRunner.preset.useWASM) {
+      // Debug: JavaScript path taken
+      if (this.debugMode && this.blending && this.frameNum % 30 === 0 && !blending) {
+        console.log('[runPixelEquations] Using JavaScript path for new preset');
+      }
       // Clear previous preset buffer when not blending (consistency with WASM path)
       if (!blending) {
         this.prevWarpColor.fill(0);
@@ -784,11 +862,12 @@ export default class Renderer {
   }
 
   render({ audioLevels, elapsedTime } = {}) {
-    this.calcTimeAndFPS(elapsedTime);
-    this.frameNum += 1;
+    try {
+      this.calcTimeAndFPS(elapsedTime);
+      this.frameNum += 1;
 
-    if (audioLevels) {
-      this.audio.updateAudio(
+      if (audioLevels) {
+        this.audio.updateAudio(
         audioLevels.timeByteArray,
         audioLevels.timeByteArrayL,
         audioLevels.timeByteArrayR
@@ -798,16 +877,44 @@ export default class Renderer {
     }
     this.audioLevels.updateAudioLevels(this.fps, this.frameNum);
 
+    // Sanitize audio levels to prevent NaN propagation
+    const sanitizeAudioValue = (value, defaultValue = 1) => {
+      if (isNaN(value) || !isFinite(value)) {
+        return defaultValue;
+      }
+      return value;
+    };
+
+    // Log if we detect NaN in audio with details
+    const nanFields = [];
+    if (isNaN(this.audioLevels.bass)) nanFields.push('bass');
+    if (isNaN(this.audioLevels.bass_att)) nanFields.push('bass_att');
+    if (isNaN(this.audioLevels.mid)) nanFields.push('mid');
+    if (isNaN(this.audioLevels.mid_att)) nanFields.push('mid_att');
+    if (isNaN(this.audioLevels.treb)) nanFields.push('treb');
+    if (isNaN(this.audioLevels.treb_att)) nanFields.push('treb_att');
+
+    if (nanFields.length > 0) {
+      console.warn('[Renderer] Audio levels contained NaN - using defaults. NaN fields:', nanFields, {
+        bass: this.audioLevels.bass,
+        bass_att: this.audioLevels.bass_att,
+        mid: this.audioLevels.mid,
+        mid_att: this.audioLevels.mid_att,
+        treb: this.audioLevels.treb,
+        treb_att: this.audioLevels.treb_att
+      });
+    }
+
     const globalVars = {
       frame: this.frameNum,
       time: this.time,
       fps: this.fps,
-      bass: this.audioLevels.bass,
-      bass_att: this.audioLevels.bass_att,
-      mid: this.audioLevels.mid,
-      mid_att: this.audioLevels.mid_att,
-      treb: this.audioLevels.treb,
-      treb_att: this.audioLevels.treb_att,
+      bass: sanitizeAudioValue(this.audioLevels.bass),
+      bass_att: sanitizeAudioValue(this.audioLevels.bass_att),
+      mid: sanitizeAudioValue(this.audioLevels.mid),
+      mid_att: sanitizeAudioValue(this.audioLevels.mid_att),
+      treb: sanitizeAudioValue(this.audioLevels.treb),
+      treb_att: sanitizeAudioValue(this.audioLevels.treb_att),
       meshx: this.mesh_width,
       meshy: this.mesh_height,
       aspectx: this.invAspectx,
@@ -827,9 +934,84 @@ export default class Renderer {
       Object.assign(globalVars, this.regVars);
     }
 
-    const mdVSFrame = this.presetEquationRunner.runFrameEquations(globalVars);
+    // AUDIO FIX: Ensure new preset gets fresh audio data during blending
+    // The issue is that presets are initialized with whatever audio was playing when loadPreset() was called
+    // But during blending, we need both presets to use the current live audio data
+    let mdVSFrame;
+    if (this.blending && this.presetEquationRunner) {
+      // For new preset during blending, refresh the audio variables in the base state
+      // This ensures the new preset uses current audio, not initialization-time audio
+      this.presetEquationRunner.mdVS.bass = globalVars.bass;
+      this.presetEquationRunner.mdVS.bass_att = globalVars.bass_att;
+      this.presetEquationRunner.mdVS.mid = globalVars.mid;
+      this.presetEquationRunner.mdVS.mid_att = globalVars.mid_att;
+      this.presetEquationRunner.mdVS.treb = globalVars.treb;
+      this.presetEquationRunner.mdVS.treb_att = globalVars.treb_att;
+    }
+
+    // Debug: Check equation runner state before running
+    if (this.debugMode && this.blending && this.frameNum % 30 === 0) {  // Log every 30 frames during blending
+      console.log('[Renderer] Blending state check:', {
+        frameNum: this.frameNum,
+        blendProgress: this.blendProgress.toFixed(2),
+        newPreset: (this.preset && this.preset.desc) || 'unknown',
+        prevPreset: (this.prevPreset && this.prevPreset.desc) || 'unknown',
+        newPresetHasEquations: !!(this.presetEquationRunner && this.presetEquationRunner.runFrameEquations),
+        prevPresetHasEquations: !!(this.prevPresetEquationRunner && this.prevPresetEquationRunner.runFrameEquations),
+        newPresetAudio: {
+          bass: this.presetEquationRunner && this.presetEquationRunner.mdVS && this.presetEquationRunner.mdVS.bass ? this.presetEquationRunner.mdVS.bass.toFixed(2) : undefined,
+          mid: this.presetEquationRunner && this.presetEquationRunner.mdVS && this.presetEquationRunner.mdVS.mid ? this.presetEquationRunner.mdVS.mid.toFixed(2) : undefined,
+          treb: this.presetEquationRunner && this.presetEquationRunner.mdVS && this.presetEquationRunner.mdVS.treb ? this.presetEquationRunner.mdVS.treb.toFixed(2) : undefined
+        }
+      });
+    }
+
+    mdVSFrame = this.presetEquationRunner.runFrameEquations(globalVars);
+
+    // Sanitize frame values to prevent NaN/Infinity from breaking rendering
+    Object.keys(mdVSFrame).forEach(key => {
+      if (typeof mdVSFrame[key] === 'number') {
+        if (isNaN(mdVSFrame[key]) || !isFinite(mdVSFrame[key])) {
+          // Replace invalid values with safe defaults
+          const defaults = {
+            zoom: 1, zoomexp: 1, rot: 0, warp: 0,
+            cx: 0.5, cy: 0.5, dx: 0, dy: 0, sx: 1, sy: 1,
+            decay: 0.98, wave_a: 0.1,
+            brighten: 0, darken: 0, solarize: 0, invert: 0
+          };
+          const safeValue = defaults[key] !== undefined ? defaults[key] : 0;
+          console.warn(`[Renderer] Sanitizing ${key}: ${mdVSFrame[key]} -> ${safeValue}`);
+          mdVSFrame[key] = safeValue;
+        }
+      }
+    });
 
     this.runPixelEquations(this.presetEquationRunner, mdVSFrame, globalVars, false);
+
+    // Debug: Check warpColor right after pixel equations for new preset
+    if (this.debugMode && this.blending && this.frameNum % 30 === 0) {
+      const checkAlpha = () => {
+        let zeroCount = 0;
+        for (let i = 3; i < this.warpColor.length; i += 4) {
+          if (this.warpColor[i] === 0) zeroCount++;
+        }
+        return zeroCount / (this.warpColor.length / 4);
+      };
+
+      const zeroRatio = checkAlpha();
+      if (zeroRatio > 0.9) {
+        console.warn('[Renderer] New preset alpha zeroed after pixel equations!', {
+          preset: (this.preset && this.preset.desc) || 'unknown',
+          zeroRatio: (zeroRatio * 100).toFixed(1) + '%',
+          wave_a: mdVSFrame.wave_a,
+          decay: mdVSFrame.decay,
+          brighten: mdVSFrame.brighten,
+          darken: mdVSFrame.darken,
+          solarize: mdVSFrame.solarize,
+          invert: mdVSFrame.invert
+        });
+      }
+    }
 
     if (!this.preset.useWASM) {
       Object.assign(this.regVars, Utils.pick(this.mdVSVertex, this.regs));
@@ -839,12 +1021,66 @@ export default class Renderer {
     let mdVSFrameMixed;
     if (this.blending) {
       this.prevMDVSFrame = this.prevPresetEquationRunner.runFrameEquations(prevGlobalVars);
+
+      // Sanitize previous frame values too
+      Object.keys(this.prevMDVSFrame).forEach(key => {
+        if (typeof this.prevMDVSFrame[key] === 'number') {
+          if (isNaN(this.prevMDVSFrame[key]) || !isFinite(this.prevMDVSFrame[key])) {
+            const defaults = {
+              zoom: 1, zoomexp: 1, rot: 0, warp: 0,
+              cx: 0.5, cy: 0.5, dx: 0, dy: 0, sx: 1, sy: 1,
+              decay: 0.98, wave_a: 0.1,
+              brighten: 0, darken: 0, solarize: 0, invert: 0
+            };
+            const safeValue = defaults[key] !== undefined ? defaults[key] : 0;
+            console.warn(`[Renderer] Sanitizing prev ${key}: ${this.prevMDVSFrame[key]} -> ${safeValue}`);
+            this.prevMDVSFrame[key] = safeValue;
+          }
+        }
+      });
       this.runPixelEquations(
         this.prevPresetEquationRunner,
         this.prevMDVSFrame,
         prevGlobalVars,
         true
       );
+
+      // Debug: Check if either frame has invalid values that could cause black screen
+      if (this.frameNum % 30 === 0) {
+        const checkFrame = (frame, name) => {
+          const hasNaN = Object.values(frame).some(v => typeof v === 'number' && isNaN(v));
+          const hasInfinity = Object.values(frame).some(v => typeof v === 'number' && !isFinite(v));
+          const zeroAlpha = frame.decay <= 0 || frame.wave_a <= 0;
+
+          if (hasNaN || hasInfinity || zeroAlpha) {
+            // Find which specific fields have problems
+            const problemFields = {};
+            Object.entries(frame).forEach(([key, val]) => {
+              if (typeof val === 'number') {
+                if (isNaN(val)) problemFields[key] = 'NaN';
+                else if (!isFinite(val)) problemFields[key] = 'Infinity';
+                else if (val === 0 && (key === 'decay' || key === 'wave_a')) {
+                  problemFields[key] = 'zero';
+                }
+              }
+            });
+
+            console.warn(`[Renderer] ${name} frame has issues:`, {
+              hasNaN,
+              hasInfinity,
+              zeroAlpha,
+              problemFields,
+              decay: frame.decay,
+              wave_a: frame.wave_a,
+              zoom: frame.zoom,
+              rot: frame.rot
+            });
+          }
+        };
+
+        checkFrame(mdVSFrame, 'New');
+        checkFrame(this.prevMDVSFrame, 'Previous');
+      }
 
       mdVSFrameMixed = Renderer.mixFrameEquations(
         this.blendProgress,
@@ -907,6 +1143,25 @@ export default class Renderer {
         this.warpUVs,
         this.prevWarpColor // Use separate alpha buffer for previous preset
       );
+
+      // Debug: Check warp color buffers for black values during transitions
+      if (this.frameNum % 30 === 0) {
+        const checkColors = (colors, name) => {
+          let blackCount = 0;
+          for (let i = 3; i < colors.length; i += 4) { // Check alpha channel
+            if (colors[i] <= 0.01) blackCount++;
+          }
+          const blackRatio = blackCount / (colors.length / 4);
+          if (blackRatio > 0.9) {
+            console.warn(`[Renderer] ${name} warpColor is mostly black:`, {
+              blackRatio: (blackRatio * 100).toFixed(1) + '%',
+              sampleAlphas: [colors[3], colors[7], colors[11], colors[15]].map(a => a !== undefined ? a.toFixed(2) : undefined)
+            });
+          }
+        };
+        checkColors(this.prevWarpColor, 'Previous');
+        checkColors(this.warpColor, 'New');
+      }
 
       // CROSSFADE FIX: Keep alpha blending for proper crossfade (prevents fade to black)
       // The first pass already rendered with correct alpha, second pass uses additive
@@ -1055,6 +1310,42 @@ export default class Renderer {
     this.mdVSFrameMixed = mdVSFrameMixed;
 
     this.renderToScreen();
+    } catch (error) {
+      console.error('[Renderer] RENDER FAILED:', {
+        preset: (this.preset && this.preset.desc) || 'unknown',
+        blending: this.blending,
+        blendProgress: this.blendProgress,
+        frameNum: this.frameNum,
+        error: error.message,
+        stack: error.stack
+      });
+
+      // Check GL errors
+      const glError = this.gl.getError();
+      if (glError !== this.gl.NO_ERROR) {
+        const errorNames = {
+          [this.gl.INVALID_ENUM]: 'INVALID_ENUM',
+          [this.gl.INVALID_VALUE]: 'INVALID_VALUE',
+          [this.gl.INVALID_OPERATION]: 'INVALID_OPERATION',
+          [this.gl.INVALID_FRAMEBUFFER_OPERATION]: 'INVALID_FRAMEBUFFER_OPERATION',
+          [this.gl.OUT_OF_MEMORY]: 'OUT_OF_MEMORY',
+          [this.gl.CONTEXT_LOST_WEBGL]: 'CONTEXT_LOST_WEBGL'
+        };
+        console.error('[Renderer] WebGL error:', errorNames[glError] || glError);
+      }
+
+      // Try to recover by clearing the frame
+      try {
+        this.bindFrambufferAndSetViewport(null, this.width, this.height);
+        this.gl.clearColor(0, 0, 0, 1);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+      } catch (clearError) {
+        console.error('[Renderer] Failed to clear after error:', clearError.message);
+      }
+
+      // Re-throw to let caller handle
+      throw error;
+    }
   }
 
   renderToScreen() {

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2025-09-23T21:11:38.253Z",
+  "generated": "2025-09-24T19:31:03.931Z",
   "presets": {
     "8ed85908": {
       "authors": [
@@ -342,57 +342,6 @@
       },
       "pack": "butterchurnPresetsMinimal"
     },
-    "02aae0b6": {
-      "authors": [
-        "martin"
-      ],
-      "names": [
-        "martin - reflections on black tiles"
-      ],
-      "fingerprint": {
-        "energy": 0.4,
-        "bassEnergy": 0.6,
-        "trebleEnergy": 0.75,
-        "complexity": 0.15000000000000002,
-        "beatSync": 1,
-        "fps": 60
-      },
-      "pack": "butterchurnPresetsMinimal"
-    },
-    "99c14ede": {
-      "authors": [
-        "martin"
-      ],
-      "names": [
-        "martin - witchcraft reloaded"
-      ],
-      "fingerprint": {
-        "energy": 0.24999999999999997,
-        "bassEnergy": 0.9,
-        "trebleEnergy": 1,
-        "complexity": 0.25,
-        "beatSync": 1,
-        "fps": 55.9
-      },
-      "pack": "butterchurnPresetsMinimal"
-    },
-    "10a88bc9": {
-      "authors": [
-        "martin [shadow harlequins shape code]"
-      ],
-      "names": [
-        "martin [shadow harlequins shape code] - fata morgana"
-      ],
-      "fingerprint": {
-        "energy": 0.4,
-        "bassEnergy": 1,
-        "trebleEnergy": 1,
-        "complexity": 0.2,
-        "beatSync": 1,
-        "fps": 58.8
-      },
-      "pack": "butterchurnPresetsMinimal"
-    },
     "5e991b94": {
       "authors": [
         "Milk Artist At our Best"
@@ -424,23 +373,6 @@
         "complexity": 0.25,
         "beatSync": 0,
         "fps": 60
-      },
-      "pack": "butterchurnPresetsMinimal"
-    },
-    "9efad54f": {
-      "authors": [
-        "Unchained & Rovastar"
-      ],
-      "names": [
-        "Unchained & Rovastar - Wormhole Pillars (Hall of Shadows mix)"
-      ],
-      "fingerprint": {
-        "energy": 1,
-        "bassEnergy": 0.5,
-        "trebleEnergy": 0,
-        "complexity": 0.35,
-        "beatSync": 0,
-        "fps": 39.2
       },
       "pack": "butterchurnPresetsMinimal"
     },
@@ -505,7 +437,6 @@
       "cf4fdbb0",
       "5e991b94",
       "960605df",
-      "9efad54f",
       "fbfea42b",
       "ea8f819f"
     ],
@@ -513,28 +444,113 @@
       "6dfe4f17",
       "7066b188",
       "41d1c058",
-      "99c14ede",
-      "10a88bc9",
       "ea8f819f"
     ],
     "calm": [
       "41d1c058",
       "0b19eb39",
-      "8bc1249c",
-      "99c14ede"
+      "8bc1249c"
     ],
     "particle": [],
     "fractal": [],
     "geometric": [],
     "organic": []
   },
-  "authorIndex": {},
-  "nameIndex": {},
+  "authorIndex": {
+    "$$$ Royal": [
+      "8ed85908",
+      "0ae1b2e7"
+    ],
+    "unknown": [
+      "2e7021e3"
+    ],
+    "An AdamFX n Martin Infusion 2 flexi": [
+      "6dfe4f17"
+    ],
+    "Eo.S.": [
+      "65b466df"
+    ],
+    "Flexi": [
+      "7ec1deaa",
+      "3341b965"
+    ],
+    "flexi": [
+      "4d945b08"
+    ],
+    "Flexi, fishbrain, Geiss": [
+      "ca5f0821"
+    ],
+    "Flexi, martin": [
+      "c309280d"
+    ],
+    "Geiss": [
+      "1b9b90ac",
+      "90c9286a",
+      "309633ea"
+    ],
+    "Idiot": [
+      "7066b188"
+    ],
+    "Krash": [
+      "cf4fdbb0"
+    ],
+    "Martin": [
+      "7b9f7b4b",
+      "8bc1249c"
+    ],
+    "martin": [
+      "41d1c058",
+      "0b19eb39",
+      "883cf3b2"
+    ],
+    "Milk Artist At our Best": [
+      "5e991b94"
+    ],
+    "suksma": [
+      "960605df"
+    ],
+    "Unchained": [
+      "fbfea42b"
+    ],
+    "yin": [
+      "ea8f819f"
+    ],
+    "Zylot": [
+      "64cf605f"
+    ]
+  },
+  "nameIndex": {
+    "$$$ Royal - Mashup (197)": "8ed85908",
+    "$$$ Royal - Mashup (431)": "0ae1b2e7",
+    "_Mig_085": "2e7021e3",
+    "An AdamFX n Martin Infusion 2 flexi - Why The Sky Looks Diffrent Today - AdamFx n Martin Infusion - Tack Tile Disfunction B": "6dfe4f17",
+    "Eo.S. + Phat - cubetrace - v2": "65b466df",
+    "Flexi - alien fish pond": "7ec1deaa",
+    "flexi - bouncing balls [double mindblob neon mix]": "4d945b08",
+    "Flexi - mindblob [shiny mix]": "3341b965",
+    "Flexi, fishbrain, Geiss + Martin - tokamak witchery": "ca5f0821",
+    "Flexi, martin + geiss - dedicated to the sherwin maxawow": "c309280d",
+    "Geiss - Cauldron - painterly 2 (saturation remix)": "1b9b90ac",
+    "Geiss - Reaction Diffusion 2": "90c9286a",
+    "Geiss - Thumb Drum": "309633ea",
+    "Idiot - Star Of Annon": "7066b188",
+    "Krash + Illusion - Spiral Movement": "cf4fdbb0",
+    "Martin - acid wiring": "7b9f7b4b",
+    "martin - chain breaker": "41d1c058",
+    "martin - extreme heat": "0b19eb39",
+    "martin - mandelbox explorer - high speed demo version": "883cf3b2",
+    "Martin - QBikal - Surface Turbulence IIb": "8bc1249c",
+    "Milk Artist At our Best - FED - SlowFast Ft AdamFX n Martin - HD CosmoFX": "5e991b94",
+    "suksma - uninitialized variabowl (hydroponic chronic)": "960605df",
+    "Unchained - Rewop": "fbfea42b",
+    "yin - 191 - Temporal singularities": "ea8f819f",
+    "Zylot - Paint Spill (Music Reactive Paint Mix)": "64cf605f"
+  },
   "stats": {
-    "totalFiles": 29,
-    "uniquePresets": 29,
+    "totalFiles": 25,
+    "uniquePresets": 25,
     "duplicatesFound": 0,
-    "authorsCount": 20,
+    "authorsCount": 18,
     "failedFiles": 0
   }
 }

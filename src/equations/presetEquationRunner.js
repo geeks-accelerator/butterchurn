@@ -28,7 +28,8 @@ export default class PresetEquationRunner {
   }
 
   initializeEquations(globalVars) {
-    this.runVertEQs = this.preset.pixel_eqs !== '';
+    // Check if pixel_eqs exists and is not empty (handles both string and function)
+    this.runVertEQs = this.preset.pixel_eqs && this.preset.pixel_eqs !== '';
 
     this.mdVSQInit = null;
     this.mdVSRegs = null;
@@ -85,7 +86,10 @@ export default class PresetEquationRunner {
 
     const nonUserKeys = this.qs.concat(this.regs, Object.keys(this.mdVS));
 
-    const mdVSAfterInit = this.preset.init_eqs(Utils.cloneVars(this.mdVS));
+    // Safety check: ensure init_eqs exists and is a function
+    const mdVSAfterInit = (this.preset.init_eqs && typeof this.preset.init_eqs === 'function')
+      ? this.preset.init_eqs(Utils.cloneVars(this.mdVS))
+      : this.mdVS;
 
     // qs need to be initialized to there init values every frame
     this.mdVSQInit = Utils.pick(mdVSAfterInit, this.qs);
@@ -97,9 +101,12 @@ export default class PresetEquationRunner {
     initUserVars.megabuf = mdVSAfterInit.megabuf;
     initUserVars.gmegabuf = mdVSAfterInit.gmegabuf;
 
-    this.mdVSFrame = this.preset.frame_eqs(
-      Object.assign({}, this.mdVS, this.mdVSQInit, this.mdVSRegs, initUserVars)
-    );
+    // Safety check: ensure frame_eqs exists and is a function
+    this.mdVSFrame = (this.preset.frame_eqs && typeof this.preset.frame_eqs === 'function')
+      ? this.preset.frame_eqs(
+          Object.assign({}, this.mdVS, this.mdVSQInit, this.mdVSRegs, initUserVars)
+        )
+      : Object.assign({}, this.mdVS, this.mdVSQInit, this.mdVSRegs, initUserVars);
 
     // user vars need to be copied between frames
     this.mdVSUserKeys = Object.keys(Utils.omit(this.mdVSFrame, nonUserKeys));

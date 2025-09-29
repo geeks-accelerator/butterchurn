@@ -537,6 +537,8 @@ class PresetFingerprintGenerator {
                     // Add this as an alternate name
                     if (!this.database.presets[hash].names.includes(presetName)) {
                         this.database.presets[hash].names.push(presetName);
+                        // Add to name index for this duplicate name too
+                        this.database.nameIndex[presetName] = hash;
                     }
 
                     // Add author if not already included
@@ -564,6 +566,17 @@ class PresetFingerprintGenerator {
                         fingerprint,
                         pack: path.basename(jsonFile, '.json')
                     };
+
+                    // Add to name index
+                    this.database.nameIndex[presetName] = hash;
+
+                    // Add to author index
+                    if (!this.database.authorIndex[author]) {
+                        this.database.authorIndex[author] = [];
+                    }
+                    if (!this.database.authorIndex[author].includes(hash)) {
+                        this.database.authorIndex[author].push(hash);
+                    }
                 }
 
                 this.stats.totalFiles++;

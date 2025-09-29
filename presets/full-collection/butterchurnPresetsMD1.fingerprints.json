@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2025-09-23T21:11:38.189Z",
+  "generated": "2025-09-24T19:31:03.894Z",
   "presets": {
     "98203958": {
       "authors": [
@@ -223,23 +223,6 @@
       },
       "pack": "butterchurnPresetsMD1"
     },
-    "f523411d": {
-      "authors": [
-        "baked"
-      ],
-      "names": [
-        "baked - mushroom rainbows[acid Storm]"
-      ],
-      "fingerprint": {
-        "energy": 0.5,
-        "bassEnergy": 1,
-        "trebleEnergy": 1,
-        "complexity": 0.25,
-        "beatSync": 0.5,
-        "fps": 20
-      },
-      "pack": "butterchurnPresetsMD1"
-    },
     "114417c0": {
       "authors": [
         "baked"
@@ -393,23 +376,6 @@
       },
       "pack": "butterchurnPresetsMD1"
     },
-    "103ab413": {
-      "authors": [
-        "Eo.S."
-      ],
-      "names": [
-        "Eo.S. - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix07 recursive demons"
-      ],
-      "fingerprint": {
-        "energy": 0.5,
-        "bassEnergy": 1,
-        "trebleEnergy": 1,
-        "complexity": 0.35,
-        "beatSync": 0.7,
-        "fps": 34.7
-      },
-      "pack": "butterchurnPresetsMD1"
-    },
     "15c7c935": {
       "authors": [
         "Eo.S."
@@ -441,23 +407,6 @@
         "complexity": 0.05,
         "beatSync": 0,
         "fps": 52.6
-      },
-      "pack": "butterchurnPresetsMD1"
-    },
-    "83a53b02": {
-      "authors": [
-        "fiShbRaiN"
-      ],
-      "names": [
-        "fiShbRaiN - a quiet death"
-      ],
-      "fingerprint": {
-        "energy": 0.35,
-        "bassEnergy": 0.4,
-        "trebleEnergy": 0.5,
-        "complexity": 0.1,
-        "beatSync": 0,
-        "fps": 55.5
       },
       "pack": "butterchurnPresetsMD1"
     },
@@ -1022,23 +971,6 @@
       },
       "pack": "butterchurnPresetsMD1"
     },
-    "6c7edcab": {
-      "authors": [
-        "Rovastar"
-      ],
-      "names": [
-        "Rovastar + Geiss - Hurricane Nightmare"
-      ],
-      "fingerprint": {
-        "energy": 0.85,
-        "bassEnergy": 0.4,
-        "trebleEnergy": 0,
-        "complexity": 0.15000000000000002,
-        "beatSync": 0,
-        "fps": 55.4
-      },
-      "pack": "butterchurnPresetsMD1"
-    },
     "40c4e463": {
       "authors": [
         "Rovastar"
@@ -1260,23 +1192,6 @@
       },
       "pack": "butterchurnPresetsMD1"
     },
-    "71cbb13e": {
-      "authors": [
-        "TEcHNO & SandStorm"
-      ],
-      "names": [
-        "TEcHNO & SandStorm - Psychodelic Highway"
-      ],
-      "fingerprint": {
-        "energy": 0.9500000000000001,
-        "bassEnergy": 0.6,
-        "trebleEnergy": 0.625,
-        "complexity": 0.1,
-        "beatSync": 0,
-        "fps": 58.3
-      },
-      "pack": "butterchurnPresetsMD1"
-    },
     "05ca3bbe": {
       "authors": [
         "Telek"
@@ -1308,23 +1223,6 @@
         "complexity": 0.3,
         "beatSync": 0.6,
         "fps": 26
-      },
-      "pack": "butterchurnPresetsMD1"
-    },
-    "9efad54f": {
-      "authors": [
-        "Unchained & Rovastar"
-      ],
-      "names": [
-        "Unchained & Rovastar - Wormhole Pillars (Hall of Shadows mix)"
-      ],
-      "fingerprint": {
-        "energy": 1,
-        "bassEnergy": 0.5,
-        "trebleEnergy": 0,
-        "complexity": 0.35,
-        "beatSync": 0,
-        "fps": 39.2
       },
       "pack": "butterchurnPresetsMD1"
     },
@@ -1506,7 +1404,6 @@
       "3eebf890",
       "ed193271",
       "737ec40e",
-      "6c7edcab",
       "40c4e463",
       "499f89a3",
       "079cf8f5",
@@ -1518,9 +1415,7 @@
       "0f4ec09e",
       "3ced4326",
       "2c997d4f",
-      "71cbb13e",
       "05ca3bbe",
-      "9efad54f",
       "525e0c81",
       "94c3c7fb",
       "55f1df14",
@@ -1531,12 +1426,10 @@
     ],
     "bass": [
       "76cff618",
-      "f523411d",
       "114417c0",
       "108c9b62",
       "d7c75646",
       "e99185d3",
-      "103ab413",
       "52f3f45d",
       "a20b87ca",
       "7066b188",
@@ -1568,13 +1461,239 @@
     "geometric": [],
     "organic": []
   },
-  "authorIndex": {},
-  "nameIndex": {},
+  "authorIndex": {
+    "Aderrasi": [
+      "76cff618",
+      "39026ab7",
+      "5ec602be",
+      "a6167d98",
+      "bf3cf940",
+      "a37023cb",
+      "4a4f0d85",
+      "83d30904"
+    ],
+    "amandio c": [
+      "49141c73",
+      "d36e55e8",
+      "4a3b5c8a"
+    ],
+    "baked": [
+      "e5551dd1",
+      "114417c0"
+    ],
+    "bdrv": [
+      "5102b688",
+      "108c9b62"
+    ],
+    "beta106i": [
+      "5c2783d7"
+    ],
+    "Eo.S.": [
+      "65b466df",
+      "2bb3fe5d",
+      "d7c75646",
+      "d710d1e9",
+      "e99185d3",
+      "15c7c935",
+      "3460bd78"
+    ],
+    "fiShbRaiN": [
+      "6605901b",
+      "eed16ebb",
+      "be4b0dc1",
+      "42b5217d"
+    ],
+    "Geiss": [
+      "7f7cb91c",
+      "4a05884d",
+      "f5f63ed5",
+      "03cad2f8",
+      "be31a570",
+      "20c0230f"
+    ],
+    "GreatWho": [
+      "52f3f45d"
+    ],
+    "Idiot": [
+      "a20b87ca",
+      "7066b188"
+    ],
+    "iMuS and  Rovastar": [
+      "d0796966"
+    ],
+    "Ishan": [
+      "c6432bda"
+    ],
+    "Krash & Rovastar": [
+      "3d4c5a34"
+    ],
+    "Krash": [
+      "cf4fdbb0",
+      "d72565cf"
+    ],
+    "ORB": [
+      "ab8fc7dd",
+      "a0e3dc33",
+      "8d88b22d"
+    ],
+    "phat": [
+      "30e7a242"
+    ],
+    "Phat": [
+      "322aab1d",
+      "897bb1f7"
+    ],
+    "Phat_Zylot_Eo.S.": [
+      "06852751",
+      "fc4dc880"
+    ],
+    "PieturP": [
+      "23d0e695",
+      "73c671b4"
+    ],
+    "Redi Jedi": [
+      "11484c7a"
+    ],
+    "Rovastar & Idiot24": [
+      "3eebf890"
+    ],
+    "Rovastar & Loadus": [
+      "4d008ca6"
+    ],
+    "Rovastar": [
+      "ed193271",
+      "737ec40e",
+      "40c4e463",
+      "499f89a3",
+      "079cf8f5",
+      "b3d4f629",
+      "2b4b8122",
+      "b60f27d5",
+      "7933e75a"
+    ],
+    "Rozzor & Shreyas": [
+      "d17df3fe"
+    ],
+    "shifter": [
+      "d266c529",
+      "0f4ec09e",
+      "57e5cf8b"
+    ],
+    "stahlregen": [
+      "3ced4326"
+    ],
+    "Studio Music and Unchained": [
+      "2c997d4f"
+    ],
+    "Telek": [
+      "05ca3bbe",
+      "ae144353"
+    ],
+    "Unchained": [
+      "525e0c81",
+      "98203958",
+      "94c3c7fb",
+      "55f1df14",
+      "fbfea42b",
+      "8093ebb5"
+    ],
+    "yin": [
+      "9d2efaf8",
+      "ea8f819f",
+      "c0f0a6f8"
+    ],
+    "Zylot": [
+      "f9bb78a3"
+    ]
+  },
+  "nameIndex": {
+    "Aderrasi - Agitator": "76cff618",
+    "Aderrasi - Airhandler (Last Breath - Calm)": "39026ab7",
+    "Aderrasi - Contortion (Escher′s Tunnel Mix)": "5ec602be",
+    "Aderrasi - Contortion (Wide Twist Mix)": "a6167d98",
+    "Aderrasi - Curse of the Mirror Emu": "bf3cf940",
+    "Aderrasi - Halls Of Centrifuge": "a37023cb",
+    "Aderrasi - Potion of Spirits": "4a4f0d85",
+    "Aderrasi - Songflower (Moss Posy)": "83d30904",
+    "amandio c - feeling well 3": "49141c73",
+    "amandio c - flashy thing": "d36e55e8",
+    "amandio c - salty beats - spiral": "4a3b5c8a",
+    "baked - Chinese Fingerbang (cao ni ma =]) - PieturP colors - Bitcore speed tweak": "e5551dd1",
+    "baked - River of Illusion Dillusion [Bubble]": "114417c0",
+    "bdrv + al shifter - feathers (angel wings)_phat_remix4 bdrv et  AL  rmxmix bdrv et.AL5": "5102b688",
+    "bdrv - ultramix2 #43": "108c9b62",
+    "beta106i - Potion of Ink": "5c2783d7",
+    "Eo.S. + Phat - cubetrace - v2": "65b466df",
+    "Eo.S. + Phat - Emergent factors": "2bb3fe5d",
+    "Eo.S. + Zylot - skylight (Stained Glass Majesty mix)": "d7c75646",
+    "Eo.S. - glowsticks v2 03 music": "d710d1e9",
+    "Eo.S. - glowsticks v2 05 and proton lights (+Krash′s beat code) _Phat_remix02b": "e99185d3",
+    "Eo.S. - multisphere 01 B_Phat_Ra_mix": "15c7c935",
+    "Eo.S. - spark C_Phat_Jester_Mix_v2": "3460bd78",
+    "fiShbRaiN - breakfast cruiser": "6605901b",
+    "fiShbRaiN - the adventures of prismo jenkins": "eed16ebb",
+    "fiShbRaiN - toffee cream and icing sugar": "be4b0dc1",
+    "fiShbRaiN - witchcraft (necromancer remix)_phat_edit_v3": "42b5217d",
+    "Geiss + Rovastar - Notions Of Tonality 2": "7f7cb91c",
+    "Geiss - Eggs": "4a05884d",
+    "Geiss - El Cubismo": "f5f63ed5",
+    "Geiss - Feedback 2": "03cad2f8",
+    "Geiss - Hurricane": "be31a570",
+    "Geiss - Planet 1": "20c0230f",
+    "GreatWho - Lasershow": "52f3f45d",
+    "Idiot - Marphets Surreal Dream (Hypnotic Spiral Mix)": "a20b87ca",
+    "Idiot - Star Of Annon": "7066b188",
+    "iMuS and  Rovastar - The Shroomery (psilobellum)": "d0796966",
+    "Ishan - Anuera": "c6432bda",
+    "Krash & Rovastar - A Million Miles from Earth (Ripple Mix)": "3d4c5a34",
+    "Krash + Illusion - Spiral Movement": "cf4fdbb0",
+    "Krash - War Machine (Shifting Complexity Mix)": "d72565cf",
+    "ORB - Blue Emotion": "ab8fc7dd",
+    "ORB - Fire and Fumes 2": "a0e3dc33",
+    "ORB - Solar Radiation": "8d88b22d",
+    "phat + Eo.S. - Bass_responce_Red_Movements_Disorienting nebula3": "30e7a242",
+    "Phat + Zylot + Eo.S. - work with lines": "322aab1d",
+    "Phat+fiShbRaiN+Eo.S_Mandala_Chasers_remix": "897bb1f7",
+    "Phat_Zylot_Eo.S. spiral_Movements_Beatle": "06852751",
+    "Phat_Zylot_Eo.S. square_faces_v2_alt_colours": "fc4dc880",
+    "PieturP - triptrap_(getting_concrete_visions_through_a_diafragma_version)": "23d0e695",
+    "PieturP - triptrap_(ultimate-trip-mix)": "73c671b4",
+    "Redi Jedi - i dont think those were portabello mushrooms": "11484c7a",
+    "Rovastar & Idiot24-7 - Balk Acid": "3eebf890",
+    "Rovastar & Loadus + Zylot - FractalDrop (Spark Machine v2.0)": "4d008ca6",
+    "Rovastar + Che - Asylum Animations": "ed193271",
+    "Rovastar + Fvese - Mosaic Waves": "737ec40e",
+    "Rovastar + Telek - Altars of Madness (Rolling Oceans Mix)": "40c4e463",
+    "Rovastar - A Million Miles From Earth (Wormhole Mix)": "499f89a3",
+    "Rovastar - Explosive Minds": "079cf8f5",
+    "Rovastar - Hyperspace": "b3d4f629",
+    "Rovastar - Oozing Resistance": "2b4b8122",
+    "Rovastar - Torrid Tales": "b60f27d5",
+    "Rovastar-altarsofmadness(forgottenrea": "7933e75a",
+    "Rozzor & Shreyas - Deeper Aesthetics": "d17df3fe",
+    "shifter - escape the worm - Eo.S. + Phat - Before_It_Eats_Your_Brain_Mix_v2": "d266c529",
+    "shifter - feathers (angel wings)": "0f4ec09e",
+    "shifter - fractal grinder": "57e5cf8b",
+    "stahlregen - old school, baby (spiral ornament)": "3ced4326",
+    "Studio Music and Unchained - Rapid Alteration": "2c997d4f",
+    "Telek - City Helix Lattice": "05ca3bbe",
+    "Telek - Sine Wave": "ae144353",
+    "Unchained - All You Can Eat": "525e0c81",
+    "Unchained - Fuzzy Sciences": "98203958",
+    "Unchained - Making a Science of It 4": "94c3c7fb",
+    "Unchained - Making a Science of It 7": "55f1df14",
+    "Unchained - Rewop": "fbfea42b",
+    "Unchained - Unified Drag 2": "8093ebb5",
+    "yin - 190 - Temporal fluctuations": "9d2efaf8",
+    "yin - 191 - Temporal singularities": "ea8f819f",
+    "yin - 250 - Artificial poles of the continuum_Phat′s_Orbit_mix": "c0f0a6f8",
+    "Zylot - Star Ornament": "f9bb78a3"
+  },
   "stats": {
-    "totalFiles": 87,
-    "uniquePresets": 87,
+    "totalFiles": 81,
+    "uniquePresets": 81,
     "duplicatesFound": 0,
-    "authorsCount": 33,
+    "authorsCount": 31,
     "failedFiles": 0
   }
 }
