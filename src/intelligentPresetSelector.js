@@ -98,6 +98,17 @@ class IntelligentPresetSelector {
         this.maxSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
             config.get('presetSelection.maxSwitchInterval', 60000) : 60000;  // 60 seconds max
 
+        // TODO: Implement audio lookahead (~1 second) to anticipate drops/energy changes
+        // Currently we're reactive, switching AFTER energy changes happen, which can cause
+        // awkward transitions in the middle of drops. We should analyze upcoming audio
+        // to schedule transitions BEFORE the drop hits, aligning preset changes with
+        // musical structure rather than reacting to it.
+        // Potential approach:
+        // 1. Buffer 1-2 seconds of future audio data
+        // 2. Analyze for sudden energy changes (drops, buildups)
+        // 3. Schedule preset switches to complete just before the drop
+        // 4. This would make transitions feel intentional, not reactive
+
         // Initialize MA Crossover system for intelligent switching
         const crossoverConfig = (typeof config !== 'undefined' && config?.get) ? {
             energyFast: config.get('crossover.energyFast', 5),
