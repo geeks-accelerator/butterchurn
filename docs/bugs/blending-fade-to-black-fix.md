@@ -56,36 +56,36 @@ this.prevWarpColor = new Float32Array(
 
 ### 2. Fixed Alpha Calculation - Non-WASM Path
 
-**In `runPixelEquations()` blending section** (lines 574-580):
+**In `runPixelEquations()` blending section** (lines 636, 642):
 ```javascript
 // BLENDING FIX: Set normal warp color
 this.warpColor[offsetColor + 0] = 1;
 this.warpColor[offsetColor + 1] = 1;
 this.warpColor[offsetColor + 2] = 1;
-this.warpColor[offsetColor + 3] = 1 - mix2; // NEW preset fades IN (0→1)
+this.warpColor[offsetColor + 3] = mix2; // NEW preset fades IN (0→1)
 
-// BLENDING FIX: Store previous preset alpha in separate buffer (NON-WASM fix)
+// BLENDING FIX: Proper crossfade - old preset fades OUT
 this.prevWarpColor[offsetColor + 0] = 1;
 this.prevWarpColor[offsetColor + 1] = 1;
 this.prevWarpColor[offsetColor + 2] = 1;
-this.prevWarpColor[offsetColor + 3] = mix2; // OLD preset fades OUT (1→0)
+this.prevWarpColor[offsetColor + 3] = 1 - mix2; // OLD preset fades OUT (1→0)
 ```
 
 ### 3. Fixed Alpha Calculation - WASM Path
 
-**In WASM blending section** (lines 671-678):
+**In WASM blending section** (lines 706, 712):
 ```javascript
 // BLENDING FIX: Set normal warp color
 this.warpColor[offsetColor + 0] = 1;
 this.warpColor[offsetColor + 1] = 1;
 this.warpColor[offsetColor + 2] = 1;
-this.warpColor[offsetColor + 3] = 1 - mix2; // NEW preset fades IN (0→1)
+this.warpColor[offsetColor + 3] = mix2; // NEW preset fades IN (0→1)
 
-// BLENDING FIX: Store previous preset alpha in separate buffer (WASM fix)
+// BLENDING FIX: Proper crossfade - old preset fades OUT (WASM path)
 this.prevWarpColor[offsetColor + 0] = 1;
 this.prevWarpColor[offsetColor + 1] = 1;
 this.prevWarpColor[offsetColor + 2] = 1;
-this.prevWarpColor[offsetColor + 3] = mix2; // OLD preset fades OUT (1→0)
+this.prevWarpColor[offsetColor + 3] = 1 - mix2; // OLD preset fades OUT (1→0)
 ```
 
 ### 4. Updated Shader Calls to Use Separate Buffers
