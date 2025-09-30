@@ -633,13 +633,13 @@ export default class Renderer {
             this.warpColor[offsetColor + 0] = 1;
             this.warpColor[offsetColor + 1] = 1;
             this.warpColor[offsetColor + 2] = 1;
-            this.warpColor[offsetColor + 3] = 1 - mix2; // NEW preset fades IN (0→1)
+            this.warpColor[offsetColor + 3] = mix2; // NEW preset fades IN (0→1)
 
             // BLENDING FIX: Proper crossfade - old preset fades OUT
             this.prevWarpColor[offsetColor + 0] = 1;
             this.prevWarpColor[offsetColor + 1] = 1;
             this.prevWarpColor[offsetColor + 2] = 1;
-            this.prevWarpColor[offsetColor + 3] = mix2; // OLD preset fades OUT (1→0)
+            this.prevWarpColor[offsetColor + 3] = 1 - mix2; // OLD preset fades OUT (1→0)
           }
 
           offset += 2;
@@ -703,13 +703,13 @@ export default class Renderer {
             this.warpColor[offsetColor + 0] = 1;
             this.warpColor[offsetColor + 1] = 1;
             this.warpColor[offsetColor + 2] = 1;
-            this.warpColor[offsetColor + 3] = 1 - mix2; // NEW preset fades IN (0→1)
+            this.warpColor[offsetColor + 3] = mix2; // NEW preset fades IN (0→1)
 
             // BLENDING FIX: Proper crossfade - old preset fades OUT (WASM path)
             this.prevWarpColor[offsetColor + 0] = 1;
             this.prevWarpColor[offsetColor + 1] = 1;
             this.prevWarpColor[offsetColor + 2] = 1;
-            this.prevWarpColor[offsetColor + 3] = mix2; // OLD preset fades OUT (1→0)
+            this.prevWarpColor[offsetColor + 3] = 1 - mix2; // OLD preset fades OUT (1→0)
 
             offset += 2;
             offsetColor += 4;
@@ -1145,7 +1145,7 @@ export default class Renderer {
       );
 
       // Debug: Check warp color buffers for black values during transitions
-      if (this.frameNum % 30 === 0) {
+      if (this.debugMode && this.frameNum % 30 === 0) {
         const checkColors = (colors, name) => {
           let blackCount = 0;
           for (let i = 3; i < colors.length; i += 4) { // Check alpha channel
