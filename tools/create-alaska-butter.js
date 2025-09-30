@@ -78,7 +78,8 @@ async function createAlaskaButter() {
     await fs.writeFile(jsonOutputPath, JSON.stringify(allPresets, null, 2));
     console.log(`\n✅ Saved JSON: ${jsonOutputPath}`);
 
-    // Create JavaScript module (UMD format like the originals)
+    // Create JavaScript module (UMD format matching butterchurnPresets)
+    // Export presets directly instead of wrapped in methods
     const jsContent = `(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -86,16 +87,7 @@ async function createAlaskaButter() {
 }(this, function () {
     'use strict';
 
-    const presets = ${JSON.stringify(allPresets)};
-
-    return {
-        getPresets() {
-            return presets;
-        },
-        getPresetList() {
-            return Object.keys(presets);
-        }
-    };
+    return ${JSON.stringify(allPresets)};
 }));`;
 
     const jsOutputPath = path.join(targetDir, 'alaskaButter.js');
