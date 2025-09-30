@@ -70,11 +70,12 @@ export class PresetCompatibilityChecker {
                     analysis.recommendedTransition = 'cut';  // Hard cut
                     analysis.recommendedDuration = 0;
                 } else if (decay < this.thresholds.minSafeDecay) {
-                    analysis.compatible = false;
+                    // Very low decay needs monitoring but might work with high energy
                     analysis.issues.push('very_low_decay');
-                    analysis.severity = 'incompatible';
-                    analysis.recommendedTransition = 'cut';
-                    analysis.recommendedDuration = 0;
+                    analysis.severity = 'needs_verification';
+                    analysis.recommendedTransition = 'blend';
+                    analysis.recommendedDuration = 0.5;  // Very short trial
+                    analysis.compatible = true;  // Let it try!
                 } else if (decay < this.thresholds.lowDecayWarning) {
                     analysis.issues.push('low_decay');
                     analysis.severity = 'warning';
@@ -97,12 +98,13 @@ export class PresetCompatibilityChecker {
                 analysis.recommendedTransition = 'cut';
                 analysis.recommendedDuration = 0;
             } else if (preset.baseVals.wave_a < 0.01) {
-                // Very low wave_a (< 0.01) can also cause issues
-                analysis.compatible = false;
+                // Very low wave_a (< 0.01) needs verification during transition
+                // These presets often use shapes/shaders instead of waves
                 analysis.issues.push('very_low_wave_a');
-                analysis.severity = 'incompatible';
-                analysis.recommendedTransition = 'cut';
-                analysis.recommendedDuration = 0;
+                analysis.severity = 'needs_verification';
+                analysis.recommendedTransition = 'blend';
+                analysis.recommendedDuration = 1.0;  // Short trial blend
+                analysis.compatible = true;  // Give it a chance!
             }
         }
 
@@ -219,16 +221,32 @@ export class PresetCompatibilityChecker {
         const fromAnalysis = this.analyzePreset(fromPreset);
         const toAnalysis = this.analyzePreset(toPreset);
 
-        // If either preset is incompatible, use hard cut
-        // This includes both transitioning TO and FROM problematic presets
-        if (!fromAnalysis.compatible || !toAnalysis.compatible) {
+        // If either preset is truly incompatible (not just needs_verification), use hard cut
+        const fromIncompatible = !fromAnalysis.compatible && fromAnalysis.severity === 'incompatible';
+        const toIncompatible = !toAnalysis.compatible && toAnalysis.severity === 'incompatible';
+
+        if (fromIncompatible || toIncompatible) {
             return {
                 type: 'cut',
                 duration: 0,
                 reason: [
-                    ...(!fromAnalysis.compatible ? [`from: ${fromAnalysis.issues.join(', ')}`] : []),
-                    ...(!toAnalysis.compatible ? [`to: ${toAnalysis.issues.join(', ')}`] : [])
+                    ...(fromIncompatible ? [`from: ${fromAnalysis.issues.join(', ')}`] : []),
+                    ...(toIncompatible ? [`to: ${toAnalysis.issues.join(', ')}`] : [])
                 ].join('; ')
+            };
+        }
+
+        // If either needs verification, use short blend with monitoring
+        if (fromAnalysis.severity === 'needs_verification' || toAnalysis.severity === 'needs_verification') {
+            const minDuration = Math.min(
+                fromAnalysis.recommendedDuration || 2.5,
+                toAnalysis.recommendedDuration || 2.5
+            );
+            return {
+                type: 'blend',
+                duration: minDuration,
+                needsMonitoring: true,
+                reason: 'Preset needs verification during transition'
             };
         }
 

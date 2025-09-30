@@ -221,6 +221,14 @@ class IntelligentPresetSelector {
      * Set up module initialization when async modules become available
      */
     setupModuleInitialization() {
+        // TODO: Fix scaling issue - building reverse mapping from preset names to hash IDs
+        // Currently the intelligent selector needs to build a reverse mapping from preset names
+        // to hash IDs which doesn't scale well with large preset collections. Consider:
+        // 1. Pre-computing the reverse mapping at build time
+        // 2. Using a more efficient data structure (Map vs Object)
+        // 3. Caching the mapping in localStorage for faster subsequent loads
+        // 4. Loading mappings on-demand rather than all at once
+
         // Check periodically if modules have loaded
         const checkModules = () => {
             if (frameAnalyzer && !this.frameAnalyzer) {
