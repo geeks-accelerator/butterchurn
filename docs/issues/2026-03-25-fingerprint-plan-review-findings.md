@@ -283,6 +283,7 @@ All updates applied to `docs/plans/fingerprint-quality-improvements.md`:
 - **Source Review:** [fingerprint-quality-review-2026-03-25.md](../reviews/fingerprint-quality-review-2026-03-25.md)
 - **Codex Review:** [2026-03-25-fingerprint-plan-codex.md](../reviews/2026-03-25-fingerprint-plan-codex.md)
 - **Gemini Review:** [2026-03-25-fingerprint-plan-gemini.md](../reviews/2026-03-25-fingerprint-plan-gemini.md)
+- **Follow-On Twin Review:** [2026-03-25-fingerprint-plan-twin-review-findings.md](./2026-03-25-fingerprint-plan-twin-review-findings.md)
 
 ---
 
