@@ -196,11 +196,9 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
 
 **Solution:** Expand mood vocabulary and add fractal-specific mood derivation.
 
-> **PRE-4 NOTE (Forward Compatibility):** The new mood types (mystical, hypnotic, psychedelic, dreamy, meditative) are generated in fingerprints but NOT yet matched at runtime. The `detectMood()` function in `advancedAnalyzer.js` only returns 5 labels (aggressive, relaxed, happy, electronic, acoustic).
+> **PRE-4 NOTE (Forward Compatibility):** The new mood types (mystical, hypnotic, psychedelic, dreamy, meditative) are generated in fingerprints and now matched at runtime.
 >
-> **Decision:** Accept as forward-compatible. These moods improve fingerprint diversity and enable future runtime detection enhancements without regenerating fingerprints.
->
-> **Future Work:** Add runtime detection for new mood types in `src/audio/advancedAnalyzer.js:detectMood()`.
+> **Status:** ✅ COMPLETE - Runtime detection added to `src/audio/advancedAnalyzer.js:detectMood()` with 7 unit tests (commit 9123acb).
 
 ```javascript
 // In deriveMoodAffinities(), add new moods:
@@ -210,7 +208,7 @@ const affinities = {
     happy: 0.5,
     electronic: 0.5,
     acoustic: 0.5,
-    // NEW v2.1 moods (PRE-4: forward-compatible, runtime detection is future work):
+    // NEW v2.1 moods (PRE-4: runtime detection complete in advancedAnalyzer.js):
     mystical: 0.5,
     hypnotic: 0.5,
     psychedelic: 0.5,
@@ -240,7 +238,7 @@ affinities[mood] = Math.max(0, Math.min(1, affinities[mood] + boost));
 - [ ] 0% of fractals have aggressive > 0.8
 - [ ] 80%+ of fractals have hypnotic > 0.6
 - [ ] Unique mood combinations > 50 (currently 1)
-- [ ] PRE-4: New moods stored in fingerprints (runtime matching is future work)
+- [x] PRE-4: New moods stored in fingerprints AND runtime detection complete
 
 ### 1.2 Fix Complexity Scaling (EXT-2, FRC-3)
 
@@ -1281,7 +1279,7 @@ console.log('Organic aggressive > 0.75:', (orgHighAgg.length / organics.length *
 
 - **TWIN-1 FIX:** Phases 1-2 and 4 modify fingerprint generation only (`tools/generate-fingerprints.js`). Phase 3 modifies BOTH generation AND runtime selector code (`src/intelligentPresetSelector.js`). Phases 5-7 are testing, regeneration, and documentation.
 - Fingerprints are computed offline, so performance is not a concern
-- New moods (mystical, hypnotic, etc.) require selector updates to use them (future work per PRE-4)
+- ~~New moods (mystical, hypnotic, etc.) require selector updates to use them (future work per PRE-4)~~ **DONE:** Runtime detection added to `advancedAnalyzer.js:detectMood()` (commit 9123acb)
 - Consider A/B testing with subset before full regeneration
 
 ---
