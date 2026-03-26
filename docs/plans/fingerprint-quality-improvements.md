@@ -1221,7 +1221,7 @@ console.log('Organic aggressive > 0.75:', (orgHighAgg.length / organics.length *
 - [x] CLR-3: Add yellow/gold detection
 - [x] ORG-4: Add psychedelic style
 - [x] ABS-3: Increase abstract mood variation
-- [ ] Manual edge case review (deferred)
+- [x] Manual edge case review (see `docs/reviews/2026-03-25-fingerprint-edge-case-review.md`)
 
 ### Phase 5: Test Coverage ✅
 - [x] Fix wiring gap: import actual generator in tests
@@ -1321,7 +1321,7 @@ All success criteria met:
 
 ### Deferred Items
 
-- Manual edge case review: Not performed (low priority)
+- None - all items complete
 
 ---
 
