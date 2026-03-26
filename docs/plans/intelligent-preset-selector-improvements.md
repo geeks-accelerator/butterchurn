@@ -243,7 +243,9 @@ export class AdvancedAudioAnalyzer {
         // ... keep featureHistory.push() logic ...
 
         // NEW: Add Meyda spectral features if available
-        if (this.meydaAnalyzer) {
+        // TWIN-CRIT-1 FIX: Check AudioContext state before calling get()
+        // Mobile browsers auto-suspend AudioContext, causing stale/undefined data
+        if (this.meydaAnalyzer && this.audioContext?.state === 'running') {
             try {
                 const meydaFeatures = this.meydaAnalyzer.get([
                     'rms', 'spectralCentroid', 'spectralFlux',
@@ -278,7 +280,9 @@ export class AdvancedAudioAnalyzer {
                 features.spectral = null;
             }
         } else {
-            features.spectral = null; // Graceful degradation
+            // TWIN-CRIT-1 FIX: Graceful degradation when Meyda unavailable
+            // or AudioContext suspended (common on mobile)
+            features.spectral = null;
         }
 
         return features;
@@ -490,11 +494,17 @@ class AdvancedAudioAnalyzer {
 
 ```javascript
   // Detect if we're in a buildup leading to a drop
-  detectBuildup(features) {
+  // TWIN-CRIT-2 FIX: Accept audioContextTime for consistent timing
+  // Mixing performance.now() and audioContext.currentTime causes drift
+  detectBuildup(features, audioContextTime = null) {
+    // Use audioContext.currentTime when available (high-priority thread, no drift)
+    const timestamp = audioContextTime !== null ?
+        audioContextTime * 1000 : performance.now();
+
     this.buildupHistory.push({
       energy: features.energy || features.beatStrength || 0,
       spectralCentroid: features.spectralCentroid || 0,
-      timestamp: performance.now()
+      timestamp: timestamp
     });
 
     if (this.buildupHistory.length > this.BUILDUP_HISTORY_SIZE) {
@@ -659,7 +669,9 @@ class IntelligentPresetSelector {
     });
 
     if (dropCandidates.length > 0) {
-      const hash = dropCandidates[Math.floor(Math.random() * dropCandidates.length)];
+      // TWIN-WARN-1 FIX: Use deterministic RNG for visual regression tests
+      // CLAUDE.md: "KEEP deterministic RNG context for visual regression tests"
+      const hash = dropCandidates[Math.floor(this.rng() * dropCandidates.length)];
       return { hash, preset: this.db.presets[hash] };
     }
     return this.selectBestPresetWithLogic(features);
@@ -1528,9 +1540,10 @@ Add documentation for new fingerprint fields:
 - `visualStyleScores` - Confidence scores for each category
 - `moodAffinities` - Preset-mood compatibility scores
 - `optimalBpm` - Recommended BPM range (min, max, ideal)
-- `spectralProfile` - Expected spectral characteristics
 - `colorProfile` - Dominant color temperature
 - `motionSpeed` - Visual motion speed (slow/medium/fast)
+
+> **TWIN-WARN-2 FIX**: Removed `spectralProfile` - was removed by CRIT-7.
 
 ### Task 6.3: Update Architecture Docs
 
@@ -1877,27 +1890,28 @@ describe('IntelligentPresetSelector', () => {
   });
 
   describe('Bar-Aligned Switching', () => {
-    it('should queue switch for bar boundary when BPM detected', () => {
+    // TWIN-WARN-4 FIX: Use pendingSwitchOnPhrase (16-beat phrases, not 4-beat bars)
+    it('should queue switch for phrase boundary when BPM detected', () => {
       selector.analyzer.detectedBPM = 120;
-      selector.analyzer.barPosition = 2;
+      selector.analyzer.phrasePosition = 8; // Mid-phrase
 
       const result = selector.update(audioLevels);
 
       expect(result.wantsSwitch).toBe(true);
-      expect(selector.pendingSwitchOnBar).toBe(true);
+      expect(selector.pendingSwitchOnPhrase).toBe(true);
       expect(result.nextSwitch).toBeGreaterThan(0);
     });
 
-    it('should execute queued switch on bar boundary', () => {
-      selector.pendingSwitchOnBar = true;
+    it('should execute queued switch on phrase boundary', () => {
+      selector.pendingSwitchOnPhrase = true;
       selector.pendingSwitchPreset = mockPreset;
-      selector.analyzer.barPosition = 0;
+      selector.analyzer.phrasePosition = 0; // Start of phrase
       selector.analyzer.beatPhase = 0.05;
 
       const result = selector.update(audioLevels);
 
       expect(result.switched).toBe(true);
-      expect(selector.pendingSwitchOnBar).toBe(false);
+      expect(selector.pendingSwitchOnPhrase).toBe(false);
     });
 
     it('should switch immediately when no BPM detected', () => {
@@ -1989,7 +2003,7 @@ describe('Fingerprint Generation', () => {
       expect(fingerprint.visualStyleScores).toBeDefined();
       expect(fingerprint.moodAffinities).toBeDefined();
       expect(fingerprint.optimalBpm).toBeDefined();
-      expect(fingerprint.spectralProfile).toBeDefined();
+      // TWIN-WARN-3 FIX: Removed spectralProfile assertion (removed by CRIT-7)
       expect(fingerprint.colorProfile).toBeDefined();
       expect(fingerprint.motionSpeed).toBeDefined();
     });
@@ -2290,7 +2304,7 @@ The core intelligence improvements are all in butterchurn.
 
 ---
 
-*Plan Version: 4.0 | Created: 2026-03-25 | Updated: 2026-03-25*
+*Plan Version: 4.1 | Created: 2026-03-25 | Updated: 2026-03-25*
 
 **Changelog:**
 - v1.0: Initial plan
@@ -2313,3 +2327,10 @@ The core intelligence improvements are all in butterchurn.
   - WARN-4: Combine flux + bass signals (no early return)
   - WARN-5: Added Python requirements.txt
   - SUG-1: Made flux spike multiplier configurable
+- v4.1: **Addressed 6 twin review issues** from [twin review](../issues/intelligent-preset-selector-twin-review.md):
+  - TWIN-CRIT-1: Add AudioContext state check before Meyda `get()` (mobile support)
+  - TWIN-CRIT-2: Use `audioContext.currentTime` consistently in `detectBuildup()`
+  - TWIN-WARN-1: Replace `Math.random()` with `this.rng()` for deterministic RNG
+  - TWIN-WARN-2: Remove `spectralProfile` from Task 6.2 documentation
+  - TWIN-WARN-3: Remove `spectralProfile` assertion from tests
+  - TWIN-WARN-4: Fix test terminology (`pendingSwitchOnPhrase` not `pendingSwitchOnBar`)
