@@ -26,6 +26,121 @@ This plan addresses all issues identified in the fingerprint quality review. The
 
 ---
 
+## Codebase Audit
+
+**Date:** 2026-03-25
+
+### Architecture Overview
+
+The system uses **two complementary analysis approaches** - NOT duplicates:
+
+| Analysis Type | File | Purpose | When Executed |
+|--------------|------|---------|---------------|
+| **Static (Fingerprints)** | `tools/generate-fingerprints.js` | Analyze preset equations | Build time |
+| **Dynamic (Audio)** | `src/audio/advancedAnalyzer.js` | Analyze live audio | Runtime |
+| **Matching** | `src/intelligentPresetSelector.js` | Combine both for scoring | Runtime |
+
+### Implementation Locations
+
+| Feature | Static (Fingerprint) | Dynamic (Audio) | Selection |
+|---------|---------------------|-----------------|-----------|
+| Mood | `deriveMoodAffinities()` | `detectMood()` | `scoreForMood()` |
+| Energy | `analyzeEnergy()` | `calculateFeatures()` | `calculateMatchScore()` |
+| Complexity | `analyzeComplexity()` | - | `scoreContinuity()` |
+| Visual Style | `detectVisualStyle()` | - | **NOT USED** |
+| Color Profile | `extractColorProfile()` | - | **NOT USED** |
+| Beat Sync | `analyzeBeatSync()` | - | Minimal use |
+| Genre | - | `detectGenre()` | `shouldSwitchPreset()` |
+| BPM | `calculateOptimalBpm()` | `detectBPM()` | **NOT WIRED** |
+| Buildup | - | `detectBuildup()` | `shouldSwitchPreset()` |
+
+### Findings: No True Duplication
+
+**Confirmed:** The following are **complementary**, not duplicates:
+- `deriveMoodAffinities()` (static) vs `detectMood()` (live) - Different inputs/outputs
+- `analyzeEnergy()` (static) vs energy in `calculateFeatures()` (live) - Different data sources
+
+### Findings: Underutilized Features (Wiring Gaps)
+
+These fingerprint fields are **generated but NOT used** in preset selection:
+
+| Field | Generated In | Should Be Used In | Action Required |
+|-------|-------------|-------------------|-----------------|
+| `colorProfile` | `generate-fingerprints.js:371` | `intelligentPresetSelector.js` | Wire to scoring |
+| `visualStyle` | `generate-fingerprints.js:316` | `intelligentPresetSelector.js` | Wire to scoring |
+| `optimalBpm` | `generate-fingerprints.js:448` | `intelligentPresetSelector.js` | Wire to BPM matching |
+
+**Recommendation:** Phase 3 should include wiring these unused fields to the selector.
+
+### Findings: Test File Wiring Gap
+
+**Issue:** `test/tools/generateFingerprints.test.js` contains **inline implementations** that are OUT OF SYNC with actual code.
+
+```javascript
+// TEST FILE (lines 18-32) - STALE COPY:
+function extractColorProfile(preset) {
+    const equations = (preset.init_eqs_eel || '');
+    const redUsage = (equations.match(/red\s*=/gi) || []).length;
+    // OLD logic - doesn't match current implementation!
+}
+
+// ACTUAL CODE (lines 371-437) - CURRENT:
+extractColorProfile(preset) {
+    const allEqs = this.getAllEquations(preset);
+    const baseVals = preset.baseVals || {};
+    // Wave colors, shape colors, keywords, gamma/brightness...
+}
+```
+
+**Resolution:** Phase 5 addresses this - export functions and import in tests.
+
+### Code Reuse Opportunities
+
+When implementing fixes, **reuse existing code**:
+
+| New Feature | Reuse From | How |
+|-------------|-----------|-----|
+| New mood types (mystical, etc.) | `deriveMoodAffinities()` | Extend existing styleBoosts object |
+| Fractal complexity boost | `analyzeComplexity()` | Add condition, don't create new function |
+| Keyword detection | `detectVisualStyle()` | Add to existing function, don't duplicate |
+| Organic mood caps | `deriveMoodAffinities()` | Add post-processing in existing function |
+
+### Files to Modify (Single Source of Truth)
+
+All fingerprint generation changes should be made in **ONE file**:
+- **`tools/generate-fingerprints.js`** - Single source for all static analysis
+
+Do NOT create new files for:
+- Mood vocabulary expansion
+- Complexity scaling
+- Visual style keyword detection
+- Color profile improvements
+
+### Selector Wiring (New Work Required)
+
+The following **new wiring** is needed in `src/intelligentPresetSelector.js`:
+
+```javascript
+// Currently NOT implemented - needs to be added:
+
+// 1. Color profile matching
+scoreForColorProfile(preset, currentMood) {
+    // Use preset.fingerprint.colorProfile
+}
+
+// 2. Visual style continuity
+scoreForVisualStyle(currentPreset, candidatePreset) {
+    // Use preset.fingerprint.visualStyle
+}
+
+// 3. BPM matching
+scoreForBpmMatch(preset, detectedBpm) {
+    // Use preset.fingerprint.optimalBpm
+}
+```
+
+---
+
 ## Phase 1: Critical Fixes
 
 **Estimated Effort:** 4-6 hours
@@ -258,10 +373,10 @@ const ENERGY_THRESHOLDS = {
 
 **Issue:** 1 preset with energy 0.65 has relaxed: 1.0.
 
-**Solution:** Add cross-validation.
+**Solution:** Add cross-validation in `deriveMoodAffinities()` (reuse existing function).
 
 ```javascript
-// After mood derivation:
+// After mood derivation in deriveMoodAffinities():
 if (energy > 0.6) {
     affinities.relaxed -= 0.15;
 }
@@ -275,6 +390,84 @@ if (affinities.aggressive > 0.7 && affinities.relaxed > 0.7) {
     }
 }
 ```
+
+### 3.5 Wire Underutilized Fingerprint Fields (WIRE-1)
+
+**Issue:** Several fingerprint fields are generated but NOT used in preset selection.
+
+**Audit Finding:** See "Codebase Audit > Underutilized Features" section above.
+
+**Solution:** Add scoring functions in `src/intelligentPresetSelector.js` that use existing fingerprint data.
+
+```javascript
+// In intelligentPresetSelector.js - ADD to calculateMatchScore():
+
+// 1. Color profile matching (uses existing fingerprint.colorProfile)
+scoreForColorProfile(preset, detectedMood) {
+    const colorProfile = preset.fingerprint?.colorProfile || 'neutral';
+    const mood = detectedMood || this.currentMood;
+
+    // Warm colors match happy/aggressive moods
+    if (colorProfile === 'warm' && (mood === 'happy' || mood === 'aggressive')) {
+        return 0.15;
+    }
+    // Cool colors match relaxed/electronic moods
+    if (colorProfile === 'cool' && (mood === 'relaxed' || mood === 'electronic')) {
+        return 0.15;
+    }
+    // Vivid matches high energy
+    if (colorProfile === 'vivid' && this.currentEnergy > 0.7) {
+        return 0.2;
+    }
+    return 0;
+}
+
+// 2. Visual style continuity (uses existing fingerprint.visualStyle)
+scoreForVisualStyleContinuity(currentPreset, candidatePreset) {
+    const currentStyle = currentPreset?.fingerprint?.visualStyle;
+    const candidateStyle = candidatePreset?.fingerprint?.visualStyle;
+
+    if (!currentStyle || !candidateStyle) return 0;
+
+    // Same style = smooth transition
+    if (currentStyle === candidateStyle) return 0.1;
+
+    // Compatible styles
+    const compatible = {
+        organic: ['fractal', 'abstract'],
+        fractal: ['organic', 'geometric'],
+        particle: ['geometric', 'abstract'],
+        geometric: ['particle', 'fractal']
+    };
+
+    if (compatible[currentStyle]?.includes(candidateStyle)) return 0.05;
+    return -0.05; // Incompatible = penalty
+}
+
+// 3. BPM matching (uses existing fingerprint.optimalBpm)
+scoreForBpmMatch(preset, detectedBpm) {
+    if (!detectedBpm || !preset.fingerprint?.optimalBpm) return 0;
+
+    const { min, max, ideal } = preset.fingerprint.optimalBpm;
+
+    // Perfect match
+    if (Math.abs(detectedBpm - ideal) < 5) return 0.2;
+
+    // Within range
+    if (detectedBpm >= min && detectedBpm <= max) return 0.1;
+
+    // Out of range penalty
+    return -0.1;
+}
+```
+
+**Reuse:** These functions use EXISTING fingerprint fields - no changes to `generate-fingerprints.js` needed.
+
+**Acceptance Criteria:**
+- [ ] `scoreForColorProfile()` added to selector
+- [ ] `scoreForVisualStyleContinuity()` added to selector
+- [ ] `scoreForBpmMatch()` added to selector
+- [ ] `calculateMatchScore()` calls new scoring functions
 
 ---
 
@@ -618,6 +811,46 @@ describe('Integration: Selector with v2.1 Fingerprints', () => {
             // Verify EXT-3 threshold change
         });
     });
+
+    describe('WIRE-1: Underutilized Field Wiring', () => {
+        it('should score colorProfile matching for warm/happy', () => {
+            const preset = { fingerprint: { colorProfile: 'warm' } };
+            const score = selector.scoreForColorProfile(preset, 'happy');
+            expect(score).toBeGreaterThan(0);
+        });
+
+        it('should score colorProfile matching for cool/relaxed', () => {
+            const preset = { fingerprint: { colorProfile: 'cool' } };
+            const score = selector.scoreForColorProfile(preset, 'relaxed');
+            expect(score).toBeGreaterThan(0);
+        });
+
+        it('should score visualStyle continuity for same style', () => {
+            const current = { fingerprint: { visualStyle: 'organic' } };
+            const candidate = { fingerprint: { visualStyle: 'organic' } };
+            const score = selector.scoreForVisualStyleContinuity(current, candidate);
+            expect(score).toBeGreaterThan(0);
+        });
+
+        it('should penalize incompatible visualStyle transitions', () => {
+            const current = { fingerprint: { visualStyle: 'particle' } };
+            const candidate = { fingerprint: { visualStyle: 'organic' } };
+            const score = selector.scoreForVisualStyleContinuity(current, candidate);
+            expect(score).toBeLessThan(0);
+        });
+
+        it('should score BPM match for preset within optimal range', () => {
+            const preset = { fingerprint: { optimalBpm: { min: 100, max: 140, ideal: 120 } } };
+            const score = selector.scoreForBpmMatch(preset, 120);
+            expect(score).toBeGreaterThan(0.1);
+        });
+
+        it('should penalize BPM mismatch outside optimal range', () => {
+            const preset = { fingerprint: { optimalBpm: { min: 100, max: 140, ideal: 120 } } };
+            const score = selector.scoreForBpmMatch(preset, 80);
+            expect(score).toBeLessThan(0);
+        });
+    });
 });
 ```
 
@@ -635,6 +868,9 @@ describe('Integration: Selector with v2.1 Fingerprints', () => {
 | CLR-1 | Cool threshold lowered | > 20 cool presets | |
 | CLR-2 | Purple detection | Purple → cool | |
 | MOD-1 | Energy-relaxed penalty | No contradictions | |
+| WIRE-1 | scoreForColorProfile() | Color-mood matching | |
+| WIRE-1 | scoreForVisualStyleContinuity() | Style transition scoring | |
+| WIRE-1 | scoreForBpmMatch() | BPM range matching | |
 
 ---
 
@@ -643,10 +879,7 @@ describe('Integration: Selector with v2.1 Fingerprints', () => {
 **Estimated Effort:** 1-2 hours
 **Dependencies:** Phase 5 tests passing
 
-**Estimated Effort:** 1-2 hours
-**Dependencies:** All phases complete
-
-### 5.1 Regenerate All Fingerprints
+### 6.1 Regenerate All Fingerprints
 
 ```bash
 # Regenerate from source
@@ -659,7 +892,7 @@ cp presets/alaska-butter/alaskaButter.fingerprints.json docs/cdn/presets/
 cp presets/alaska-butter/alaskaButter.fingerprints.min.json docs/cdn/presets/
 ```
 
-### 5.2 Run Validation Analysis
+### 6.2 Run Validation Analysis
 
 ```bash
 # Re-run the same 6-agent review to verify improvements
@@ -669,7 +902,7 @@ const fp = require('./presets/alaska-butter/alaskaButter.fingerprints.json');
 "
 ```
 
-### 5.3 Update Version
+### 6.3 Update Version
 
 - Bump fingerprint schema to v2.1.0
 
@@ -681,30 +914,30 @@ const fp = require('./presets/alaska-butter/alaskaButter.fingerprints.json');
 **Dependencies:** Phase 6 complete
 **Files:** Various documentation files
 
-### 6.1 Update CLAUDE.md
+### 7.1 Update CLAUDE.md
 
 - Update project status section with new fingerprint version
 - Add any new critical rules discovered during implementation
 - Update file organization if new files added
 
-### 6.2 Update README.md
+### 7.2 Update README.md
 
 - Document new mood types if added (mystical, hypnotic, etc.)
 - Update fingerprint schema version reference
 - Add any new usage examples for enhanced features
 
-### 6.3 Update Architecture Documentation
+### 7.3 Update Architecture Documentation
 
 - `docs/architecture/mathematical-fingerprinting.md` - Document v2.1 schema changes
 - `docs/architecture/README.md` - Update mood detection model if changed
 
-### 6.4 Update Review Document
+### 7.4 Update Review Document
 
 - Mark resolved issues in [fingerprint-quality-review-2026-03-25.md](../reviews/fingerprint-quality-review-2026-03-25.md)
 - Add "Resolution" column to issue tracker
 - Document validation results
 
-### 6.5 Close Out Plan
+### 7.5 Close Out Plan
 
 - Update this plan with completion status
 - Add "Completed" date and summary
@@ -732,6 +965,9 @@ const fp = require('./presets/alaska-butter/alaskaButter.fingerprints.json');
 - [ ] EXT-3: Adjust BPM thresholds
 - [ ] EXT-1: Raise low energy threshold
 - [ ] MOD-1: Add energy-relaxed cross-validation
+- [ ] WIRE-1: Wire colorProfile to selector scoring
+- [ ] WIRE-1: Wire visualStyle to selector scoring
+- [ ] WIRE-1: Wire optimalBpm to selector scoring
 
 ### Phase 4: Low Priority (Optional)
 - [ ] CLR-3: Add yellow/gold detection
@@ -748,8 +984,10 @@ const fp = require('./presets/alaska-butter/alaskaButter.fingerprints.json');
 - [ ] Add unit tests for organic mood caps (ORG-1/ORG-3)
 - [ ] Add unit tests for cool color detection (CLR-1/CLR-2)
 - [ ] Add unit tests for energy-relaxed validation (MOD-1)
+- [ ] Add unit tests for selector scoring functions (WIRE-1)
 - [ ] Add integration tests for fingerprint file quality
 - [ ] Add selector integration tests for new fields
+- [ ] Add tests for colorProfile/visualStyle/BPM wiring
 - [ ] Verify all tests pass
 
 ### Phase 6: Regeneration
