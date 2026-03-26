@@ -34,7 +34,13 @@ const mockPresetDatabase = {
                     relaxed: 0.2,
                     happy: 0.5,
                     electronic: 0.7,
-                    acoustic: 0.3
+                    acoustic: 0.3,
+                    // v2.1 extended moods
+                    mystical: 0.3,
+                    hypnotic: 0.4,
+                    psychedelic: 0.6,
+                    dreamy: 0.2,
+                    meditative: 0.1
                 },
                 optimalBpm: { min: 120, max: 150, ideal: 135 }
             }
@@ -57,7 +63,13 @@ const mockPresetDatabase = {
                     relaxed: 0.8,
                     happy: 0.4,
                     electronic: 0.3,
-                    acoustic: 0.7
+                    acoustic: 0.7,
+                    // v2.1 extended moods
+                    mystical: 0.7,
+                    hypnotic: 0.6,
+                    psychedelic: 0.3,
+                    dreamy: 0.8,
+                    meditative: 0.9
                 },
                 optimalBpm: { min: 60, max: 100, ideal: 80 }
             }
@@ -313,6 +325,43 @@ describe('IntelligentPresetSelector', () => {
             const score = scorePreset('nonexistent', {}, null, mockPresetDatabase, {});
             expect(score).toBe(0);
         });
+
+        // v2.1 Extended Mood Scoring Tests
+        it('should boost score for meditative mood match (v2.1)', () => {
+            const features = { energy: 0.3, bassEnergy: 0.2 };
+            const meditativeMood = { label: 'meditative', confidence: 0.9 };
+            const mockAnalyzer = { detectedBPM: null };
+
+            // def67890 has meditative: 0.9, abc12345 has meditative: 0.1
+            const calmPresetScore = scorePreset('def67890', features, meditativeMood, mockPresetDatabase, mockAnalyzer);
+            const energeticPresetScore = scorePreset('abc12345', features, meditativeMood, mockPresetDatabase, mockAnalyzer);
+
+            expect(calmPresetScore).toBeGreaterThan(energeticPresetScore);
+        });
+
+        it('should boost score for hypnotic mood match (v2.1)', () => {
+            const features = { energy: 0.4, bassEnergy: 0.4 };
+            const hypnoticMood = { label: 'hypnotic', confidence: 0.8 };
+            const mockAnalyzer = { detectedBPM: null };
+
+            // def67890 has hypnotic: 0.6, abc12345 has hypnotic: 0.4
+            const calmPresetScore = scorePreset('def67890', features, hypnoticMood, mockPresetDatabase, mockAnalyzer);
+            const energeticPresetScore = scorePreset('abc12345', features, hypnoticMood, mockPresetDatabase, mockAnalyzer);
+
+            expect(calmPresetScore).toBeGreaterThan(energeticPresetScore);
+        });
+
+        it('should handle psychedelic mood match (v2.1)', () => {
+            const features = { energy: 0.6, bassEnergy: 0.5 };
+            const psychedelicMood = { label: 'psychedelic', confidence: 0.8 };
+            const mockAnalyzer = { detectedBPM: null };
+
+            // abc12345 has psychedelic: 0.6, def67890 has psychedelic: 0.3
+            const energeticScore = scorePreset('abc12345', features, psychedelicMood, mockPresetDatabase, mockAnalyzer);
+            const calmScore = scorePreset('def67890', features, psychedelicMood, mockPresetDatabase, mockAnalyzer);
+
+            expect(energeticScore).toBeGreaterThan(calmScore);
+        });
     });
 
     describe('Phrase-Aligned Switching State', () => {
@@ -498,13 +547,28 @@ describe('IntelligentPresetSelector', () => {
             // Color profile matching (from v2.1)
             if (fp.colorProfile && mood) {
                 const colorProfile = fp.colorProfile;
-                if (colorProfile === 'warm' && (mood.label === 'happy' || mood.label === 'aggressive')) {
+                const moodLabel = mood.label;
+
+                // Warm colors: energetic, positive moods
+                if (colorProfile === 'warm' && (moodLabel === 'happy' || moodLabel === 'aggressive')) {
                     score += 0.05;
                 }
-                if (colorProfile === 'cool' && (mood.label === 'relaxed' || mood.label === 'electronic')) {
+
+                // Cool colors: calm, ethereal, introspective moods
+                // v2.1: Added meditative, dreamy, mystical, hypnotic
+                if (colorProfile === 'cool' && (
+                    moodLabel === 'relaxed' || moodLabel === 'electronic' ||
+                    moodLabel === 'meditative' || moodLabel === 'dreamy' ||
+                    moodLabel === 'mystical' || moodLabel === 'hypnotic'
+                )) {
                     score += 0.05;
                 }
-                if (colorProfile === 'vivid' && (features.beatStrength || 0) > 0.7) {
+
+                // Vivid colors: high energy or psychedelic
+                // v2.1: Added psychedelic mood match
+                if (colorProfile === 'vivid' && (
+                    (features.beatStrength || 0) > 0.7 || moodLabel === 'psychedelic'
+                )) {
                     score += 0.05;
                 }
             }
@@ -543,6 +607,63 @@ describe('IntelligentPresetSelector', () => {
             const lowScore = scoreWithColorProfile('vivid-high', lowBeat, mood, colorMockDb);
 
             expect(highScore).toBeGreaterThan(lowScore);
+        });
+
+        // v2.1 Extended Mood Tests
+        it('should boost score for cool + meditative mood (v2.1)', () => {
+            const features = { beatStrength: 0.3 };
+            const meditativeMood = { label: 'meditative', confidence: 0.8 };
+            const happyMood = { label: 'happy', confidence: 0.8 };
+
+            const meditativeScore = scoreWithColorProfile('cool-relaxed', features, meditativeMood, colorMockDb);
+            const happyScore = scoreWithColorProfile('cool-relaxed', features, happyMood, colorMockDb);
+
+            expect(meditativeScore).toBeGreaterThan(happyScore);
+        });
+
+        it('should boost score for cool + dreamy mood (v2.1)', () => {
+            const features = { beatStrength: 0.3 };
+            const dreamyMood = { label: 'dreamy', confidence: 0.8 };
+            const aggressiveMood = { label: 'aggressive', confidence: 0.8 };
+
+            const dreamyScore = scoreWithColorProfile('cool-relaxed', features, dreamyMood, colorMockDb);
+            const aggressiveScore = scoreWithColorProfile('cool-relaxed', features, aggressiveMood, colorMockDb);
+
+            expect(dreamyScore).toBeGreaterThan(aggressiveScore);
+        });
+
+        it('should boost score for cool + hypnotic mood (v2.1)', () => {
+            const features = { beatStrength: 0.4 };
+            const hypnoticMood = { label: 'hypnotic', confidence: 0.8 };
+            const happyMood = { label: 'happy', confidence: 0.8 };
+
+            const hypnoticScore = scoreWithColorProfile('cool-relaxed', features, hypnoticMood, colorMockDb);
+            const happyScore = scoreWithColorProfile('cool-relaxed', features, happyMood, colorMockDb);
+
+            expect(hypnoticScore).toBeGreaterThan(happyScore);
+        });
+
+        it('should boost score for cool + mystical mood (v2.1)', () => {
+            const features = { beatStrength: 0.4 };
+            const mysticalMood = { label: 'mystical', confidence: 0.8 };
+            const aggressiveMood = { label: 'aggressive', confidence: 0.8 };
+
+            const mysticalScore = scoreWithColorProfile('cool-relaxed', features, mysticalMood, colorMockDb);
+            const aggressiveScore = scoreWithColorProfile('cool-relaxed', features, aggressiveMood, colorMockDb);
+
+            expect(mysticalScore).toBeGreaterThan(aggressiveScore);
+        });
+
+        it('should boost score for vivid + psychedelic mood (v2.1)', () => {
+            const features = { beatStrength: 0.5 };  // Not high enough for energy-based boost
+            const psychedelicMood = { label: 'psychedelic', confidence: 0.8 };
+            const relaxedMood = { label: 'relaxed', confidence: 0.8 };
+
+            const psychedelicScore = scoreWithColorProfile('vivid-high', features, psychedelicMood, colorMockDb);
+            const relaxedScore = scoreWithColorProfile('vivid-high', features, relaxedMood, colorMockDb);
+
+            // Psychedelic should get bonus even with low beat strength
+            expect(psychedelicScore).toBeGreaterThan(relaxedScore);
         });
     });
 
