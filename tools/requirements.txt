@@ -1,0 +1,16 @@
+# Visual style classification dependencies for Butterchurn
+# Phase 6: ML Visual Style Tagging
+#
+# Installation:
+#   pip install -r tools/requirements.txt
+#
+# Note: CLIP requires PyTorch. For GPU support:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+
+torch>=2.0.0
+clip @ git+https://github.com/openai/CLIP.git
+pillow>=9.0.0
+tqdm>=4.64.0
+
+# Optional: for faster inference
+# onnxruntime>=1.15.0
