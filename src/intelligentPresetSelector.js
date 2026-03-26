@@ -208,7 +208,7 @@ class IntelligentPresetSelector {
 
         // Emergency mode tracking
         this.isEmergencyMode = false;
-        this.emergencyStartTime = 0
+        this.emergencyStartTime = 0;
 
         // Direct preset pack support (for testing without fingerprint database)
         this.presetPack = null;
@@ -317,6 +317,8 @@ class IntelligentPresetSelector {
 
         // Check immediately and then periodically
         checkModules();
+        // SEL-4 FIX: Set startTime before interval references it
+        this.startTime = Date.now();
         const moduleCheckInterval = setInterval(() => {
             checkModules();
             // Stop checking once all modules are loaded or after 10 seconds
@@ -326,8 +328,6 @@ class IntelligentPresetSelector {
                 clearInterval(moduleCheckInterval);
             }
         }, 100);
-
-        this.startTime = Date.now();
     }
 
     /**
@@ -1217,8 +1217,9 @@ class IntelligentPresetSelector {
         const genreMultiplier = this.detectedGenre?.timingMultiplier || 1.0;
 
         // WARN-2 FIX: Apply BPM-based timing adjustment (EXT-3 acceptance criteria)
+        // SEL-2 FIX: Use correct property name detectedBPM (not currentBpm)
         let bpmMultiplier = 1.0;
-        const currentBpm = this.audioAnalyzer?.currentBpm || 120;
+        const currentBpm = this.audioAnalyzer?.detectedBPM || 120;
         if (currentBpm > BPM_THRESHOLDS.veryHigh) {
             bpmMultiplier = 0.7;  // Faster switching for very fast music (D&B, fast EDM)
         } else if (currentBpm > BPM_THRESHOLDS.high) {
@@ -1937,16 +1938,30 @@ class IntelligentPresetSelector {
 
     /**
      * Add preset to problematic list (for presets that don't render)
+     * SEL-1 FIX: Consolidated from two duplicate methods - now handles both
+     * localStorage persistence AND presetLogger failure tracking
+     * @param {string} hash - Preset hash or name to mark as problematic
+     * @param {string} reason - Reason for marking (default: 'rendering_issues')
      */
-    markProblematic(hash) {
+    markProblematic(hash, reason = 'rendering_issues') {
         this.problematicPresets.add(hash);
-        console.warn(`Marked preset ${hash} as problematic due to rendering issues`);
 
-        // Save to persistent storage if available
+        // Save to persistent storage if available (browser persistence)
         if (typeof localStorage !== 'undefined') {
             const problematic = Array.from(this.problematicPresets);
             localStorage.setItem('problematicPresets', JSON.stringify(problematic));
         }
+
+        // Also add to failure logger for permanent tracking (if available)
+        if (this.presetLogger) {
+            const context = {
+                audioLevel: this.audioHistory[this.audioHistory.length - 1]?.energy || 0,
+                fps: this.butterchurn?.fps || 60
+            };
+            this.presetLogger.logFailure(hash, reason, context);
+        }
+
+        console.warn(`[IntelligentSelector] Marked preset ${hash} as problematic: ${reason}`);
     }
 
     /**
@@ -2082,23 +2097,7 @@ class IntelligentPresetSelector {
         return this.problematicPresets.has(hash);
     }
 
-    /**
-     * Mark preset as problematic (fingerprint mode)
-     */
-    markProblematic(hash) {
-        this.problematicPresets.add(hash);
-
-        // Also add to failure logger for permanent tracking
-        const context = {
-            audioLevel: this.audioHistory[this.audioHistory.length - 1]?.energy || 0,
-            fps: this.butterchurn?.fps || 60
-        };
-
-        if (this.presetLogger) {
-            this.presetLogger.logFailure(hash, 'solid_color_detected', context);
-        }
-        console.warn(`[IntelligentSelector] Marked preset ${hash} as problematic`);
-    }
+    // SEL-1 FIX: Removed duplicate markProblematic() - consolidated into single method above (line ~1942)
 
     /**
      * Add preset to problematic list (preset pack mode)
