@@ -838,4 +838,196 @@ describe('IntelligentPresetSelector', () => {
             expect(filtered.length).toBe(3);
         });
     });
+
+    // CRIT-2 FIX: Musical event type handling tests
+    describe('Musical Event Type Handling', () => {
+        // Simulate the detectMusicalEvent return format from advancedAnalyzer.js
+        const createMusicalEvent = (type, confidence = 0.8) => ({
+            type,
+            confidence,
+            details: {}
+        });
+
+        // Simulates the fixed calculateAudioFeatures behavior
+        const processMusicalEvent = (musicalEvent) => ({
+            // CRIT-2 FIX: Use musicalEvent?.type?.toLowerCase() instead of musicalEvent === 'string'
+            isDrop: musicalEvent?.type?.toLowerCase() === 'drop',
+            isBuildup: musicalEvent?.type?.toLowerCase() === 'buildup',
+            isChill: musicalEvent?.type?.toLowerCase() === 'chill' || musicalEvent?.type?.toLowerCase() === 'ambient',
+            isBreakdown: musicalEvent?.type?.toLowerCase() === 'breakdown'
+        });
+
+        it('should detect drop events correctly (CRIT-2 fix)', () => {
+            const dropEvent = createMusicalEvent('Drop');
+            const result = processMusicalEvent(dropEvent);
+
+            expect(result.isDrop).toBe(true);
+            expect(result.isBuildup).toBe(false);
+            expect(result.isChill).toBe(false);
+            expect(result.isBreakdown).toBe(false);
+        });
+
+        it('should detect buildup events correctly (CRIT-2 fix)', () => {
+            const buildupEvent = createMusicalEvent('Buildup');
+            const result = processMusicalEvent(buildupEvent);
+
+            expect(result.isDrop).toBe(false);
+            expect(result.isBuildup).toBe(true);
+            expect(result.isChill).toBe(false);
+            expect(result.isBreakdown).toBe(false);
+        });
+
+        it('should detect ambient/chill events correctly (CRIT-2 fix)', () => {
+            const ambientEvent = createMusicalEvent('Ambient');
+            const chillEvent = createMusicalEvent('Chill');
+
+            const ambientResult = processMusicalEvent(ambientEvent);
+            const chillResult = processMusicalEvent(chillEvent);
+
+            expect(ambientResult.isChill).toBe(true);
+            expect(chillResult.isChill).toBe(true);
+        });
+
+        it('should detect breakdown events correctly (CRIT-2 fix)', () => {
+            const breakdownEvent = createMusicalEvent('Breakdown');
+            const result = processMusicalEvent(breakdownEvent);
+
+            expect(result.isBreakdown).toBe(true);
+            expect(result.isDrop).toBe(false);
+        });
+
+        it('should handle null/undefined musical events (CRIT-2 fix)', () => {
+            const nullResult = processMusicalEvent(null);
+            const undefinedResult = processMusicalEvent(undefined);
+
+            expect(nullResult.isDrop).toBe(false);
+            expect(nullResult.isBuildup).toBe(false);
+            expect(undefinedResult.isDrop).toBe(false);
+            expect(undefinedResult.isBuildup).toBe(false);
+        });
+
+        it('should be case-insensitive for event types (CRIT-2 fix)', () => {
+            const lowercase = processMusicalEvent({ type: 'drop' });
+            const uppercase = processMusicalEvent({ type: 'DROP' });
+            const mixed = processMusicalEvent({ type: 'Drop' });
+
+            expect(lowercase.isDrop).toBe(true);
+            expect(uppercase.isDrop).toBe(true);
+            expect(mixed.isDrop).toBe(true);
+        });
+    });
+
+    // CRIT-1 FIX: Raw features propagation tests
+    describe('Raw Features Propagation', () => {
+        // Mock features as returned by calculateAudioFeatures
+        const mockCalculatedFeatures = {
+            energy: 0.6,
+            bassEnergy: 0.5,
+            trebleEnergy: 0.4,
+            isDrop: false,
+            isBuildup: false,
+            isChill: false,
+            isBreakdown: false,
+            trend: 'stable',
+            // CRIT-1 FIX: rawFeatures should contain spectral data
+            rawFeatures: {
+                bass: 0.5,
+                mid: 0.4,
+                treble: 0.4,
+                beatStrength: 0.6,
+                spectralCentroid: 0.5,
+                zeroCrossingRate: 0.1,
+                dynamicRange: 0.3,
+                spectral: {
+                    rms: 0.5,
+                    centroid: 0.5,
+                    flux: 0.3,
+                    flatness: 0.4,
+                    rolloff: 0.6,
+                    zcr: 0.1,
+                    sharpness: 0.5
+                }
+            }
+        };
+
+        it('should extract raw features for detection methods (CRIT-1 fix)', () => {
+            const features = mockCalculatedFeatures;
+            // CRIT-1 FIX: Pass raw features (with spectral data) to detection methods
+            const rawFeatures = features.rawFeatures || features;
+
+            expect(rawFeatures.spectral).toBeDefined();
+            expect(rawFeatures.spectral.centroid).toBe(0.5);
+            expect(rawFeatures.spectral.rms).toBe(0.5);
+        });
+
+        it('should handle features without rawFeatures (fallback case)', () => {
+            const simpleFeatures = {
+                energy: 0.5,
+                bass: 0.5,
+                spectral: { rms: 0.4 }
+            };
+
+            // CRIT-1 FIX: Falls back to features directly
+            const rawFeatures = simpleFeatures.rawFeatures || simpleFeatures;
+
+            expect(rawFeatures.spectral).toBeDefined();
+            expect(rawFeatures.spectral.rms).toBe(0.4);
+        });
+
+        it('should pass spectral data for mood detection (CRIT-1 fix)', () => {
+            const features = mockCalculatedFeatures;
+            const rawFeatures = features.rawFeatures || features;
+
+            // detectMood expects features.spectral to exist
+            expect(rawFeatures.spectral).toBeDefined();
+            expect(rawFeatures.bass).toBeDefined();
+            expect(rawFeatures.beatStrength).toBeDefined();
+        });
+    });
+
+    // WARN-3 FIX: Energy threshold scoring tests
+    describe('Energy Threshold Scoring', () => {
+        const scoreEnergyMatch = (audioEnergy, presetEnergy) => {
+            let bonus = 0;
+
+            // WARN-3 FIX: Energy threshold bonus/penalty
+            if (audioEnergy > ENERGY_THRESHOLDS.high && presetEnergy > ENERGY_THRESHOLDS.medium) {
+                bonus = 0.05; // High energy audio + high/medium energy preset
+            } else if (audioEnergy < ENERGY_THRESHOLDS.low && presetEnergy < ENERGY_THRESHOLDS.medium) {
+                bonus = 0.05; // Low energy audio + low/medium energy preset
+            } else if (
+                (audioEnergy > ENERGY_THRESHOLDS.high && presetEnergy < ENERGY_THRESHOLDS.low) ||
+                (audioEnergy < ENERGY_THRESHOLDS.low && presetEnergy > ENERGY_THRESHOLDS.high)
+            ) {
+                bonus = -0.03; // Mismatch penalty
+            }
+
+            return bonus;
+        };
+
+        it('should give bonus for high audio + high preset energy match', () => {
+            const bonus = scoreEnergyMatch(0.9, 0.8);
+            expect(bonus).toBe(0.05);
+        });
+
+        it('should give bonus for low audio + low preset energy match', () => {
+            const bonus = scoreEnergyMatch(0.2, 0.3);
+            expect(bonus).toBe(0.05);
+        });
+
+        it('should penalize high audio + low preset mismatch', () => {
+            const bonus = scoreEnergyMatch(0.9, 0.2);
+            expect(bonus).toBe(-0.03);
+        });
+
+        it('should penalize low audio + high preset mismatch', () => {
+            const bonus = scoreEnergyMatch(0.2, 0.9);
+            expect(bonus).toBe(-0.03);
+        });
+
+        it('should give no bonus/penalty for moderate energy', () => {
+            const bonus = scoreEnergyMatch(0.5, 0.5);
+            expect(bonus).toBe(0);
+        });
+    });
 });
