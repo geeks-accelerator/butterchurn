@@ -468,7 +468,23 @@ class PresetFingerprintGenerator {
     }
 
     /**
-     * Get all equations as a single string for analysis
+     * Get all equations as a single lowercase string for analysis
+     * DOC-2 FIX: Added complete JSDoc documentation
+     *
+     * Concatenates all equation types from a preset into a single string
+     * for pattern matching and keyword detection.
+     *
+     * @param {Object} preset - Butterchurn preset object
+     * @param {string} [preset.init_eqs_str] - Initialization equations (string format)
+     * @param {string} [preset.init_eqs_eel] - Initialization equations (EEL format)
+     * @param {string} [preset.frame_eqs_str] - Per-frame equations (string format)
+     * @param {string} [preset.frame_eqs_eel] - Per-frame equations (EEL format)
+     * @param {string} [preset.pixel_eqs_str] - Per-pixel equations (string format)
+     * @param {string} [preset.pixel_eqs_eel] - Per-pixel equations (EEL format)
+     * @param {Object} [preset.warp] - Warp shader configuration
+     * @param {Object} [preset.comp] - Composite shader configuration
+     * @param {Array} [preset.shapes] - Shape definitions with their equations
+     * @returns {string} All equations joined and lowercased for analysis
      */
     getAllEquations(preset) {
         return [
