@@ -15,6 +15,7 @@ The main visualization engine that coordinates all subsystems:
 - **AudioProcessor** - 2048-sample FFT analysis with temporal smoothing
 - **AudioLevels** - Audio feature extraction and normalization
 - **FFT** - Fast Fourier Transform implementation for frequency analysis
+- **AdvancedAudioAnalyzer** - Enhanced analysis with Meyda.js integration (see below)
 
 #### Rendering System (`src/rendering/`)
 - **Renderer** - Main rendering coordinator with separate alpha buffer management
@@ -31,6 +32,26 @@ The main visualization engine that coordinates all subsystems:
 - Real-time audio feature analysis for preset matching
 - Fingerprint-based preset database with mathematical analysis
 - Audio history tracking for trend detection and smooth transitions
+- **Phrase-aligned switching** - Preset changes on 16-beat boundaries
+- **Pre-drop anticipation** - Switches 1.5s before detected energy buildups
+- **Performance degradation tracking** - Auto-switch when quality drops 40%+
+- **Mood-aware scoring** - Matches preset mood affinities to detected audio mood
+
+#### Advanced Audio Analyzer (`src/audio/advancedAnalyzer.js`)
+Enhanced audio analysis with Meyda.js integration for intelligent preset selection:
+
+**Spectral Features (via Meyda.js):**
+- MFCC (Mel-frequency cepstral coefficients)
+- Spectral Centroid, Flatness, Rolloff, Sharpness
+- Spectral Flux for onset detection
+- Zero Crossing Rate
+
+**Musical Intelligence:**
+- **BPM Detection** - Onset-based autocorrelation (60-180 BPM range)
+- **Beat Tracking** - 4-beat bars, 16-beat phrases
+- **Mood Detection** - Aggressive, relaxed, happy, electronic, acoustic
+- **Buildup Detection** - Rising energy trend analysis with drop ETA
+- **Musical Event Detection** - Drop, Buildup, Breakdown, Ambient, Peak, Steady
 
 ### Data Flow Architecture
 
@@ -122,3 +143,99 @@ Canvas Output ← Frame Stabilizer ← WebGL2 Context
 - Object pooling for frequently created objects
 - Minimal allocation during render loops
 - Strategic cleanup of large temporary objects
+
+### Advanced Audio Analysis Pipeline
+
+#### AdvancedAudioAnalyzer Architecture
+```
+Audio Source → AudioContext → AnalyserNode (2048 FFT)
+                                    ↓
+              ┌─────────────────────┴─────────────────────┐
+              ↓                                           ↓
+        Basic Features                              Meyda Analyzer
+    (bass, mid, treble,                          (MFCC, spectral flux,
+     beatStrength, ZCR)                           centroid, flatness)
+              ↓                                           ↓
+              └─────────────────────┬─────────────────────┘
+                                    ↓
+                          Feature Aggregation
+                                    ↓
+              ┌─────────────────────┼─────────────────────┐
+              ↓                     ↓                     ↓
+        BPM Detection         Mood Detection        Buildup Detection
+     (onset correlation)    (spectral analysis)    (energy trending)
+              ↓                     ↓                     ↓
+              └─────────────────────┴─────────────────────┘
+                                    ↓
+                        IntelligentPresetSelector
+                                    ↓
+              ┌─────────────────────┼─────────────────────┐
+              ↓                     ↓                     ↓
+        Phrase Tracking       Preset Scoring        Performance Tracking
+     (16-beat boundaries)   (mood + BPM match)    (degradation detection)
+              ↓                     ↓                     ↓
+              └─────────────────────┴─────────────────────┘
+                                    ↓
+                          Preset Switch Decision
+                                    ↓
+              ┌─────────────────────┼─────────────────────┐
+              ↓                     ↓                     ↓
+         Pre-Drop            Phrase-Aligned          Performance
+     (1.5s anticipation)    (musical coherence)     (quality drop)
+```
+
+#### BPM Detection Algorithm
+1. **Onset Detection**: Spectral flux threshold crossing
+2. **Autocorrelation**: Find periodicity in onset times
+3. **Peak Picking**: Identify dominant tempo candidate
+4. **Range Clamping**: Constrain to 60-180 BPM (halve/double if outside)
+5. **Confidence Scoring**: Strength of autocorrelation peak
+
+#### Beat Phase Tracking
+```javascript
+// Beat hierarchy: beats → bars → phrases
+const beatInfo = {
+  bpm: 120,                    // Detected tempo
+  beatPosition: 2,             // Current beat in bar (0-3)
+  barPosition: 1,              // Current bar in phrase (0-3)
+  phrasePosition: 6,           // Current beat in phrase (0-15)
+  isPhraseBoundary: false,     // True when phrasePosition === 0
+  timeToNextPhrase: 4200       // Milliseconds to next phrase boundary
+};
+```
+
+#### Mood Detection Model
+| Mood | Key Indicators |
+|------|----------------|
+| **Aggressive** | High bass (>0.7), high beat strength (>0.6), high sharpness |
+| **Relaxed** | Low beat strength (<0.4), low spectral centroid, low sharpness |
+| **Happy** | High spectral centroid, moderate energy, low flatness |
+| **Electronic** | High spectral flatness (>0.5), moderate sharpness |
+| **Acoustic** | Low flatness, moderate centroid, natural harmonic structure |
+
+#### Preset Scoring Weights (v2.0)
+| Factor | Weight | Description |
+|--------|--------|-------------|
+| Energy Match | 25% | Audio energy vs preset energy fingerprint |
+| Bass Match | 15% | Bass response alignment |
+| Mood Affinity | 15% | Mood detection vs preset mood affinities |
+| BPM Range | 10% | Detected BPM within preset optimal range |
+| Spectral Match | 10% | Spectral characteristics alignment |
+| Continuity | 10% | Visual similarity to current preset |
+| Performance | 10% | FPS estimate for current device |
+| Variety | 5% | Penalty for recently-shown presets |
+
+#### Priority-Based Switch Scheduling
+1. **Pre-Drop** (Highest): Buildup detected, switch 1.5s before drop
+2. **Phrase Boundary**: Queued switch executes on beat 1 of phrase
+3. **Performance Degradation**: Quality dropped 40%+ from baseline
+4. **Audio-Triggered** (Lowest): Energy/mood change detected, queue for next phrase
+
+### Fingerprint v2.0 Schema
+
+See [mathematical-fingerprinting.md](mathematical-fingerprinting.md#v20-schema-phase-7-enhancements---january-2025) for complete v2.0 schema documentation including:
+- Mood affinities derivation
+- Optimal BPM calculation
+- Color profile extraction
+- Motion speed classification
+- CLIP visual style integration

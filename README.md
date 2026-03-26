@@ -23,6 +23,18 @@ Butterchurn is an intelligent WebGL implementation of the Milkdrop Visualizer wi
 - **Scene-Based Switching** - Moving Average crossover detection for musical scene transitions
 - **Visual Regression Testing** - Deterministic rendering for reliable automated testing
 
+### Intelligent Preset Selection (v4.1)
+- **Meyda.js Spectral Analysis** - Advanced audio features including MFCC, spectral centroid, flatness, rolloff, and sharpness
+- **BPM Detection & Beat Tracking** - Onset-based BPM detection with 4-beat bars and 16-beat phrase tracking
+- **Phrase-Aligned Switching** - Preset changes synchronized to musical phrase boundaries (every 16 beats)
+- **Pre-Drop Anticipation** - Detects energy buildups and switches 1.5 seconds before the drop
+- **Mood-Aware Selection** - Real-time mood classification (aggressive, relaxed, happy, electronic, acoustic)
+- **Genre Detection** - Automatic genre classification (EDM, dubstep, hip-hop, rock, classical, ambient, pop) with timing adjustments
+- **Performance Degradation Tracking** - Automatic preset switching when match quality drops 40%+ from baseline
+- **v2.0 Fingerprint Schema** - Enhanced fingerprints with mood affinities, optimal BPM ranges, and visual styles
+- **CLIP Visual Classification** - ML-based preset categorization into 8 visual style categories
+- **Adaptive FFT Recommendations** - Device-aware FFT size optimization suggestions
+
 ### Performance Improvements
 - **25-30% faster rendering** through direct WebGL output (no Canvas 2D intermediate)
 - **40% better frequency resolution** with 4x larger audio buffers
@@ -168,13 +180,26 @@ visualizer.loadPreset(presets[presetKeys[0]], 0.0);
 // Load intelligent selector with new fingerprint system
 import IntelligentPresetSelector from './src/intelligentPresetSelector.js';
 
-// Create intelligent selector (auto-loads fingerprints)
-const selector = new IntelligentPresetSelector(visualizer);
+// Create intelligent selector with optional audio context for advanced features
+const selector = new IntelligentPresetSelector(visualizer, {
+  // Configuration options
+  energyMatch: 0.25,      // Energy matching weight
+  moodMatch: 0.15,        // Mood affinity weight
+  bpmMatch: 0.10,         // BPM range matching weight
+  spectralMatch: 0.10     // Spectral similarity weight
+}, audioContext, audioSource);  // Optional: for Meyda.js integration
 
 // Initialize with Alaska Butter preset collection
 await selector.initialize({
   basePath: '/presets/',  // Location of preset and fingerprint files
   autoLoadPacks: true     // Automatically load all preset JS files
+});
+
+// Trigger BPM detection when audio is loaded
+audioElement.addEventListener('canplay', async () => {
+  const audioBuffer = await audioContext.decodeAudioData(audioData);
+  await selector.onAudioLoaded(audioBuffer);
+  console.log('Detected BPM:', selector.audioAnalyzer.detectedBPM);
 });
 
 // Render loop with intelligent selection
@@ -185,8 +210,14 @@ function animate() {
     timeByteArrayR: new Uint8Array(visualizer.audio.timeByteArrayR)
   };
 
-  // Intelligent preset selection with Moving Average crossovers
-  selector.update(audioLevels);
+  // Intelligent preset selection with phrase-aligned switching
+  const result = selector.update(audioLevels);
+
+  // Access detected features
+  if (result.features) {
+    console.log('Current mood:', result.features.mood?.label);
+    console.log('Beat phase:', result.features.beatInfo?.phrasePosition, '/ 16');
+  }
 
   // Render with audio data
   visualizer.render({ audioLevels });
@@ -194,6 +225,37 @@ function animate() {
   requestAnimationFrame(animate);
 }
 animate();
+```
+
+### Advanced Intelligent Selection Features
+```javascript
+// Access real-time audio analysis
+const analyzer = selector.audioAnalyzer;
+
+// Get current beat information
+const beatInfo = analyzer.trackBeatPhase();
+if (beatInfo) {
+  console.log(`BPM: ${beatInfo.bpm}`);
+  console.log(`Beat: ${beatInfo.beatPosition + 1}/4`);
+  console.log(`Bar: ${beatInfo.barPosition + 1}/4`);
+  console.log(`Phrase: ${beatInfo.phrasePosition + 1}/16`);
+  console.log(`Is phrase boundary: ${beatInfo.isPhraseBoundary}`);
+}
+
+// Get mood detection
+const features = analyzer.calculateFeatures(freqData, timeData);
+const mood = analyzer.detectMood(features);
+console.log(`Mood: ${mood.label} (${(mood.confidence * 100).toFixed(0)}% confidence)`);
+
+// Detect buildups (for pre-drop anticipation)
+const buildup = analyzer.detectBuildup(features);
+if (buildup.isBuildup) {
+  console.log(`Buildup detected! Drop ETA: ${buildup.dropETA}ms`);
+}
+
+// Manual preset selection with mood/BPM matching
+const mood = { label: 'electronic', confidence: 0.8 };
+const bestPreset = selector.selectBestPreset(features, mood);
 ```
 
 ### Manual Preset Loading by Hash
@@ -268,12 +330,22 @@ Preset Database ← Intelligent Selector ← Audio Features
 
 ### Mathematical Fingerprinting System
 Each preset is analyzed by its mathematical equations to generate:
+
+**v1.0 Fields (Core):**
 - **Content Hash**: 8-character SHA256-based unique identifier for deduplication
 - **Energy Score**: Complexity based on equation analysis and variable usage
 - **Bass Reactivity**: Frequency of bass-related variables (bass, bass_att, etc.)
 - **Treble Reactivity**: Usage of treble frequency variables (treb, high, etc.)
 - **Performance Estimate**: Shader complexity scoring for FPS estimation
 - **Pack Attribution**: Source pack tracking with author and name preservation
+
+**v2.0 Fields (Intelligent Selection):**
+- **Mood Affinities**: Compatibility scores for aggressive, relaxed, happy, electronic, acoustic
+- **Optimal BPM Range**: Min/max/ideal BPM for best visual synchronization
+- **Color Profile**: Dominant color temperature (warm, cool, nature, neutral)
+- **Motion Speed**: Visual motion category (slow, medium, fast)
+- **Visual Style**: Primary visual category from ML classification
+- **Visual Style Scores**: CLIP confidence scores across 8 visual categories
 
 ### Preset Collections
 - **Alaska Butter**: 388 unique presets (deduplicated from all 6 packs)

@@ -35,11 +35,22 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Phase 2 Complete - Intelligent Selection Active**
+**Phase: Phase 3 Complete - Intelligent Preset Selector Improvements**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
 - Phase 2 intelligent preset selection with equation-based fingerprinting
+- **Phase 3 Intelligent Preset Selector Improvements:**
+  - Meyda.js spectral audio analysis (2048-sample buffer)
+  - BPM detection and 16-beat phrase tracking
+  - Phrase-aligned preset switching (musical coherence)
+  - Pre-drop anticipation (switches 1.5s before drops)
+  - Mood-aware selection (aggressive, relaxed, happy, electronic, acoustic)
+  - Genre detection with timing adjustments (EDM, dubstep, hiphop, rock, classical, ambient, pop)
+  - Preset performance degradation tracking
+  - Enhanced fingerprints v2.0 (mood affinities, optimal BPM, visual styles)
+  - CLIP-based visual style classification tooling
+  - Adaptive FFT size recommendation system
 - Alaska Butter unified collection (388 unique presets with deduplication)
 - Individual preset pack support with 1:1 fingerprint mapping
 - FingerprintLoader + FingerprintAdapter system for modular preset loading
@@ -52,19 +63,21 @@ This file provides AI-optimized development context for Claude Code when working
 - AlaskaButter demo site at https://alaskabutter.com
 
 ### What's Ready for Implementation 🚀
-- Phase 3: Song structure recognition and energy-based preset memory
-- Advanced instrumentation detection
-- Preset performance tracking and learning
-- Real-time spectral analysis for instrument detection
+- Phase 4: Machine learning-enhanced preset matching
+- User preference learning and personalization
+- Multi-device synchronization
+- Advanced visual effects based on genre detection
 
 ### Critical Files Status
-- `src/intelligentPresetSelector.js` - ✅ Complete with preset loading and MA crossovers
+- `src/intelligentPresetSelector.js` - ✅ Complete with phrase-aligned switching, pre-drop anticipation, mood scoring
+- `src/audio/advancedAnalyzer.js` - ✅ Enhanced with Meyda, BPM detection, mood/buildup detection
 - `src/fingerprintLoader.js` - ✅ Modular fingerprint database loader
 - `src/fingerprintAdapter.js` - ✅ Database format adapter for selector compatibility
 - `presets/alaska-butter/` - ✅ Unified collection (388 presets + fingerprints)
 - `presets/full-collection/` - ✅ Individual packs with 1:1 fingerprint mapping
-- `tools/generate-fingerprints.js` - ✅ Equation-based fingerprint generator
-- `tools/create-alaska-butter.js` - ✅ Deduplication and collection merger
+- `tools/generate-fingerprints.js` - ✅ v2.0 fingerprint schema with mood, BPM, visual style
+- `tools/classify-visual-style.py` - ✅ CLIP-based visual style classifier
+- `tools/render-preset-frames.js` - ✅ Headless preset frame renderer
 - `test/fingerprint-test.html` - ✅ Working demo with new system
 - `docs/cdn/presets/` - ✅ Updated CDN with all preset + fingerprint files
 

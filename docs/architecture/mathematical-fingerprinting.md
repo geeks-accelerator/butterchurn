@@ -228,6 +228,8 @@ function generatePerformanceFingerprint(preset) {
 
 ## Complete Fingerprint Structure
 
+### v1.0 Schema (Original)
+
 ```javascript
 {
     "hash": "a3f7b2c9",  // Content hash of equations
@@ -284,6 +286,177 @@ function generatePerformanceFingerprint(preset) {
     // Semantic keywords (from DeepSeek-R1)
     "keywords": ["explosive", "mind", "radial", "bass", "reactive"]
 }
+```
+
+### v2.0 Schema (Phase 7 Enhancements - January 2025)
+
+The v2.0 fingerprint schema extends v1.0 with intelligent selector enhancements for mood-aware selection, BPM-optimal matching, and ML-based visual style classification.
+
+```javascript
+{
+    "hash": "a3f7b2c9",
+    "name": "Rovastar - Explosive Minds",
+
+    // --- v1.0 Fields (backward compatible) ---
+    "fingerprint": {
+        "energy": 0.8,           // Overall visual energy (0-1)
+        "bass": 0.7,             // Bass responsiveness (alias: bassEnergy)
+        "bassEnergy": 0.7,       // Bass responsiveness
+        "trebleEnergy": 0.5,     // Treble responsiveness
+        "complexity": 0.6,       // Computational complexity
+        "beatSync": 1,           // Beat synchronization strength (0-2)
+        "beat": 1,               // Alias for beatSync
+        "fps": 60,               // Expected FPS
+        "styles": ["particle"],  // Visual style tags (legacy)
+        "warmupTime": 0          // Seconds before preset stabilizes
+    },
+
+    // --- v2.0 Fields (Phase 7 additions) ---
+
+    // Visual Style Classification (CLIP ML or equation analysis)
+    "visualStyle": "particle",   // Primary style: fluid_organic, particle,
+                                 // geometric, fractal, abstract, kaleidoscope,
+                                 // tunnel, waveform
+
+    // CLIP confidence scores per category (when ML classification used)
+    "visualStyleScores": {
+        "fluid_organic": 0.12,
+        "particle": 0.85,        // Highest = primary style
+        "geometric": 0.05,
+        "fractal": 0.02,
+        "abstract": 0.08,
+        "kaleidoscope": 0.01,
+        "tunnel": 0.03,
+        "waveform": 0.04
+    },
+
+    // Color Profile (extracted from equation color assignments)
+    "colorProfile": "warm",      // warm (red-dominant), cool (blue-dominant),
+                                 // nature (green-dominant), neutral (balanced)
+
+    // Motion Speed (derived from equation complexity + energy)
+    "motionSpeed": "fast",       // slow, medium, fast
+
+    // Mood Affinities (derived from style, motion, color)
+    "moodAffinities": {
+        "aggressive": "0.80",    // High-energy, bass-heavy
+        "relaxed": "0.20",       // Calm, ambient
+        "happy": "0.50",         // Upbeat, bright
+        "electronic": "0.70",    // EDM, synthetic
+        "acoustic": "0.30"       // Organic, instrumental
+    },
+
+    // Optimal BPM Range (calculated from motion speed + energy)
+    "optimalBpm": {
+        "min": 120,              // Minimum comfortable BPM
+        "max": 150,              // Maximum comfortable BPM
+        "ideal": 135             // Best-matching BPM
+    },
+
+    // Experimental field markers (may change in future versions)
+    "_experimental": ["colorProfile", "motionSpeed", "moodAffinities"]
+}
+```
+
+#### v2.0 Field Extraction Methods
+
+**colorProfile** - Extracted by analyzing color assignments in equations:
+```javascript
+// Count red/green/blue assignments in frame equations
+const redUsage = (equations.match(/red\s*=/gi) || []).length;
+const greenUsage = (equations.match(/green\s*=/gi) || []).length;
+const blueUsage = (equations.match(/blue\s*=/gi) || []).length;
+
+// Dominant color determines profile
+if (redUsage > greenUsage && redUsage > blueUsage) return 'warm';
+if (blueUsage > redUsage && blueUsage > greenUsage) return 'cool';
+if (greenUsage > redUsage && greenUsage > blueUsage) return 'nature';
+return 'neutral';
+```
+
+**motionSpeed** - Derived from equation complexity and energy:
+```javascript
+const complexity = frameEqs.length / 1000;  // Characters per 1000
+if (complexity > 5 || energy > 0.7) return 'fast';
+if (complexity > 2 || energy > 0.4) return 'medium';
+return 'slow';
+```
+
+**optimalBpm** - Calculated from motion speed with energy offset:
+```javascript
+const ranges = {
+    slow: { min: 60, max: 100, ideal: 80 },
+    medium: { min: 100, max: 140, ideal: 120 },
+    fast: { min: 130, max: 180, ideal: 150 }
+};
+const energyOffset = (energy - 0.5) * 20;  // ±10 BPM adjustment
+```
+
+**moodAffinities** - Derived from visual style, motion, and color:
+```javascript
+// Style influences: particle → electronic, organic → relaxed
+// Motion influences: fast → aggressive, slow → relaxed
+// Color influences: warm → aggressive/happy, cool → relaxed/electronic
+// Values normalized to 0.0-1.0 range
+```
+
+**visualStyle / visualStyleScores** - From CLIP ML classification:
+```python
+# Uses CLIP ViT-B/32 model with 8 visual categories
+CATEGORIES = [
+    "fluid organic flowing water pattern",
+    "particle sparkle dot effect",
+    "geometric shapes lines triangles",
+    "fractal recursive mathematical pattern",
+    "abstract color field gradient",
+    "kaleidoscope mirror symmetry",
+    "tunnel depth perspective zoom",
+    "waveform oscilloscope audio"
+]
+```
+
+#### v2.0 Scoring Integration
+
+The IntelligentPresetSelector uses v2.0 fields for enhanced scoring:
+
+```javascript
+// Mood affinity scoring (15% weight)
+if (mood && fp.moodAffinities) {
+    const moodScore = fp.moodAffinities[mood.label];
+    score += moodScore * mood.confidence * 0.15;
+}
+
+// BPM range scoring (10% weight)
+if (analyzer.detectedBPM && fp.optimalBpm) {
+    const bpm = analyzer.detectedBPM;
+    if (bpm >= fp.optimalBpm.min && bpm <= fp.optimalBpm.max) {
+        const distFromIdeal = Math.abs(bpm - fp.optimalBpm.ideal);
+        const rangeSize = (fp.optimalBpm.max - fp.optimalBpm.min) / 2;
+        score += Math.max(0, 1 - distFromIdeal / rangeSize) * 0.10;
+    }
+}
+```
+
+#### CLIP Visual Style Classification Pipeline
+
+Phase 6 adds ML-based visual style tagging using OpenAI's CLIP model:
+
+1. **Frame Rendering** (`tools/render-preset-frames.js`)
+   - Renders 3-5 frames per preset using Puppeteer
+   - Captures at different warmup times for style consistency
+
+2. **CLIP Classification** (`tools/classify-visual-style.py`)
+   - Loads CLIP ViT-B/32 model (GPU-accelerated if available)
+   - Computes text-image similarity for 8 style categories
+   - Averages scores across frames for stable classification
+
+3. **Fingerprint Merging** (`tools/generate-fingerprints.js --visual-styles`)
+   - Merges CLIP results into fingerprint database
+   - Falls back to equation-derived styles if CLIP unavailable
+
+```bash
+# Full pipeline
+./tools/generate-enhanced-fingerprints.sh alaskaButter
 ```
 
 ## Implementation Strategy
