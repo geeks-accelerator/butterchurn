@@ -322,7 +322,326 @@ if (visualStyle === 'abstract') {
 
 ---
 
-## Phase 5: Regeneration & Validation
+## Phase 5: Test Coverage
+
+**Estimated Effort:** 3-4 hours
+**Dependencies:** Phase 1-4 implementation complete
+**Files:** `test/tools/generateFingerprints.test.js`, `test/intelligentPresetSelector.test.js`
+
+### 5.1 Fix Wiring Gap: Inline Test Implementations
+
+**Issue:** Current tests in `test/tools/generateFingerprints.test.js` use inline function implementations that are **out of sync** with `tools/generate-fingerprints.js`.
+
+**Current State (BROKEN):**
+```javascript
+// Test file has OLD implementation:
+function extractColorProfile(preset) {
+    const equations = (preset.init_eqs_eel || '');
+    const redUsage = (equations.match(/red\s*=/gi) || []).length;
+    // ... OLD logic that doesn't match actual code
+}
+```
+
+**Solution:** Export functions from generator and import in tests.
+
+```javascript
+// In tools/generate-fingerprints.js, add exports:
+export {
+    PresetFingerprintGenerator,
+    // Or export individual methods for unit testing
+};
+
+// In test/tools/generateFingerprints.test.js:
+import PresetFingerprintGenerator from '../../tools/generate-fingerprints.js';
+
+const generator = new PresetFingerprintGenerator();
+// Use generator.extractColorProfile() instead of inline copy
+```
+
+**Acceptance Criteria:**
+- [ ] Tests import actual implementation, no inline copies
+- [ ] Tests fail when implementation changes (proper wiring)
+
+### 5.2 Unit Tests for New Features
+
+Add tests for all new functionality:
+
+```javascript
+describe('Phase 1: Critical Fixes', () => {
+    describe('FRC-1/FRC-2: Expanded Mood Vocabulary', () => {
+        it('should include new mood types', () => {
+            const affinities = generator.deriveMoodAffinities('fractal', 'medium', 'neutral');
+            expect(affinities).toHaveProperty('mystical');
+            expect(affinities).toHaveProperty('hypnotic');
+            expect(affinities).toHaveProperty('psychedelic');
+            expect(affinities).toHaveProperty('dreamy');
+            expect(affinities).toHaveProperty('meditative');
+        });
+
+        it('should reduce aggressive for fractal style', () => {
+            const affinities = generator.deriveMoodAffinities('fractal', 'medium', 'neutral');
+            expect(parseFloat(affinities.aggressive)).toBeLessThan(0.5);
+        });
+
+        it('should boost hypnotic for fractal style', () => {
+            const affinities = generator.deriveMoodAffinities('fractal', 'medium', 'neutral');
+            expect(parseFloat(affinities.hypnotic)).toBeGreaterThan(0.7);
+        });
+    });
+
+    describe('EXT-2/FRC-3: Complexity Scaling', () => {
+        it('should allow complexity > 0.5', () => {
+            const preset = {
+                shapes: [{ enabled: true }, { enabled: true }, { enabled: true }],
+                waves: [{ enabled: true }, { enabled: true }],
+                pixel_eqs_str: 'x'.repeat(500),
+                frame_eqs_eel: 'zoom=1.1;rot=0.01;'
+            };
+            const complexity = generator.analyzeComplexity(preset);
+            expect(complexity).toBeGreaterThan(0.5);
+        });
+
+        it('should boost complexity for fractal patterns', () => {
+            const fractalPreset = {
+                frame_eqs_eel: 'zoom=1.1;rot=0.05;'
+            };
+            const normalPreset = {
+                frame_eqs_eel: 'wave=1;'
+            };
+            const fractalComplexity = generator.analyzeComplexity(fractalPreset);
+            const normalComplexity = generator.analyzeComplexity(normalPreset);
+            expect(fractalComplexity).toBeGreaterThan(normalComplexity);
+        });
+    });
+
+    describe('ABS-2: Keyword-Based Style Detection', () => {
+        it('should detect fractal from preset name', () => {
+            const styles = generator.detectVisualStyle({
+                name: 'Flexi - smashing fractals 2.0'
+            });
+            expect(styles).toContain('fractal');
+        });
+
+        it('should detect particle from preset name', () => {
+            const styles = generator.detectVisualStyle({
+                name: 'martin - sparky particles'
+            });
+            expect(styles).toContain('particle');
+        });
+
+        it('should detect organic from preset name', () => {
+            const styles = generator.detectVisualStyle({
+                name: 'Waltra - Ice Plasma'
+            });
+            expect(styles).toContain('organic');
+        });
+    });
+});
+
+describe('Phase 2: High Priority', () => {
+    describe('ORG-1/ORG-3: Organic Style Caps', () => {
+        it('should cap aggressive at 0.75 for organic', () => {
+            // High energy preset that would normally be very aggressive
+            const affinities = generator.deriveMoodAffinities('organic', 'fast', 'warm');
+            expect(parseFloat(affinities.aggressive)).toBeLessThanOrEqual(0.75);
+        });
+
+        it('should ensure acoustic >= electronic for organic', () => {
+            const affinities = generator.deriveMoodAffinities('organic', 'medium', 'neutral');
+            expect(parseFloat(affinities.acoustic)).toBeGreaterThanOrEqual(
+                parseFloat(affinities.electronic)
+            );
+        });
+    });
+
+    describe('CLR-1/CLR-2: Cool Color Detection', () => {
+        it('should detect purple as cool', () => {
+            const preset = {
+                baseVals: { wave_r: 0.6, wave_g: 0.2, wave_b: 0.8 }
+            };
+            expect(generator.extractColorProfile(preset)).toBe('cool');
+        });
+
+        it('should have lower threshold for cool detection', () => {
+            const preset = {
+                baseVals: { wave_r: 0.3, wave_g: 0.3, wave_b: 0.55 }
+            };
+            expect(generator.extractColorProfile(preset)).toBe('cool');
+        });
+    });
+});
+
+describe('Phase 3: Medium Priority', () => {
+    describe('MOD-1: Energy-Relaxed Cross-Validation', () => {
+        it('should reduce relaxed when energy > 0.6', () => {
+            // Simulate high energy preset
+            const highEnergyAffinities = generator.deriveMoodAffinities(
+                'organic', 'fast', 'neutral', 0.8, 0.5
+            );
+            const lowEnergyAffinities = generator.deriveMoodAffinities(
+                'organic', 'slow', 'neutral', 0.3, 0.5
+            );
+            expect(parseFloat(highEnergyAffinities.relaxed)).toBeLessThan(
+                parseFloat(lowEnergyAffinities.relaxed)
+            );
+        });
+
+        it('should prevent aggressive + relaxed both > 0.7', () => {
+            // Any preset should not have both aggressive and relaxed > 0.7
+            const affinities = generator.deriveMoodAffinities('particle', 'fast', 'warm', 0.9, 0.9);
+            const aggressive = parseFloat(affinities.aggressive);
+            const relaxed = parseFloat(affinities.relaxed);
+            expect(aggressive > 0.7 && relaxed > 0.7).toBe(false);
+        });
+    });
+});
+```
+
+**Acceptance Criteria:**
+- [ ] All Phase 1-4 features have corresponding unit tests
+- [ ] Tests verify acceptance criteria from each issue
+
+### 5.3 Integration Tests: Fingerprint File Validation
+
+Test the actual generated fingerprint file meets quality criteria:
+
+```javascript
+describe('Integration: Fingerprint File Quality', () => {
+    let fingerprints;
+
+    beforeAll(() => {
+        fingerprints = require('../../presets/alaska-butter/alaskaButter.fingerprints.json');
+    });
+
+    describe('Fractal Presets (FRC-1, FRC-2)', () => {
+        it('should have 0% fractals with aggressive > 0.8', () => {
+            const fractals = Object.values(fingerprints.presets)
+                .filter(p => p.fingerprint.visualStyle === 'fractal');
+            const highAggressive = fractals.filter(
+                p => parseFloat(p.fingerprint.moodAffinities.aggressive) > 0.8
+            );
+            expect(highAggressive.length).toBe(0);
+        });
+
+        it('should have 80%+ fractals with hypnotic > 0.6', () => {
+            const fractals = Object.values(fingerprints.presets)
+                .filter(p => p.fingerprint.visualStyle === 'fractal');
+            const highHypnotic = fractals.filter(
+                p => parseFloat(p.fingerprint.moodAffinities.hypnotic) > 0.6
+            );
+            expect(highHypnotic.length / fractals.length).toBeGreaterThanOrEqual(0.8);
+        });
+
+        it('should have > 50 unique mood combinations', () => {
+            const fractals = Object.values(fingerprints.presets)
+                .filter(p => p.fingerprint.visualStyle === 'fractal');
+            const uniqueMoods = new Set(
+                fractals.map(p => JSON.stringify(p.fingerprint.moodAffinities))
+            );
+            expect(uniqueMoods.size).toBeGreaterThan(50);
+        });
+    });
+
+    describe('Complexity (EXT-2)', () => {
+        it('should have > 50 presets above complexity 0.5', () => {
+            const highComplexity = Object.values(fingerprints.presets)
+                .filter(p => p.fingerprint.complexity > 0.5);
+            expect(highComplexity.length).toBeGreaterThan(50);
+        });
+
+        it('should have complexity range reaching 0.8+', () => {
+            const maxComplexity = Math.max(
+                ...Object.values(fingerprints.presets).map(p => p.fingerprint.complexity)
+            );
+            expect(maxComplexity).toBeGreaterThanOrEqual(0.8);
+        });
+    });
+
+    describe('Abstract Misclassification (ABS-2)', () => {
+        it('should have < 10% misclassification rate', () => {
+            const abstracts = Object.values(fingerprints.presets)
+                .filter(p => p.fingerprint.visualStyle === 'abstract');
+            const misclassified = abstracts.filter(p => {
+                const name = (p.names[0] || '').toLowerCase();
+                return name.includes('fractal') || name.includes('particle') ||
+                       name.includes('spiral') || name.includes('spark');
+            });
+            expect(misclassified.length / abstracts.length).toBeLessThan(0.1);
+        });
+    });
+
+    describe('Color Profile Distribution (CLR-1)', () => {
+        it('should have > 20 cool presets', () => {
+            const cool = Object.values(fingerprints.presets)
+                .filter(p => p.fingerprint.colorProfile === 'cool');
+            expect(cool.length).toBeGreaterThan(20);
+        });
+    });
+
+    describe('Organic Moods (ORG-1, ORG-3)', () => {
+        it('should have < 15% organic presets with aggressive > 0.75', () => {
+            const organics = Object.values(fingerprints.presets)
+                .filter(p => p.fingerprint.visualStyle === 'organic');
+            const highAggressive = organics.filter(
+                p => parseFloat(p.fingerprint.moodAffinities.aggressive) > 0.75
+            );
+            expect(highAggressive.length / organics.length).toBeLessThan(0.15);
+        });
+    });
+});
+```
+
+### 5.4 Selector Integration Tests
+
+Test that IntelligentPresetSelector correctly uses new fingerprint fields:
+
+```javascript
+// In test/intelligentPresetSelector.test.js, add:
+
+describe('Integration: Selector with v2.1 Fingerprints', () => {
+    describe('New Mood Type Support', () => {
+        it('should match mystical presets for ambient music', () => {
+            // Verify selector can filter by mystical mood
+        });
+
+        it('should match hypnotic presets for trance music', () => {
+            // Verify selector can filter by hypnotic mood
+        });
+    });
+
+    describe('Threshold Updates', () => {
+        it('should use lowEnergy threshold of 0.35', () => {
+            // Verify EXT-1 threshold change
+        });
+
+        it('should use highBpm threshold of 140', () => {
+            // Verify EXT-3 threshold change
+        });
+    });
+});
+```
+
+### 5.5 Test Coverage Checklist
+
+| Issue | Unit Test | Integration Test | Status |
+|-------|-----------|------------------|--------|
+| FRC-1 | Mood vocabulary expansion | Fractal mood diversity | |
+| FRC-2 | Fractal aggressive reduction | 0% aggressive > 0.8 | |
+| FRC-3 | Fractal complexity boost | Avg complexity > 0.5 | |
+| EXT-2 | Complexity normalization | Range reaches 0.8+ | |
+| ABS-2 | Keyword detection | < 10% misclassified | |
+| ORG-1 | Acoustic >= electronic | Organic mood balance | |
+| ORG-3 | Aggressive cap at 0.75 | < 15% high aggressive | |
+| CLR-1 | Cool threshold lowered | > 20 cool presets | |
+| CLR-2 | Purple detection | Purple → cool | |
+| MOD-1 | Energy-relaxed penalty | No contradictions | |
+
+---
+
+## Phase 6: Regeneration & Validation
+
+**Estimated Effort:** 1-2 hours
+**Dependencies:** Phase 5 tests passing
 
 **Estimated Effort:** 1-2 hours
 **Dependencies:** All phases complete
@@ -356,10 +675,10 @@ const fp = require('./presets/alaska-butter/alaskaButter.fingerprints.json');
 
 ---
 
-## Phase 6: Documentation Updates
+## Phase 7: Documentation Updates
 
 **Estimated Effort:** 1-2 hours
-**Dependencies:** Phase 5 complete
+**Dependencies:** Phase 6 complete
 **Files:** Various documentation files
 
 ### 6.1 Update CLAUDE.md
@@ -420,13 +739,27 @@ const fp = require('./presets/alaska-butter/alaskaButter.fingerprints.json');
 - [ ] ABS-3: Increase abstract mood variation
 - [ ] Manual edge case review
 
-### Phase 5: Finalization
+### Phase 5: Test Coverage
+- [ ] Fix wiring gap: export functions from generator
+- [ ] Update test imports to use actual implementation
+- [ ] Add unit tests for expanded mood vocabulary (FRC-1/FRC-2)
+- [ ] Add unit tests for complexity scaling (EXT-2/FRC-3)
+- [ ] Add unit tests for keyword detection (ABS-2)
+- [ ] Add unit tests for organic mood caps (ORG-1/ORG-3)
+- [ ] Add unit tests for cool color detection (CLR-1/CLR-2)
+- [ ] Add unit tests for energy-relaxed validation (MOD-1)
+- [ ] Add integration tests for fingerprint file quality
+- [ ] Add selector integration tests for new fields
+- [ ] Verify all tests pass
+
+### Phase 6: Regeneration
 - [ ] Regenerate all fingerprints
 - [ ] Run validation analysis
+- [ ] Verify integration tests pass with new fingerprints
 - [ ] Update version numbers
 - [ ] Commit changes
 
-### Phase 6: Documentation
+### Phase 7: Documentation
 - [ ] Update CLAUDE.md with new status
 - [ ] Update README.md with new features
 - [ ] Update architecture docs (mathematical-fingerprinting.md)
