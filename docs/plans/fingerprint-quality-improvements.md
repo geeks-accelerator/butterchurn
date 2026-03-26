@@ -1223,20 +1223,20 @@ console.log('Organic aggressive > 0.75:', (orgHighAgg.length / organics.length *
 - [x] ABS-3: Increase abstract mood variation
 - [ ] Manual edge case review (deferred)
 
-### Phase 5: Test Coverage (Deferred)
-- [ ] Fix wiring gap: export functions from generator
-- [ ] Update test imports to use actual implementation
-- [ ] Add unit tests for expanded mood vocabulary (FRC-1/FRC-2)
-- [ ] Add unit tests for complexity scaling (EXT-2/FRC-3)
-- [ ] Add unit tests for keyword detection (ABS-2)
-- [ ] Add unit tests for organic mood caps (ORG-1/ORG-3)
-- [ ] Add unit tests for cool color detection (CLR-1/CLR-2)
-- [ ] Add unit tests for energy-relaxed validation (MOD-1)
-- [ ] Add unit tests for selector scoring functions (WIRE-1)
-- [ ] Add integration tests for fingerprint file quality
-- [ ] Add selector integration tests for new fields
-- [ ] Add tests for colorProfile/visualStyle/BPM wiring
-- [ ] Verify all tests pass
+### Phase 5: Test Coverage ✅
+- [x] Fix wiring gap: import actual generator in tests
+- [x] Update test imports to use actual implementation
+- [x] Add unit tests for expanded mood vocabulary (FRC-1/FRC-2)
+- [x] Add unit tests for complexity scaling (EXT-2/FRC-3)
+- [x] Add unit tests for keyword detection (ABS-2)
+- [x] Add unit tests for organic mood caps (ORG-1/ORG-3)
+- [x] Add unit tests for cool color detection (CLR-1/CLR-2)
+- [x] Add unit tests for energy-relaxed validation (MOD-1)
+- [x] Add unit tests for selector scoring functions (WIRE-1)
+- [x] Add integration tests for fingerprint file quality
+- [x] Add selector integration tests for new fields
+- [x] Add tests for colorProfile/visualStyle/BPM wiring
+- [x] All 70 unit tests pass
 
 ### Phase 6: Regeneration ✅
 - [x] Regenerate all fingerprints
@@ -1321,8 +1321,7 @@ All success criteria met:
 
 ### Deferred Items
 
-- Phase 5 (Test Coverage): Unit and integration tests not yet added
-- Manual edge case review: Not performed
+- Manual edge case review: Not performed (low priority)
 
 ---
 
