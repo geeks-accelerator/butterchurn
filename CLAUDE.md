@@ -35,7 +35,7 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Phase 3 Complete - Intelligent Preset Selector Improvements**
+**Phase: Fingerprint Quality Improvements Complete - v2.1 Released**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
@@ -48,10 +48,17 @@ This file provides AI-optimized development context for Claude Code when working
   - Mood-aware selection (aggressive, relaxed, happy, electronic, acoustic)
   - Genre detection with timing adjustments (EDM, dubstep, hiphop, rock, classical, ambient, pop)
   - Preset performance degradation tracking
-  - Enhanced fingerprints v2.0 (mood affinities, optimal BPM, visual styles)
-  - CLIP-based visual style classification tooling
   - Adaptive FFT size recommendation system
-- Alaska Butter unified collection (388 unique presets with deduplication)
+- **Fingerprint Quality Improvements (v2.1):**
+  - Expanded mood vocabulary (mystical, hypnotic, psychedelic, dreamy, meditative)
+  - Fractal-specific mood profiles (0% aggressive > 0.8)
+  - Enhanced complexity scaling (378 presets > 0.5, max 0.90)
+  - Keyword-based visual style detection with word boundary regex
+  - Improved cool color detection (60 presets, including purple/violet)
+  - Organic mood caps (acoustic > electronic, aggressive ≤ 0.75)
+  - BPM and energy threshold constants in selector
+  - ColorProfile and visualStyle scoring in preset selection
+- Alaska Butter unified collection (495 presets, 388 unique after deduplication)
 - Individual preset pack support with 1:1 fingerprint mapping
 - FingerprintLoader + FingerprintAdapter system for modular preset loading
 - Moving Average crossover detection for scene-based preset switching
@@ -75,7 +82,7 @@ This file provides AI-optimized development context for Claude Code when working
 - `src/fingerprintAdapter.js` - ✅ Database format adapter for selector compatibility
 - `presets/alaska-butter/` - ✅ Unified collection (388 presets + fingerprints)
 - `presets/full-collection/` - ✅ Individual packs with 1:1 fingerprint mapping
-- `tools/generate-fingerprints.js` - ✅ v2.0 fingerprint schema with mood, BPM, visual style
+- `tools/generate-fingerprints.js` - ✅ v2.1 fingerprint schema with expanded moods, complexity scaling, color detection
 - `tools/classify-visual-style.py` - ✅ CLIP-based visual style classifier
 - `tools/render-preset-frames.js` - ✅ Headless preset frame renderer
 - `test/fingerprint-test.html` - ✅ Working demo with new system
