@@ -1685,17 +1685,32 @@ class IntelligentPresetSelector {
         }
 
         // WIRE-1: Color profile matching (5%)
-        // Warm colors match happy/aggressive moods, cool colors match relaxed/electronic
+        // Warm colors match happy/aggressive moods, cool colors match relaxed/electronic/meditative/dreamy/mystical
+        // v2.1: Added support for extended moods
         if (fp.colorProfile && mood) {
             const colorProfile = fp.colorProfile;
-            if (colorProfile === 'warm' && (mood.label === 'happy' || mood.label === 'aggressive')) {
+            const moodLabel = mood.label;
+
+            // Warm colors: energetic, positive moods
+            if (colorProfile === 'warm' && (moodLabel === 'happy' || moodLabel === 'aggressive')) {
                 score += 0.05;
             }
-            if (colorProfile === 'cool' && (mood.label === 'relaxed' || mood.label === 'electronic')) {
+
+            // Cool colors: calm, ethereal, introspective moods
+            // v2.1: Added meditative, dreamy, mystical, hypnotic
+            if (colorProfile === 'cool' && (
+                moodLabel === 'relaxed' || moodLabel === 'electronic' ||
+                moodLabel === 'meditative' || moodLabel === 'dreamy' ||
+                moodLabel === 'mystical' || moodLabel === 'hypnotic'
+            )) {
                 score += 0.05;
             }
-            // Vivid matches high energy audio
-            if (colorProfile === 'vivid' && (features.beatStrength || 0) > 0.7) {
+
+            // Vivid colors: high energy or psychedelic
+            // v2.1: Added psychedelic mood match
+            if (colorProfile === 'vivid' && (
+                (features.beatStrength || 0) > 0.7 || moodLabel === 'psychedelic'
+            )) {
                 score += 0.05;
             }
         }
