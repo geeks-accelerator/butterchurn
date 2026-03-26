@@ -353,8 +353,43 @@ const fp = require('./presets/alaska-butter/alaskaButter.fingerprints.json');
 ### 5.3 Update Version
 
 - Bump fingerprint schema to v2.1.0
-- Update CLAUDE.md with new status
-- Update README.md if new moods added
+
+---
+
+## Phase 6: Documentation Updates
+
+**Estimated Effort:** 1-2 hours
+**Dependencies:** Phase 5 complete
+**Files:** Various documentation files
+
+### 6.1 Update CLAUDE.md
+
+- Update project status section with new fingerprint version
+- Add any new critical rules discovered during implementation
+- Update file organization if new files added
+
+### 6.2 Update README.md
+
+- Document new mood types if added (mystical, hypnotic, etc.)
+- Update fingerprint schema version reference
+- Add any new usage examples for enhanced features
+
+### 6.3 Update Architecture Documentation
+
+- `docs/architecture/mathematical-fingerprinting.md` - Document v2.1 schema changes
+- `docs/architecture/README.md` - Update mood detection model if changed
+
+### 6.4 Update Review Document
+
+- Mark resolved issues in [fingerprint-quality-review-2026-03-25.md](../reviews/fingerprint-quality-review-2026-03-25.md)
+- Add "Resolution" column to issue tracker
+- Document validation results
+
+### 6.5 Close Out Plan
+
+- Update this plan with completion status
+- Add "Completed" date and summary
+- Document any deferred items for future work
 
 ---
 
@@ -389,8 +424,15 @@ const fp = require('./presets/alaska-butter/alaskaButter.fingerprints.json');
 - [ ] Regenerate all fingerprints
 - [ ] Run validation analysis
 - [ ] Update version numbers
-- [ ] Update documentation
-- [ ] Commit and push
+- [ ] Commit changes
+
+### Phase 6: Documentation
+- [ ] Update CLAUDE.md with new status
+- [ ] Update README.md with new features
+- [ ] Update architecture docs (mathematical-fingerprinting.md)
+- [ ] Mark issues resolved in review document
+- [ ] Close out this plan with completion summary
+- [ ] Final commit and push
 
 ---
 
