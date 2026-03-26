@@ -31,6 +31,21 @@ Butterchurn is an intelligent WebGL implementation of the Milkdrop Visualizer wi
 - **Mood-Aware Selection** - Real-time mood classification with 10 mood types:
   - *Primary:* aggressive, relaxed, happy, electronic, acoustic
   - *Extended (v2.1):* mystical, hypnotic, psychedelic, dreamy, meditative
+
+  **Mood Triggers (DOC-3):**
+  | Mood | Audio Triggers | Visual Characteristics |
+  |------|---------------|------------------------|
+  | aggressive | High bass (>0.7), loud, fast BPM | High energy, sharp edges |
+  | relaxed | Low energy (<0.4), smooth dynamics | Soft motion, organic flow |
+  | happy | Major tonality, bright mids | Warm colors, upward motion |
+  | electronic | High flatness (>0.5), processed | Synthetic, precise patterns |
+  | acoustic | Low flatness, dynamic range | Natural, organic forms |
+  | mystical | High rolloff, soft transients | Cool colors, ethereal glow |
+  | hypnotic | Steady rhythm, moderate energy | Repetitive patterns, iteration |
+  | psychedelic | High flux, wide dynamic range | Vivid colors, complex motion |
+  | dreamy | High centroid, low sharpness | Soft focus, flowing shapes |
+  | meditative | Very low energy, slow tempo | Minimal motion, calm colors |
+
 - **Genre Detection** - Automatic genre classification (EDM, dubstep, hip-hop, rock, classical, ambient, pop) with timing adjustments
 - **Performance Degradation Tracking** - Automatic preset switching when match quality drops 40%+ from baseline
 - **v2.1 Fingerprint Schema** - Enhanced fingerprints with expanded mood vocabulary, improved complexity scaling, and keyword-based style detection
