@@ -53,3 +53,10 @@ presets/full-collection/presets/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Phase 6: CLIP visual style classification artifacts
+tools/frames-*/
+tools/visual-styles*.json
+tools/test-presets*.json
+tools/combined-presets.json
+tools/.venv/
