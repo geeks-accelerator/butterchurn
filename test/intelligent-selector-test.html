@@ -237,6 +237,59 @@
                 </div>
             </div>
 
+            <!-- Musical Intelligence Panel (Phase 3) -->
+            <div class="info">
+                <h3>🎼 Musical Intelligence</h3>
+                <div class="preset-info">
+                    <span class="label">Detected BPM:</span>
+                    <span class="value" id="detectedBpm">--</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Current Mood:</span>
+                    <span class="value" id="currentMood">--</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Mood Confidence:</span>
+                    <span class="value" id="moodConfidence">--</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Phrase Position:</span>
+                    <span class="value" id="phrasePosition">-- / 16</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Bar Position:</span>
+                    <span class="value" id="barPosition">-- / 4</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Buildup Status:</span>
+                    <span class="value" id="buildupStatus">None</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Pre-Drop ETA:</span>
+                    <span class="value" id="preDropEta">--</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Pending Switch:</span>
+                    <span class="value" id="pendingSwitch">None</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Detected Genre:</span>
+                    <span class="value" id="detectedGenre">--</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">Timing Multiplier:</span>
+                    <span class="value" id="timingMultiplier">1.0x</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">FFT Size:</span>
+                    <span class="value" id="fftSize">2048</span>
+                </div>
+                <div class="preset-info">
+                    <span class="label">FFT Recommendation:</span>
+                    <span class="value" id="fftRecommendation">--</span>
+                </div>
+            </div>
+
             <!-- Frame Analysis Panel -->
             <div class="info">
                 <h3>🎬 Frame Analysis</h3>
@@ -334,10 +387,10 @@
     <!-- Load our local improved Butterchurn build (UMD format with Phase 1 improvements) -->
     <!-- Using NON-MINIFIED version for debugging with console logs -->
     <script>
-        // Dynamic cache busting for butterchurn.js
+        // Dynamic cache busting for butterchurn.min.js
         const cacheBuster = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        document.write('<script src="../dist/butterchurn.js?v=' + cacheBuster + '"><\/script>');
-        console.log('Loading butterchurn.js with cache buster:', cacheBuster);
+        document.write('<script src="../dist/butterchurn.min.js?v=' + cacheBuster + '"><\/script>');
+        console.log('Loading butterchurn.min.js with cache buster:', cacheBuster);
     </script>
     <!-- Load presets from CDN -->
     <!-- Load Alaska Butter first (primary preset pack) -->
@@ -887,8 +940,12 @@
 
                 if (selectedPack === 'alaska-butter') {
                     // Load Alaska Butter collection
+                    // Note: alaskaButter exports presets directly as an object, not with getPresets()
                     if (typeof alaskaButter !== 'undefined') {
-                        presets = alaskaButter.getPresets();
+                        // alaskaButter is a direct object of presets, not with getPresets()
+                        presets = typeof alaskaButter.getPresets === 'function'
+                            ? alaskaButter.getPresets()
+                            : alaskaButter;
                         packName = 'Alaska Butter';
                         console.log('[Preset Pack] Alaska Butter already loaded, using it directly');
                     } else {
@@ -904,7 +961,10 @@
                         });
 
                         if (typeof alaskaButter !== 'undefined') {
-                            presets = alaskaButter.getPresets();
+                            // alaskaButter is a direct object of presets, not with getPresets()
+                            presets = typeof alaskaButter.getPresets === 'function'
+                                ? alaskaButter.getPresets()
+                                : alaskaButter;
                             packName = 'Alaska Butter';
                             console.log('[Preset Pack] Alaska Butter dynamically loaded successfully');
                         } else {
@@ -1266,6 +1326,105 @@
                             `${(advancedFeatures.zeroCrossingRate * 100).toFixed(1)}% percussive`;
                         document.getElementById('dynamicRange').textContent =
                             `${(advancedFeatures.dynamicRange * 100).toFixed(0)}% range`;
+
+                        // Update Musical Intelligence panel (Phase 3 features)
+                        if (selector.audioAnalyzer) {
+                            const analyzer = selector.audioAnalyzer;
+
+                            // BPM detection
+                            const bpm = analyzer.detectedBPM;
+                            document.getElementById('detectedBpm').textContent =
+                                bpm ? `${bpm} BPM` : 'Detecting...';
+
+                            // Beat/phrase tracking
+                            const beatInfo = analyzer.trackBeatPhase ? analyzer.trackBeatPhase() : null;
+                            if (beatInfo) {
+                                document.getElementById('phrasePosition').textContent =
+                                    `${beatInfo.phrasePosition + 1} / 16${beatInfo.isPhraseBoundary ? ' 🎵' : ''}`;
+                                document.getElementById('barPosition').textContent =
+                                    `${beatInfo.barPosition + 1} / 4`;
+                            } else {
+                                document.getElementById('phrasePosition').textContent = '-- / 16';
+                                document.getElementById('barPosition').textContent = '-- / 4';
+                            }
+
+                            // Mood detection
+                            if (analyzer.detectMood && result.features) {
+                                const mood = analyzer.detectMood(result.features);
+                                const moodEmojis = {
+                                    aggressive: '🔥',
+                                    relaxed: '😌',
+                                    happy: '😊',
+                                    electronic: '🎹',
+                                    acoustic: '🎸',
+                                    neutral: '⚪'
+                                };
+                                document.getElementById('currentMood').textContent =
+                                    `${moodEmojis[mood.label] || ''} ${mood.label}`;
+                                document.getElementById('moodConfidence').textContent =
+                                    `${(mood.confidence * 100).toFixed(0)}%`;
+                            }
+
+                            // Buildup detection
+                            if (analyzer.detectBuildup && result.features) {
+                                const buildup = analyzer.detectBuildup(result.features);
+                                if (buildup.isBuildup) {
+                                    document.getElementById('buildupStatus').textContent =
+                                        `🔺 Rising (${(buildup.confidence * 100).toFixed(0)}%)`;
+                                    document.getElementById('preDropEta').textContent =
+                                        buildup.dropETA ? `${(buildup.dropETA / 1000).toFixed(1)}s` : '--';
+                                } else {
+                                    document.getElementById('buildupStatus').textContent = 'None';
+                                    document.getElementById('preDropEta').textContent = '--';
+                                }
+                            }
+                        }
+
+                        // Show pending switch status
+                        if (selector.pendingSwitchOnPhrase) {
+                            document.getElementById('pendingSwitch').textContent =
+                                `🎯 ${selector.pendingSwitchReason || 'Phrase-aligned'}`;
+                        } else if (selector.preDropSwitchScheduled) {
+                            document.getElementById('pendingSwitch').textContent = '⚡ Pre-drop queued';
+                        } else {
+                            document.getElementById('pendingSwitch').textContent = 'None';
+                        }
+
+                        // Show detected genre
+                        if (selector.detectedGenre) {
+                            const genreEmojis = {
+                                edm: '🎹',
+                                dubstep: '🔊',
+                                hiphop: '🎤',
+                                rock: '🎸',
+                                classical: '🎻',
+                                ambient: '🌙',
+                                pop: '🎵',
+                                unknown: '❓'
+                            };
+                            const genre = selector.detectedGenre;
+                            document.getElementById('detectedGenre').textContent =
+                                `${genreEmojis[genre.label] || ''} ${genre.label} (${(genre.confidence * 100).toFixed(0)}%)`;
+                            document.getElementById('timingMultiplier').textContent =
+                                `${genre.timingMultiplier.toFixed(1)}x`;
+                        }
+
+                        // Show FFT recommendation
+                        if (selector.audioAnalyzer?.recommendFFTSize) {
+                            const deviceCaps = {
+                                tier: selector.deviceTier || 'medium',
+                                cores: navigator.hardwareConcurrency || 4,
+                                memory: navigator.deviceMemory || 4
+                            };
+                            const presetComplexity = selector.currentFingerprint?.complexity || 0.5;
+                            const fftRec = selector.audioAnalyzer.recommendFFTSize(deviceCaps, presetComplexity);
+
+                            document.getElementById('fftSize').textContent = `${fftRec.currentSize}`;
+                            document.getElementById('fftRecommendation').textContent =
+                                fftRec.canUpgrade ?
+                                    `⬆️ ${fftRec.recommendedSize} (${fftRec.reason.slice(0, 30)}...)` :
+                                    `✓ ${fftRec.recommendedSize} optimal`;
+                        }
 
                         // Update musical event detection display (only if features exist)
                         const musicalEvent = result.features ? detectMusicalEvent(result.features) : { type: 'No Audio' };
