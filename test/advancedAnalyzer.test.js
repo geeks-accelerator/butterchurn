@@ -257,6 +257,118 @@ describe('AdvancedAudioAnalyzer', () => {
             const mood = analyzer.detectMood(features);
             expect(mood.label).toBe('relaxed');
         });
+
+        // V2.1 Extended Mood Detection Tests
+        describe('Extended Moods (v2.1)', () => {
+            it('should detect meditative mood for very low energy and sharpness', () => {
+                // Centroid >= 0.4 to avoid triggering relaxed (which requires centroid < 0.4)
+                const features = {
+                    bass: 0.15,
+                    mid: 0.2,
+                    treble: 0.1,
+                    beatStrength: 0.1,
+                    dynamicRange: 0.15,
+                    spectral: { centroid: 0.45, flatness: 0.2, sharpness: 0.1, flux: 0.1, rolloff: 0.3 }
+                };
+
+                const mood = analyzer.detectMood(features);
+                expect(mood.label).toBe('meditative');
+                expect(mood.confidence).toBeGreaterThanOrEqual(0.6);
+            });
+
+            it('should detect dreamy mood for low energy with high centroid', () => {
+                const features = {
+                    bass: 0.25,
+                    mid: 0.4,
+                    treble: 0.5,
+                    beatStrength: 0.25,
+                    dynamicRange: 0.3,
+                    spectral: { centroid: 0.65, flatness: 0.35, sharpness: 0.2, flux: 0.2, rolloff: 0.5 }
+                };
+
+                const mood = analyzer.detectMood(features);
+                expect(mood.label).toBe('dreamy');
+                expect(mood.confidence).toBeGreaterThanOrEqual(0.55);
+            });
+
+            it('should detect hypnotic mood for moderate energy with low dynamic range', () => {
+                const features = {
+                    bass: 0.4,
+                    mid: 0.55,
+                    treble: 0.35,
+                    beatStrength: 0.45,
+                    dynamicRange: 0.2,
+                    spectral: { centroid: 0.45, flatness: 0.35, sharpness: 0.35, flux: 0.2, rolloff: 0.4 }
+                };
+
+                const mood = analyzer.detectMood(features);
+                expect(mood.label).toBe('hypnotic');
+                expect(mood.confidence).toBeGreaterThanOrEqual(0.55);
+            });
+
+            it('should detect mystical mood for organic sound with high rolloff', () => {
+                const features = {
+                    bass: 0.3,
+                    mid: 0.45,
+                    treble: 0.4,
+                    beatStrength: 0.35,
+                    dynamicRange: 0.35,
+                    spectral: { centroid: 0.5, flatness: 0.2, sharpness: 0.3, flux: 0.2, rolloff: 0.65 }
+                };
+
+                const mood = analyzer.detectMood(features);
+                expect(mood.label).toBe('mystical');
+                expect(mood.confidence).toBeGreaterThanOrEqual(0.5);
+            });
+
+            it('should detect psychedelic mood for high flux and dynamic range', () => {
+                const features = {
+                    bass: 0.4,
+                    mid: 0.5,
+                    treble: 0.55,
+                    beatStrength: 0.5,
+                    dynamicRange: 0.55,
+                    spectral: { centroid: 0.55, flatness: 0.4, sharpness: 0.4, flux: 0.45, rolloff: 0.5 }
+                };
+
+                const mood = analyzer.detectMood(features);
+                expect(mood.label).toBe('psychedelic');
+                expect(mood.confidence).toBeGreaterThanOrEqual(0.5);
+            });
+
+            it('should prioritize primary moods when confidence is high', () => {
+                // Strong aggressive features should take priority
+                const features = {
+                    bass: 0.85,
+                    mid: 0.5,
+                    treble: 0.4,
+                    beatStrength: 0.8,
+                    dynamicRange: 0.5,
+                    spectral: { centroid: 0.5, flatness: 0.3, sharpness: 0.7, flux: 0.4, rolloff: 0.5 }
+                };
+
+                const mood = analyzer.detectMood(features);
+                expect(mood.label).toBe('aggressive');
+                expect(mood.confidence).toBeGreaterThan(0.7);
+            });
+
+            it('should fall back to extended moods only when primary confidence is low', () => {
+                // Features that don't strongly match any primary mood
+                // but match meditative (very low everything)
+                const features = {
+                    bass: 0.1,
+                    mid: 0.15,
+                    treble: 0.1,
+                    beatStrength: 0.15,
+                    dynamicRange: 0.1,
+                    spectral: { centroid: 0.35, flatness: 0.28, sharpness: 0.15, flux: 0.1, rolloff: 0.3 }
+                };
+
+                const mood = analyzer.detectMood(features);
+                // Should be meditative since primary moods don't match well
+                expect(['meditative', 'relaxed']).toContain(mood.label);
+            });
+        });
     });
 
     describe('Buildup Detection', () => {

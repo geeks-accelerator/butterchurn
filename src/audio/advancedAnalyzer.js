@@ -479,6 +479,7 @@ export class AdvancedAudioAnalyzer {
     /**
      * Detect current audio mood based on spectral features
      * CRIT-5 FIX: Use actual property names from analyzer output
+     * v2.1: Added support for new mood types (mystical, hypnotic, psychedelic, dreamy, meditative)
      * @param {Object} features - Current audio features
      * @returns {Object} Mood detection result with label and confidence
      */
@@ -486,14 +487,18 @@ export class AdvancedAudioAnalyzer {
         if (!features.spectral) return { label: 'neutral', confidence: 0.5 };
 
         // CRIT-5 FIX: Use actual property names from calculateFeatures()
-        const { bass, mid, treble, beatStrength } = features;
-        const { centroid, flatness, sharpness } = features.spectral;
+        const { bass, mid, treble, beatStrength, dynamicRange, zeroCrossingRate } = features;
+        const { centroid, flatness, sharpness, flux, rolloff } = features.spectral;
 
         // Use normalized energy (beatStrength) instead of absolute volume
         // This makes mood detection volume-invariant
         const energy = beatStrength || 0;
 
         let mood = { label: 'neutral', confidence: 0.5 };
+
+        // ============================================
+        // PRIMARY MOODS (original 5)
+        // ============================================
 
         // High energy + bass = aggressive (volume-invariant)
         if (bass > 0.7 && energy > 0.6 && (sharpness || 0) > 0.5) {
@@ -514,6 +519,55 @@ export class AdvancedAudioAnalyzer {
         // Low flatness + mid-focused = acoustic
         else if ((flatness || 0) < 0.25 && mid > bass && mid > treble) {
             mood = { label: 'acoustic', confidence: 0.55 };
+        }
+
+        // ============================================
+        // EXTENDED MOODS (v2.1 - new mood types)
+        // These provide more nuanced detection when primary moods don't match strongly
+        // ============================================
+
+        // Only check extended moods if primary mood confidence is low
+        if (mood.confidence < 0.65) {
+            // Meditative: Very calm, minimal activity
+            // Characteristics: very low energy, smooth (low ZCR), low dynamics
+            if (energy < 0.2 && (sharpness || 0) < 0.2 && (dynamicRange || 0) < 0.25) {
+                const conf = 0.6 + ((1 - energy) * 0.2) + ((1 - (sharpness || 0)) * 0.1);
+                if (conf > mood.confidence) {
+                    mood = { label: 'meditative', confidence: Math.min(0.9, conf) };
+                }
+            }
+            // Dreamy: Soft, floating, ethereal
+            // Characteristics: low energy, low sharpness, high centroid (bright but soft), low bass
+            else if (energy < 0.35 && (sharpness || 0) < 0.3 && centroid > 0.5 && bass < 0.4) {
+                const conf = 0.55 + (centroid * 0.2) + ((1 - bass) * 0.1);
+                if (conf > mood.confidence) {
+                    mood = { label: 'dreamy', confidence: Math.min(0.85, conf) };
+                }
+            }
+            // Hypnotic: Repetitive, trance-inducing, steady
+            // Characteristics: moderate energy, low dynamic range (consistent), mid-focused
+            else if (energy > 0.3 && energy < 0.6 && (dynamicRange || 0) < 0.3 && mid > 0.4) {
+                const conf = 0.55 + ((1 - (dynamicRange || 0)) * 0.2) + (mid * 0.1);
+                if (conf > mood.confidence) {
+                    mood = { label: 'hypnotic', confidence: Math.min(0.8, conf) };
+                }
+            }
+            // Mystical: Ethereal, otherworldly
+            // Characteristics: low-moderate energy, organic (low flatness), bright (high rolloff), soft
+            else if (energy < 0.5 && (flatness || 0) < 0.3 && (rolloff || 0) > 0.5 && (sharpness || 0) < 0.4) {
+                const conf = 0.5 + ((rolloff || 0) * 0.2) + ((1 - (flatness || 0)) * 0.15);
+                if (conf > mood.confidence) {
+                    mood = { label: 'mystical', confidence: Math.min(0.8, conf) };
+                }
+            }
+            // Psychedelic: Trippy, constantly evolving, high variation
+            // Characteristics: high flux (changing), high dynamic range, mid-high treble, moderate+ flatness
+            else if ((flux || 0) > 0.3 && (dynamicRange || 0) > 0.4 && treble > 0.4 && (flatness || 0) > 0.3) {
+                const conf = 0.5 + ((flux || 0) * 0.2) + ((dynamicRange || 0) * 0.15);
+                if (conf > mood.confidence) {
+                    mood = { label: 'psychedelic', confidence: Math.min(0.8, conf) };
+                }
+            }
         }
 
         return mood;
