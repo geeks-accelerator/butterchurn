@@ -31,7 +31,7 @@ class PresetFingerprintGenerator {
         };
 
         this.database = {
-            version: "1.0.0",
+            version: "2.0.0",  // Updated for v2.0 fingerprint schema with mood, BPM, visual style
             generated: new Date().toISOString(),
             presets: {},
             indices: {
@@ -361,18 +361,268 @@ class PresetFingerprintGenerator {
         ].join(' ').toLowerCase();
     }
 
+    // ============================================
+    // NEW v2.0 Helper Functions (Phase 5)
+    // ============================================
+
+    /**
+     * Extract dominant color profile from preset equations and baseVals
+     */
+    extractColorProfile(preset) {
+        const allEqs = this.getAllEquations(preset);
+        const baseVals = preset.baseVals || {};
+
+        // Scoring for each color temperature
+        let warmScore = 0;
+        let coolScore = 0;
+        let natureScore = 0;
+        let vividScore = 0;
+
+        // Check wave colors (wave_r, wave_g, wave_b)
+        const waveR = baseVals.wave_r ?? 0.5;
+        const waveG = baseVals.wave_g ?? 0.5;
+        const waveB = baseVals.wave_b ?? 0.5;
+
+        if (waveR > 0.6 && waveR > waveG && waveR > waveB) warmScore += 2;
+        if (waveB > 0.6 && waveB > waveR && waveB > waveG) coolScore += 2;
+        if (waveG > 0.6 && waveG > waveR && waveG > waveB) natureScore += 2;
+
+        // Check for high saturation patterns (vivid colors)
+        const colorRange = Math.max(waveR, waveG, waveB) - Math.min(waveR, waveG, waveB);
+        if (colorRange > 0.4) vividScore += 2;
+
+        // Analyze shape colors
+        (preset.shapes || []).forEach(shape => {
+            if (!shape.enabled) return;
+            const r = shape.r ?? 0.5;
+            const g = shape.g ?? 0.5;
+            const b = shape.b ?? 0.5;
+
+            if (r > 0.6 && r > g && r > b) warmScore += 1;
+            if (b > 0.6 && b > r && b > g) coolScore += 1;
+            if (g > 0.6 && g > r && g > b) natureScore += 1;
+
+            // Check for orange/yellow (warm)
+            if (r > 0.7 && g > 0.4 && g < 0.8 && b < 0.4) warmScore += 1;
+            // Check for cyan/teal (cool)
+            if (b > 0.5 && g > 0.5 && r < 0.4) coolScore += 1;
+        });
+
+        // Check equations for color manipulation patterns
+        if (allEqs.includes('red') || allEqs.includes('orange') || allEqs.includes('fire')) warmScore += 1;
+        if (allEqs.includes('blue') || allEqs.includes('ice') || allEqs.includes('cold')) coolScore += 1;
+        if (allEqs.includes('green') || allEqs.includes('nature') || allEqs.includes('forest')) natureScore += 1;
+        if (allEqs.includes('rainbow') || allEqs.includes('hue') || allEqs.includes('hsv')) vividScore += 1;
+
+        // Check gamma and brightness for dark/light profiles
+        const gamma = baseVals.gamma ?? 1;
+        const brightness = baseVals.brightness ?? 1;
+        let isDark = gamma < 0.8 || brightness < 0.8;
+        let isBright = gamma > 1.2 || brightness > 1.2;
+
+        // Determine dominant profile
+        const scores = { warm: warmScore, cool: coolScore, nature: natureScore, vivid: vividScore };
+        const maxScore = Math.max(...Object.values(scores));
+
+        if (maxScore < 2) {
+            // No strong color preference
+            if (isDark) return 'dark';
+            if (isBright) return 'bright';
+            return 'neutral';
+        }
+
+        // Return the highest scoring profile
+        const dominant = Object.entries(scores).find(([_, v]) => v === maxScore)?.[0] || 'neutral';
+        return dominant;
+    }
+
+    /**
+     * Extract motion speed from preset complexity and energy
+     */
+    extractMotionSpeed(preset, energy) {
+        const frameEqs = preset.frame_eqs_eel || preset.frame_eqs_str || '';
+        const complexity = frameEqs.length / 1000;
+
+        if (complexity > 5 || energy > 0.7) return 'fast';
+        if (complexity > 2 || energy > 0.4) return 'medium';
+        return 'slow';
+    }
+
+    /**
+     * Calculate optimal BPM range based on motion speed and energy
+     */
+    calculateOptimalBpm(motionSpeed, energy) {
+        const ranges = {
+            slow: { min: 60, max: 100, ideal: 80 },
+            medium: { min: 100, max: 140, ideal: 120 },
+            fast: { min: 130, max: 180, ideal: 150 }
+        };
+
+        const base = ranges[motionSpeed] || ranges.medium;
+        const energyOffset = (energy - 0.5) * 20;
+
+        return {
+            min: Math.round(base.min + energyOffset),
+            max: Math.round(base.max + energyOffset),
+            ideal: Math.round(base.ideal + energyOffset)
+        };
+    }
+
+    /**
+     * Derive mood affinities from visual style, motion, color, and energy
+     */
+    deriveMoodAffinities(visualStyle, motionSpeed, colorProfile, energy = 0.5, beatSync = 0.5) {
+        const affinities = {
+            aggressive: 0.5,
+            relaxed: 0.5,
+            happy: 0.5,
+            electronic: 0.5,
+            acoustic: 0.5
+        };
+
+        // Style influences
+        const styleBoosts = {
+            fluid_organic: { relaxed: 0.3, acoustic: 0.2 },
+            organic: { relaxed: 0.25, acoustic: 0.2, happy: 0.1 },
+            particle: { electronic: 0.4, happy: 0.2 },
+            geometric: { electronic: 0.3, aggressive: 0.1 },
+            fractal: { electronic: 0.2, relaxed: 0.1 },
+            tunnel: { aggressive: 0.2, electronic: 0.3 },
+            abstract: { electronic: 0.15 }
+        };
+
+        // Apply style-based boosts for primary style
+        const primaryStyle = Array.isArray(visualStyle) ? visualStyle[0] : visualStyle;
+        if (primaryStyle && styleBoosts[primaryStyle]) {
+            for (const [mood, boost] of Object.entries(styleBoosts[primaryStyle])) {
+                affinities[mood] = Math.min(1, affinities[mood] + boost);
+            }
+        }
+
+        // Motion speed influences
+        if (motionSpeed === 'fast') {
+            affinities.aggressive += 0.2;
+            affinities.relaxed -= 0.2;
+            affinities.happy += 0.1;  // Fast motion can be energizing/happy
+            affinities.electronic += 0.1;
+        } else if (motionSpeed === 'slow') {
+            affinities.relaxed += 0.2;
+            affinities.aggressive -= 0.2;
+            affinities.acoustic += 0.15;
+        } else if (motionSpeed === 'medium') {
+            affinities.happy += 0.1;  // Medium pace is often pleasant
+        }
+
+        // Color influences (expanded)
+        switch (colorProfile) {
+            case 'warm':
+                affinities.aggressive += 0.1;
+                affinities.happy += 0.2;  // Warm colors feel happier
+                break;
+            case 'cool':
+                affinities.relaxed += 0.15;
+                affinities.electronic += 0.15;
+                break;
+            case 'nature':
+                affinities.relaxed += 0.2;
+                affinities.acoustic += 0.2;
+                affinities.happy += 0.15;  // Nature colors feel pleasant
+                break;
+            case 'vivid':
+                affinities.happy += 0.25;  // Vivid/rainbow is inherently happy
+                affinities.electronic += 0.15;
+                break;
+            case 'bright':
+                affinities.happy += 0.2;
+                affinities.relaxed += 0.1;
+                break;
+            case 'dark':
+                affinities.aggressive += 0.15;
+                affinities.relaxed -= 0.1;
+                affinities.acoustic += 0.1;  // Dark can be intimate
+                break;
+        }
+
+        // Energy-based adjustments
+        if (energy > 0.7) {
+            affinities.aggressive += 0.15;
+            affinities.electronic += 0.1;
+            affinities.happy += 0.1;
+        } else if (energy < 0.3) {
+            affinities.relaxed += 0.2;
+            affinities.acoustic += 0.15;
+        }
+
+        // Beat sync influences (strong beat = more electronic/aggressive)
+        if (beatSync > 0.7) {
+            affinities.electronic += 0.15;
+            affinities.aggressive += 0.1;
+        } else if (beatSync < 0.3) {
+            affinities.acoustic += 0.1;
+            affinities.relaxed += 0.1;
+        }
+
+        // Normalize to 2 decimal places
+        return Object.fromEntries(
+            Object.entries(affinities).map(([k, v]) => [k, Math.max(0, Math.min(1, v)).toFixed(2)])
+        );
+    }
+
     /**
      * Generate complete fingerprint for a preset
+     * Enhanced with v2.0 fields (Phase 5)
+     * @param {Object} preset - The preset object
+     * @param {Object} visualStyleFromCLIP - Optional CLIP classification results
      */
-    generateFingerprint(preset) {
+    generateFingerprint(preset, visualStyleFromCLIP = null) {
+        // EXISTING: Keep all original analysis
+        const energy = this.analyzeEnergy(preset);
+        const bassEnergy = this.analyzeBassReactivity(preset);
+        const trebleEnergy = this.analyzeTrebleReactivity ? this.analyzeTrebleReactivity(preset) : 0.5;
+
+        // NEW: Extract additional characteristics
+        const colorProfile = this.extractColorProfile(preset);
+        const motionSpeed = this.extractMotionSpeed(preset, energy);
+        const optimalBpm = this.calculateOptimalBpm(motionSpeed, energy);
+
+        // Determine visual style (prefer CLIP result if available)
+        const existingStyles = this.detectVisualStyle(preset);
+        const visualStyle = visualStyleFromCLIP?.visualStyle || existingStyles[0] || 'abstract';
+        const visualStyleScores = visualStyleFromCLIP?.visualStyleScores || null;
+
+        // Analyze beat sync for mood derivation
+        const beatSync = this.analyzeBeatSync(preset);
+
+        // Derive mood affinities from characteristics (pass all relevant factors)
+        const moodAffinities = this.deriveMoodAffinities(visualStyle, motionSpeed, colorProfile, energy, beatSync);
+
         return {
-            energy: this.analyzeEnergy(preset),
-            bass: this.analyzeBassReactivity(preset),
-            beat: this.analyzeBeatSync(preset),
+            // EXISTING v1.0 fields (keep all - backward compat):
+            energy: energy,
+            bassEnergy: bassEnergy,         // Changed from "bass" for clarity
+            bass: bassEnergy,               // Keep "bass" for backward compat
+            trebleEnergy: trebleEnergy,
             complexity: this.analyzeComplexity(preset),
+            beatSync: this.analyzeBeatSync(preset),
+            beat: this.analyzeBeatSync(preset),  // Keep "beat" for backward compat
             fps: this.estimatePerformance(preset),
-            styles: this.detectVisualStyle(preset),
-            warmupTime: this.calculateWarmupTime(preset)
+            styles: existingStyles,          // Keep for backward compat
+            warmupTime: this.calculateWarmupTime(preset),
+
+            // NEW v2.0 fields:
+            visualStyle: visualStyle,
+            visualStyleScores: visualStyleScores,
+            colorProfile: colorProfile,
+            motionSpeed: motionSpeed,
+            moodAffinities: moodAffinities,
+            optimalBpm: optimalBpm,
+
+            // CRIT-8 FIX: Mark heuristic-based fields as experimental
+            // These should be validated before use in scoring
+            _experimental: ['colorProfile', 'motionSpeed', 'moodAffinities']
+
+            // CRIT-7 FIX: REMOVED spectralProfile
+            // Presets don't have intrinsic spectral profiles - meaningless to add defaults
         };
     }
 
