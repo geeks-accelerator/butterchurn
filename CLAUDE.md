@@ -219,15 +219,15 @@ Debug mode enables:
 
 ### Primary Documentation
 - **README.md** - User installation, usage, and examples
-- **docs/architecture.md** - Detailed technical specifications
-- **docs/bugs/** - Bug reports and regression prevention details
+- **docs/architecture/** - Detailed technical specifications
+- **docs/issues/** - Bug reports and regression prevention details
 
 ### Specialized Documentation
-- **docs/PERFORMANCE_IMPROVEMENTS.md** - Phase 1 & 2 implementation details
-- **docs/BLENDING_BUG_ANALYSIS.md** - Critical blending bug fix documentation
-- **docs/MATHEMATICAL_FINGERPRINTING.md** - Preset fingerprinting algorithm
-- **docs/WEBASSEMBLY_IMPLEMENTATION_PLAN.md** - WASM acceleration implementation
-- **docs/PRERENDERING_IMPLEMENTATION_PLAN.md** - Advanced preset optimization plans
+- **docs/plans/phase1-performance-optimizations.md** - Phase 1 performance implementation details
+- **docs/plans/advanced-features.md** - Advanced features roadmap and status
+- **docs/issues/blending-fade-to-black-fix.md** - Critical blending bug fix documentation
+- **docs/architecture/mathematical-fingerprinting.md** - Preset fingerprinting algorithm
+- **docs/guides/** - Deployment, linting, and moving average crossover guides
 
 ### Development Resources
 - `test/` - Visual regression tests and demo pages
