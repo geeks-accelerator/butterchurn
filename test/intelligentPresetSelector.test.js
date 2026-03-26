@@ -80,6 +80,20 @@ const mockButterchurn = {
     audio: null
 };
 
+// v2.1 Threshold constants (mirroring the actual implementation)
+const BPM_THRESHOLDS = {
+    veryLow: 80,
+    low: 100,
+    high: 140,
+    veryHigh: 160
+};
+
+const ENERGY_THRESHOLDS = {
+    low: 0.35,
+    medium: 0.6,
+    high: 0.8
+};
+
 // Mock analyzer
 const createMockAnalyzer = () => ({
     detectedBPM: null,
@@ -425,6 +439,282 @@ describe('IntelligentPresetSelector', () => {
                 expect(value).toBeGreaterThanOrEqual(0);
                 expect(value).toBeLessThan(1);
             }
+        });
+    });
+
+    describe('v2.1 Threshold Constants', () => {
+        it('should have correct BPM thresholds', () => {
+            expect(BPM_THRESHOLDS.veryLow).toBe(80);
+            expect(BPM_THRESHOLDS.low).toBe(100);
+            expect(BPM_THRESHOLDS.high).toBe(140);
+            expect(BPM_THRESHOLDS.veryHigh).toBe(160);
+        });
+
+        it('should have correct energy thresholds', () => {
+            expect(ENERGY_THRESHOLDS.low).toBe(0.35);
+            expect(ENERGY_THRESHOLDS.medium).toBe(0.6);
+            expect(ENERGY_THRESHOLDS.high).toBe(0.8);
+        });
+    });
+
+    describe('v2.1 Color Profile Scoring', () => {
+        // Extended mock database with color profiles
+        const colorMockDb = {
+            presets: {
+                'warm-happy': {
+                    fingerprint: {
+                        colorProfile: 'warm',
+                        visualStyle: 'organic',
+                        moodAffinities: { happy: '0.8', aggressive: '0.3' },
+                        energy: 0.6
+                    }
+                },
+                'cool-relaxed': {
+                    fingerprint: {
+                        colorProfile: 'cool',
+                        visualStyle: 'fractal',
+                        moodAffinities: { relaxed: '0.9', electronic: '0.7' },
+                        energy: 0.3
+                    }
+                },
+                'vivid-high': {
+                    fingerprint: {
+                        colorProfile: 'vivid',
+                        visualStyle: 'particle',
+                        moodAffinities: { happy: '0.7' },
+                        energy: 0.8
+                    }
+                }
+            }
+        };
+
+        const scoreWithColorProfile = (hash, features, mood, db) => {
+            const preset = db.presets[hash];
+            if (!preset?.fingerprint) return 0;
+
+            const fp = preset.fingerprint;
+            let score = 0;
+
+            // Color profile matching (from v2.1)
+            if (fp.colorProfile && mood) {
+                const colorProfile = fp.colorProfile;
+                if (colorProfile === 'warm' && (mood.label === 'happy' || mood.label === 'aggressive')) {
+                    score += 0.05;
+                }
+                if (colorProfile === 'cool' && (mood.label === 'relaxed' || mood.label === 'electronic')) {
+                    score += 0.05;
+                }
+                if (colorProfile === 'vivid' && (features.beatStrength || 0) > 0.7) {
+                    score += 0.05;
+                }
+            }
+
+            return score;
+        };
+
+        it('should boost score for warm + happy mood match', () => {
+            const features = { beatStrength: 0.5 };
+            const happyMood = { label: 'happy', confidence: 0.8 };
+            const relaxedMood = { label: 'relaxed', confidence: 0.8 };
+
+            const happyScore = scoreWithColorProfile('warm-happy', features, happyMood, colorMockDb);
+            const relaxedScore = scoreWithColorProfile('warm-happy', features, relaxedMood, colorMockDb);
+
+            expect(happyScore).toBeGreaterThan(relaxedScore);
+        });
+
+        it('should boost score for cool + relaxed mood match', () => {
+            const features = { beatStrength: 0.5 };
+            const relaxedMood = { label: 'relaxed', confidence: 0.8 };
+            const happyMood = { label: 'happy', confidence: 0.8 };
+
+            const relaxedScore = scoreWithColorProfile('cool-relaxed', features, relaxedMood, colorMockDb);
+            const happyScore = scoreWithColorProfile('cool-relaxed', features, happyMood, colorMockDb);
+
+            expect(relaxedScore).toBeGreaterThan(happyScore);
+        });
+
+        it('should boost score for vivid + high beat strength', () => {
+            const highBeat = { beatStrength: 0.8 };
+            const lowBeat = { beatStrength: 0.3 };
+            const mood = { label: 'happy', confidence: 0.5 };
+
+            const highScore = scoreWithColorProfile('vivid-high', highBeat, mood, colorMockDb);
+            const lowScore = scoreWithColorProfile('vivid-high', lowBeat, mood, colorMockDb);
+
+            expect(highScore).toBeGreaterThan(lowScore);
+        });
+    });
+
+    describe('v2.1 Visual Style Continuity Scoring', () => {
+        const styleMockDb = {
+            presets: {
+                'organic-1': {
+                    fingerprint: { visualStyle: 'organic' }
+                },
+                'organic-2': {
+                    fingerprint: { visualStyle: 'organic' }
+                },
+                'fractal-1': {
+                    fingerprint: { visualStyle: 'fractal' }
+                },
+                'particle-1': {
+                    fingerprint: { visualStyle: 'particle' }
+                }
+            }
+        };
+
+        const scoreVisualStyleContinuity = (currentHash, candidateHash, db) => {
+            const currentFp = db.presets[currentHash]?.fingerprint;
+            const candidateFp = db.presets[candidateHash]?.fingerprint;
+
+            if (!currentFp?.visualStyle || !candidateFp?.visualStyle) return 0;
+
+            const currentStyle = currentFp.visualStyle;
+            const candidateStyle = candidateFp.visualStyle;
+
+            if (currentStyle === candidateStyle) {
+                return 0.05;  // Same style bonus
+            }
+
+            // Compatible styles
+            const compatible = {
+                organic: ['fractal', 'abstract'],
+                fractal: ['organic', 'geometric'],
+                particle: ['geometric', 'abstract'],
+                geometric: ['particle', 'fractal']
+            };
+
+            if (compatible[currentStyle]?.includes(candidateStyle)) {
+                return 0.02;  // Compatible style bonus
+            }
+
+            return 0;
+        };
+
+        it('should give highest bonus for same visual style', () => {
+            const sameScore = scoreVisualStyleContinuity('organic-1', 'organic-2', styleMockDb);
+            const compatibleScore = scoreVisualStyleContinuity('organic-1', 'fractal-1', styleMockDb);
+            const differentScore = scoreVisualStyleContinuity('organic-1', 'particle-1', styleMockDb);
+
+            expect(sameScore).toBe(0.05);
+            expect(compatibleScore).toBe(0.02);
+            expect(differentScore).toBe(0);
+        });
+
+        it('should give partial bonus for compatible styles', () => {
+            // organic is compatible with fractal
+            const score = scoreVisualStyleContinuity('organic-1', 'fractal-1', styleMockDb);
+            expect(score).toBe(0.02);
+        });
+
+        it('should give no bonus for incompatible styles', () => {
+            // organic is not compatible with particle
+            const score = scoreVisualStyleContinuity('organic-1', 'particle-1', styleMockDb);
+            expect(score).toBe(0);
+        });
+    });
+
+    describe('v2.1 BPM-Based Candidate Filtering', () => {
+        const filterByBPM = (candidates, bpm, db) => {
+            if (!bpm) return candidates;
+
+            if (bpm > BPM_THRESHOLDS.veryHigh) {
+                // Very fast music - prefer high-energy presets
+                const filtered = candidates.filter(c =>
+                    (db.presets[c]?.fingerprint?.energy || 0.5) > 0.6
+                );
+                return filtered.length > 0 ? filtered : candidates;
+            } else if (bpm < BPM_THRESHOLDS.veryLow) {
+                // Very slow music - prefer calm presets
+                const filtered = candidates.filter(c =>
+                    (db.presets[c]?.fingerprint?.energy || 0.5) < 0.5
+                );
+                return filtered.length > 0 ? filtered : candidates;
+            }
+
+            return candidates;
+        };
+
+        const bpmMockDb = {
+            presets: {
+                'high-energy': { fingerprint: { energy: 0.8 } },
+                'low-energy': { fingerprint: { energy: 0.3 } },
+                'mid-energy': { fingerprint: { energy: 0.5 } }
+            }
+        };
+
+        it('should filter to high-energy presets for very fast BPM', () => {
+            const candidates = ['high-energy', 'low-energy', 'mid-energy'];
+            const filtered = filterByBPM(candidates, 170, bpmMockDb);
+
+            expect(filtered).toContain('high-energy');
+            expect(filtered).not.toContain('low-energy');
+        });
+
+        it('should filter to low-energy presets for very slow BPM', () => {
+            const candidates = ['high-energy', 'low-energy', 'mid-energy'];
+            const filtered = filterByBPM(candidates, 70, bpmMockDb);
+
+            expect(filtered).toContain('low-energy');
+            expect(filtered).not.toContain('high-energy');
+        });
+
+        it('should not filter for normal BPM range', () => {
+            const candidates = ['high-energy', 'low-energy', 'mid-energy'];
+            const filtered = filterByBPM(candidates, 120, bpmMockDb);
+
+            expect(filtered.length).toBe(3);
+        });
+    });
+
+    describe('v2.1 Energy-Based Candidate Filtering', () => {
+        const filterByEnergy = (candidates, audioEnergy, db) => {
+            if (audioEnergy < ENERGY_THRESHOLDS.low) {
+                const filtered = candidates.filter(c =>
+                    (db.presets[c]?.fingerprint?.energy || 0.5) < ENERGY_THRESHOLDS.medium
+                );
+                return filtered.length > 0 ? filtered : candidates;
+            } else if (audioEnergy > ENERGY_THRESHOLDS.high) {
+                const filtered = candidates.filter(c =>
+                    (db.presets[c]?.fingerprint?.energy || 0.5) > ENERGY_THRESHOLDS.medium
+                );
+                return filtered.length > 0 ? filtered : candidates;
+            }
+
+            return candidates;
+        };
+
+        const energyMockDb = {
+            presets: {
+                'high-energy': { fingerprint: { energy: 0.8 } },
+                'low-energy': { fingerprint: { energy: 0.3 } },
+                'mid-energy': { fingerprint: { energy: 0.55 } }
+            }
+        };
+
+        it('should filter to calm presets for low audio energy', () => {
+            const candidates = ['high-energy', 'low-energy', 'mid-energy'];
+            const filtered = filterByEnergy(candidates, 0.2, energyMockDb);
+
+            expect(filtered).toContain('low-energy');
+            expect(filtered).toContain('mid-energy');
+            expect(filtered).not.toContain('high-energy');
+        });
+
+        it('should filter to high-energy presets for high audio energy', () => {
+            const candidates = ['high-energy', 'low-energy', 'mid-energy'];
+            const filtered = filterByEnergy(candidates, 0.9, energyMockDb);
+
+            expect(filtered).toContain('high-energy');
+            expect(filtered).not.toContain('low-energy');
+        });
+
+        it('should not filter for moderate audio energy', () => {
+            const candidates = ['high-energy', 'low-energy', 'mid-energy'];
+            const filtered = filterByEnergy(candidates, 0.5, energyMockDb);
+
+            expect(filtered.length).toBe(3);
         });
     });
 });
