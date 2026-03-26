@@ -6,7 +6,7 @@
 **Repository:** butterchurn
 **Goal:** Transform preset selection from "random-feeling" to "curated"
 
-> **Implementation Complete**: All 7 phases implemented. Phase 6 (CLIP classifier) is optional tooling - equation-based visual style detection is used by default.
+> **Implementation Complete**: All 7 phases implemented. Phase 6 CLIP classifier has been fully integrated - fingerprints v2.2.0 include `visualStyleScores` from CLIP analysis.
 
 ---
 
@@ -1364,7 +1364,21 @@ this.database = {
 
 ---
 
-## Phase 6: Visual Style ML Tagging
+## Phase 6: Visual Style ML Tagging ✅
+
+> **Status:** ✅ Implemented (2026-03-26)
+>
+> **Implementation Results:**
+> - Rendered 2511 frames (504 presets × 5 frames)
+> - CLIP classification integrated into fingerprints v2.2.0
+> - Visual style distribution: particle (88.3%), fluid_organic (6.3%), fractal (2.8%), geometric (1.8%), abstract (0.4%), waveform (0.2%), tunnel (0.2%)
+>
+> **Files Created/Modified:**
+> - `tools/render-preset-frames.js` - Batch rendering with resume capability
+> - `tools/classify-visual-style.py` - CLIP classifier
+> - `tools/merge-clip-styles.js` - Merges CLIP results into fingerprints
+> - `test/preset-render-test.html` - Headless WebGL test page
+> - `presets/alaska-butter/alaskaButter.fingerprints.json` - v2.2.0 with CLIP data
 
 ### Python Dependencies (WARN-5 FIX)
 
