@@ -18,6 +18,12 @@ This plan implements the **⚠️ PARTIALLY COMPLETED** features from the master
 | **[advanced-features.md](advanced-features.md)** | Master roadmap for all Butterchurn advanced features | **PARENT** - This plan completes Phases 2-4 |
 | **[../proposals/scene-based-preset-switching.md](../proposals/scene-based-preset-switching.md)** | Design proposal for intelligent switching | **INPUT** - Algorithms incorporated here |
 | **[mathematical-fingerprinting.md](../architecture/mathematical-fingerprinting.md)** | Fingerprint algorithm documentation | **REFERENCE** - Existing fingerprint logic |
+| **[fingerprint-quality-improvements.md](fingerprint-quality-improvements.md)** | Quality fixes for generated fingerprints | **FOLLOW-ON** - Apply after Phase 5 |
+
+### Related Issues
+| Document | Purpose |
+|----------|---------|
+| **[../issues/2026-03-25-fingerprint-plan-review-findings.md](../issues/2026-03-25-fingerprint-plan-review-findings.md)** | Pre-implementation review findings for fingerprint plan |
 
 ### Features This Plan Completes (from advanced-features.md)
 
@@ -1587,6 +1593,17 @@ Mark completed items:
 6. **Phase 6** - Visual Style ML Tagging (CLIP classifier)
 7. **Phase 7** - Documentation Update
 8. **Build & Deploy** - `npm run build:cdn`
+
+### Follow-On Work
+
+After completing Phase 5, apply quality fixes from **[fingerprint-quality-improvements.md](fingerprint-quality-improvements.md)**:
+- Fractal mood system fixes (FRC-1, FRC-2)
+- Complexity scaling normalization (EXT-2, FRC-3)
+- Visual style keyword detection (ABS-2)
+- Organic mood caps (ORG-1, ORG-3)
+- Color profile detection improvements (CLR-1, CLR-2)
+
+These quality fixes refine the fingerprint generation algorithm defined in Phase 5.
 
 ---
 
