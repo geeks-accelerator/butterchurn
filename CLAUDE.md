@@ -70,6 +70,7 @@ This file provides AI-optimized development context for Claude Code when working
 - AlaskaButter demo site at https://alaskabutter.com
 
 ### What's Ready for Implementation 🚀
+- **Selector Optimizations** - Audio lookahead & reverse index scaling (see docs/plans/selector-optimization-improvements.md)
 - Phase 4: Machine learning-enhanced preset matching
 - User preference learning and personalization
 - Multi-device synchronization
@@ -245,6 +246,7 @@ Debug mode enables:
 ### Specialized Documentation
 - **docs/plans/phase1-performance-optimizations.md** - Phase 1 performance implementation details
 - **docs/plans/advanced-features.md** - Advanced features roadmap and status
+- **docs/plans/selector-optimization-improvements.md** - Audio lookahead & reverse index scaling
 - **docs/issues/blending-fade-to-black-fix.md** - Critical blending bug fix documentation
 - **docs/architecture/mathematical-fingerprinting.md** - Preset fingerprinting algorithm
 - **docs/guides/** - Deployment, linting, and moving average crossover guides

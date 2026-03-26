@@ -8,6 +8,8 @@
 **Review Reference:** [fingerprint-quality-review-2026-03-25.md](../reviews/fingerprint-quality-review-2026-03-25.md)
 **Pre-Implementation Review:** [2026-03-25-fingerprint-plan-review-findings.md](../issues/2026-03-25-fingerprint-plan-review-findings.md)
 **Twin Review:** [2026-03-25-fingerprint-plan-twin-review-findings.md](../issues/2026-03-25-fingerprint-plan-twin-review-findings.md)
+**Follow-On Optimizations:** [selector-optimization-improvements.md](selector-optimization-improvements.md) - TODOs identified during implementation audit
+**Post-Implementation Review:** [2026-03-25-post-impl-review-fixes.md](../issues/2026-03-25-post-impl-review-fixes.md) - N=2 validated fixes
 
 ---
 

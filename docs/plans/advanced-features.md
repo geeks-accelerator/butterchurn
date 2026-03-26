@@ -37,10 +37,11 @@
 4. **Performance Optimizations** - Direct WebGL rendering done, preset precompilation/caching needed
 
 ### ❌ NOT IMPLEMENTED Features (0% Done)
-1. **Predictive Switching** - Requires audio lookahead analysis
+1. **Predictive Switching** - Requires audio lookahead analysis → See [selector-optimization-improvements.md](selector-optimization-improvements.md) Phase 1
 2. **Preset Precompilation** - Would improve performance further
 3. **Web Worker Frame Analysis** - Would prevent main thread blocking
 4. **Musical Event Prediction** - Complex audio analysis needed
+5. **Reverse Index Optimization** - Build-time preset indexing → See [selector-optimization-improvements.md](selector-optimization-improvements.md) Phase 2
 
 **Key Discoveries**:
 1. **NightRide.fm** manages 52,000 presets at production scale

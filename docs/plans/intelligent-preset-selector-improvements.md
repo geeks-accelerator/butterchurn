@@ -19,11 +19,19 @@ This plan implements the **⚠️ PARTIALLY COMPLETED** features from the master
 | **[../proposals/scene-based-preset-switching.md](../proposals/scene-based-preset-switching.md)** | Design proposal for intelligent switching | **INPUT** - Algorithms incorporated here |
 | **[mathematical-fingerprinting.md](../architecture/mathematical-fingerprinting.md)** | Fingerprint algorithm documentation | **REFERENCE** - Existing fingerprint logic |
 | **[fingerprint-quality-improvements.md](fingerprint-quality-improvements.md)** | Quality fixes for generated fingerprints | **FOLLOW-ON** - Apply after Phase 5 |
+| **[selector-optimization-improvements.md](selector-optimization-improvements.md)** | Audio lookahead & reverse index scaling | **FOLLOW-ON** - Performance optimizations |
 
 ### Related Issues
 | Document | Purpose |
 |----------|---------|
 | **[../issues/2026-03-25-fingerprint-plan-review-findings.md](../issues/2026-03-25-fingerprint-plan-review-findings.md)** | Pre-implementation review findings for fingerprint plan |
+| **[../issues/2026-03-25-post-impl-review-fixes.md](../issues/2026-03-25-post-impl-review-fixes.md)** | Post-implementation review fixes (N=2 validated) |
+
+### Post-Implementation Reviews
+| Document | Reviewer | Status |
+|----------|----------|--------|
+| **[../reviews/2026-03-25-selector-fingerprint-implementation-codex.md](../reviews/2026-03-25-selector-fingerprint-implementation-codex.md)** | Codex | Complete |
+| **[../reviews/2026-03-25-selector-fingerprint-implementation-gemini.md](../reviews/2026-03-25-selector-fingerprint-implementation-gemini.md)** | Gemini | Complete |
 
 ### Features This Plan Completes (from advanced-features.md)
 
