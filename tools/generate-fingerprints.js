@@ -19,6 +19,51 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// SUGG-2 FIX: Named constants for complexity analysis
+// These coefficients were tuned for good distribution across the preset collection
+const COMPLEXITY_WEIGHTS = {
+    // Shape/wave contributions
+    activeShape: 0.18,       // Contribution per enabled shape
+    activeWave: 0.18,        // Contribution per enabled wave
+
+    // Equation length contributions (with max caps)
+    pixelEq: {
+        minLength: 30,       // Minimum length to consider
+        maxContribution: 0.35,
+        divisor: 400
+    },
+    warpEq: {
+        minLength: 30,
+        maxContribution: 0.30,
+        divisor: 500
+    },
+    compEq: {
+        minLength: 30,
+        maxContribution: 0.25,
+        divisor: 600
+    },
+    frameEq: {
+        minLength: 50,
+        maxContribution: 0.20,
+        divisor: 700
+    },
+
+    // Math operation contributions
+    complexOp: {
+        contribution: 0.03,  // Per operation
+        maxContribution: 0.4
+    },
+
+    // Fractal pattern boosts
+    fractalBoost: {
+        strong: 0.30,        // Zoom + rot + (high decay OR trig in pixel)
+        weak: 0.15           // Just zoom + rot
+    },
+
+    // Overall cap
+    maxComplexity: 1.0
+};
+
 class PresetFingerprintGenerator {
     constructor() {
         this.baseDir = null;  // Store base directory for relative path conversion
@@ -31,7 +76,8 @@ class PresetFingerprintGenerator {
         };
 
         this.database = {
-            version: "2.0.0",  // Updated for v2.0 fingerprint schema with mood, BPM, visual style
+            // CRIT-3 FIX: Bump to v2.1.0 for expanded mood vocabulary and quality improvements
+            version: "2.1.0",  // v2.1 fingerprint schema with 10 moods, complexity scaling, color detection
             generated: new Date().toISOString(),
             presets: {},
             indices: {
@@ -252,16 +298,17 @@ class PresetFingerprintGenerator {
     /**
      * Analyze visual complexity
      * EXT-2/FRC-3: Enhanced scaling to allow complexity > 0.5 threshold
+     * SUGG-2 FIX: Uses COMPLEXITY_WEIGHTS constants for tunable values
      */
     analyzeComplexity(preset) {
         let complexity = 0;
 
-        // TWIN-11/EXT-2: Increased coefficients for better distribution
+        // TWIN-11/EXT-2: Shape and wave contributions
         const activeShapes = (preset.shapes || []).filter(s => s.enabled).length;
-        complexity += activeShapes * 0.18;  // Further increased for more spread
+        complexity += activeShapes * COMPLEXITY_WEIGHTS.activeShape;
 
         const activeWaves = (preset.waves || []).filter(w => w.enabled).length;
-        complexity += activeWaves * 0.18;   // Further increased for more spread
+        complexity += activeWaves * COMPLEXITY_WEIGHTS.activeWave;
 
         // Equation length contributes more granularly
         const pixelEqs = preset.pixel_eqs_str || '';
@@ -269,18 +316,30 @@ class PresetFingerprintGenerator {
         const compEqs = preset.comp_eqs_str || '';
         const frameEqs = preset.frame_eqs_str || preset.frame_eqs_eel || '';
 
-        // EXT-2: More aggressive equation length contribution
-        if (pixelEqs.length > 30) {
-            complexity += Math.min(0.35, pixelEqs.length / 400);
+        // EXT-2: Equation length contributions with configurable weights
+        if (pixelEqs.length > COMPLEXITY_WEIGHTS.pixelEq.minLength) {
+            complexity += Math.min(
+                COMPLEXITY_WEIGHTS.pixelEq.maxContribution,
+                pixelEqs.length / COMPLEXITY_WEIGHTS.pixelEq.divisor
+            );
         }
-        if (warpEqs.length > 30) {
-            complexity += Math.min(0.30, warpEqs.length / 500);
+        if (warpEqs.length > COMPLEXITY_WEIGHTS.warpEq.minLength) {
+            complexity += Math.min(
+                COMPLEXITY_WEIGHTS.warpEq.maxContribution,
+                warpEqs.length / COMPLEXITY_WEIGHTS.warpEq.divisor
+            );
         }
-        if (compEqs.length > 30) {
-            complexity += Math.min(0.25, compEqs.length / 600);
+        if (compEqs.length > COMPLEXITY_WEIGHTS.compEq.minLength) {
+            complexity += Math.min(
+                COMPLEXITY_WEIGHTS.compEq.maxContribution,
+                compEqs.length / COMPLEXITY_WEIGHTS.compEq.divisor
+            );
         }
-        if (frameEqs.length > 50) {
-            complexity += Math.min(0.20, frameEqs.length / 700);
+        if (frameEqs.length > COMPLEXITY_WEIGHTS.frameEq.minLength) {
+            complexity += Math.min(
+                COMPLEXITY_WEIGHTS.frameEq.maxContribution,
+                frameEqs.length / COMPLEXITY_WEIGHTS.frameEq.divisor
+            );
         }
 
         // Check for complex mathematical operations - count occurrences
@@ -292,7 +351,10 @@ class PresetFingerprintGenerator {
             if (matches) opCount += matches.length;
         }
         // More ops = more complexity, with diminishing returns
-        complexity += Math.min(0.4, opCount * 0.03);
+        complexity += Math.min(
+            COMPLEXITY_WEIGHTS.complexOp.maxContribution,
+            opCount * COMPLEXITY_WEIGHTS.complexOp.contribution
+        );
 
         // PRE-8 ENHANCEMENT: More specific fractal detection
         const baseVals = preset.baseVals || {};
@@ -303,12 +365,12 @@ class PresetFingerprintGenerator {
         const hasTrigInPixel = /\b(sin|cos|tan)\b/.test(pixelEqs);
 
         if (hasZoomRot && (hasHighDecay || hasTrigInPixel)) {
-            complexity += 0.30;  // FRC-3: Strong fractal boost
+            complexity += COMPLEXITY_WEIGHTS.fractalBoost.strong;  // FRC-3: Strong fractal boost
         } else if (hasZoomRot) {
-            complexity += 0.15;  // Weak fractal boost (might be simple zoom effect)
+            complexity += COMPLEXITY_WEIGHTS.fractalBoost.weak;    // Weak fractal boost
         }
 
-        return Math.min(1, complexity);
+        return Math.min(COMPLEXITY_WEIGHTS.maxComplexity, complexity);
     }
 
     /**

@@ -1,3 +1,6 @@
+// WARN-4 FIX: Import centralized preset pack names
+import { PRESET_PACK_NAMES } from './config/presetPacks.js';
+
 class FingerprintLoader {
   constructor() {
     this.fingerprints = new Map();
@@ -19,14 +22,8 @@ class FingerprintLoader {
   }
 
   async loadAllFingerprints(basePath = '/presets/full-collection/') {
-    const packNames = [
-      'butterchurnPresets',
-      'butterchurnPresetsExtra',
-      'butterchurnPresetsExtra2',
-      'butterchurnPresetsMD1',
-      'butterchurnPresetsMinimal',
-      'butterchurnPresetsNonMinimal'
-    ];
+    // WARN-4 FIX: Use centralized preset pack names
+    const packNames = PRESET_PACK_NAMES;
 
     console.log('[FingerprintLoader] Loading fingerprints from all packs...');
 
