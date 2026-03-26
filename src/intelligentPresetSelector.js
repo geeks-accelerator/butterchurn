@@ -19,6 +19,10 @@
 import FingerprintLoader from './fingerprintLoader.js';
 import FingerprintAdapter from './fingerprintAdapter.js';
 import PresetCompatibilityChecker from './utils/presetCompatibilityChecker.js';
+// WARN-4 FIX: Import centralized preset pack names
+import { PRESET_PACK_NAMES } from './config/presetPacks.js';
+// SUGG-1 FIX: Import extracted PresetPerformanceTracker
+import { PresetPerformanceTracker } from './analysis/presetPerformanceTracker.js';
 
 // EXT-3/PRE-5: BPM threshold constants for genre-based timing
 const BPM_THRESHOLDS = {
@@ -35,85 +39,7 @@ const ENERGY_THRESHOLDS = {
     high: 0.8       // High energy, aggressive
 };
 
-/**
- * PresetPerformanceTracker
- * Tracks how well the current preset matches ongoing audio.
- * Triggers switch when match quality degrades below threshold.
- *
- * CRIT-6 FIX: Does NOT compute its own scores - accepts scores from scorePreset()
- */
-class PresetPerformanceTracker {
-    constructor(config = {}) {
-        this.scoreHistory = [];
-        this.maxHistorySize = config.maxHistorySize || 60;  // ~1 second at 60fps
-        this.degradationThreshold = config.degradationThreshold || 0.4;  // 40% drop triggers switch
-
-        // WARN-6 FIX: Use first N scores for stable baseline (not single value)
-        this.baselineScores = [];
-        this.BASELINE_SIZE = 30;  // First 0.5 seconds for baseline
-    }
-
-    /**
-     * Update performance tracking with score from scorePreset()
-     * CRIT-6 FIX: Accepts pre-calculated score, doesn't compute its own
-     *
-     * @param {number} currentScore - Score from main scorePreset() function
-     * @returns {Object} { shouldSwitch, degradation, reason }
-     */
-    update(currentScore) {
-        if (currentScore === undefined || currentScore === null) {
-            return { shouldSwitch: false, degradation: 0, reason: null };
-        }
-
-        // WARN-6 FIX: Build baseline from first N scores (more stable than single value)
-        if (this.baselineScores.length < this.BASELINE_SIZE) {
-            this.baselineScores.push(currentScore);
-            return { shouldSwitch: false, degradation: 0, reason: 'building_baseline' };
-        }
-
-        // Track ongoing score history
-        this.scoreHistory.push(currentScore);
-        if (this.scoreHistory.length > this.maxHistorySize) {
-            this.scoreHistory.shift();
-        }
-
-        // Need enough history to detect degradation
-        if (this.scoreHistory.length < 30) {
-            return { shouldSwitch: false, degradation: 0, reason: null };
-        }
-
-        // Calculate baseline from first N scores (stable reference point)
-        const baseline = this.baselineScores.reduce((a, b) => a + b, 0) /
-                         this.baselineScores.length;
-
-        // Calculate current average score
-        const current = this.scoreHistory.reduce((a, b) => a + b, 0) /
-                        this.scoreHistory.length;
-
-        // Calculate degradation from baseline
-        const degradation = baseline > 0 ? (baseline - current) / baseline : 0;
-
-        if (degradation > this.degradationThreshold) {
-            return {
-                shouldSwitch: true,
-                degradation: degradation,
-                reason: `performance_degraded_${(degradation * 100).toFixed(0)}%`,
-                baseline: baseline,
-                current: current
-            };
-        }
-
-        return { shouldSwitch: false, degradation, baseline, current };
-    }
-
-    /**
-     * Reset tracking (call when switching presets)
-     */
-    reset() {
-        this.scoreHistory = [];
-        this.baselineScores = [];
-    }
-}
+// SUGG-1 FIX: PresetPerformanceTracker moved to src/analysis/presetPerformanceTracker.js
 
 // Advanced modules (optional - will be disabled if not available)
 let frameAnalyzer, presetLogger, emergencyManager, blocklistManager, config, AdvancedAudioAnalyzer, MultiSignalCrossover;
@@ -187,19 +113,10 @@ class IntelligentPresetSelector {
 
         // Initialize audio analyzer with config (optional)
         // CRIT-3 FIX: Pass audioContext and audioSource for Meyda integration
+        // WARN-1 FIX: Track if advanced modules are ready (may load async)
         this.audioAnalyzer = null;
-        if (AdvancedAudioAnalyzer) {
-            const analyzerConfig = (typeof config !== 'undefined' && config?.get) ? {
-                dropThreshold: config.get('audioAnalysis.dropThreshold', 0.7),
-                buildupThreshold: config.get('audioAnalysis.buildupThreshold', 0.5),
-                breakdownThreshold: config.get('audioAnalysis.breakdownThreshold', 0.3),
-                chillThreshold: config.get('audioAnalysis.chillThreshold', 0.3),
-                bassWeight: config.get('audioAnalysis.bassWeight', 0.6),
-                trebleWeight: config.get('audioAnalysis.trebleWeight', 0.3),
-                maxHistorySize: config.get('audioAnalysis.maxHistorySize', 30)
-            } : {};
-            this.audioAnalyzer = new AdvancedAudioAnalyzer(analyzerConfig, audioContext, audioSource);
-        }
+        this.advancedModulesReady = false;
+        this._initializeAudioAnalyzer();
 
         // NEW: Phrase-aligned switching (16 beats for musical coherence)
         this.pendingSwitchOnPhrase = false;
@@ -235,16 +152,13 @@ class IntelligentPresetSelector {
         this.genreUpdateInterval = 60; // Update genre detection every N frames
         this.genreUpdateCounter = 0;
 
-        // TODO: Implement audio lookahead (~1 second) to anticipate drops/energy changes
+        // TODO: Implement audio lookahead (~1-2 seconds) to anticipate drops/energy changes
+        // See: docs/plans/selector-optimization-improvements.md (Phase 1)
+        //
         // Currently we're reactive, switching AFTER energy changes happen, which can cause
         // awkward transitions in the middle of drops. We should analyze upcoming audio
         // to schedule transitions BEFORE the drop hits, aligning preset changes with
         // musical structure rather than reacting to it.
-        // Potential approach:
-        // 1. Buffer 1-2 seconds of future audio data
-        // 2. Analyze for sudden energy changes (drops, buildups)
-        // 3. Schedule preset switches to complete just before the drop
-        // 4. This would make transitions feel intentional, not reactive
 
         // Initialize MA Crossover system for intelligent switching
         const crossoverConfig = (typeof config !== 'undefined' && config?.get) ? {
@@ -359,12 +273,11 @@ class IntelligentPresetSelector {
      */
     setupModuleInitialization() {
         // TODO: Fix scaling issue - building reverse mapping from preset names to hash IDs
+        // See: docs/plans/selector-optimization-improvements.md (Phase 2)
+        //
         // Currently the intelligent selector needs to build a reverse mapping from preset names
-        // to hash IDs which doesn't scale well with large preset collections. Consider:
-        // 1. Pre-computing the reverse mapping at build time
-        // 2. Using a more efficient data structure (Map vs Object)
-        // 3. Caching the mapping in localStorage for faster subsequent loads
-        // 4. Loading mappings on-demand rather than all at once
+        // to hash IDs which doesn't scale well with large preset collections. Solution:
+        // pre-compute reverse index at build time and load from CDN.
 
         // Check periodically if modules have loaded
         const checkModules = () => {
@@ -396,6 +309,10 @@ class IntelligentPresetSelector {
                 this.blocklistManager = new blocklistManager();
                 console.log('[IntelligentSelector] Blocklist manager initialized');
             }
+            // WARN-1 FIX: Also check for AdvancedAudioAnalyzer (may load after constructor)
+            if (AdvancedAudioAnalyzer && !this.audioAnalyzer) {
+                this._initializeAudioAnalyzer();
+            }
         };
 
         // Check immediately and then periodically
@@ -403,13 +320,38 @@ class IntelligentPresetSelector {
         const moduleCheckInterval = setInterval(() => {
             checkModules();
             // Stop checking once all modules are loaded or after 10 seconds
-            if ((frameAnalyzer && presetLogger && emergencyManager && blocklistManager) ||
+            // WARN-1 FIX: Include AdvancedAudioAnalyzer in completion check
+            if ((frameAnalyzer && presetLogger && emergencyManager && blocklistManager && AdvancedAudioAnalyzer) ||
                 Date.now() - this.startTime > 10000) {
                 clearInterval(moduleCheckInterval);
             }
         }, 100);
 
         this.startTime = Date.now();
+    }
+
+    /**
+     * Initialize audio analyzer when module becomes available
+     * WARN-1 FIX: Handle async module loading race condition
+     * @private
+     */
+    _initializeAudioAnalyzer() {
+        if (this.audioAnalyzer) return; // Already initialized
+
+        if (AdvancedAudioAnalyzer) {
+            const analyzerConfig = (typeof config !== 'undefined' && config?.get) ? {
+                dropThreshold: config.get('audioAnalysis.dropThreshold', 0.7),
+                buildupThreshold: config.get('audioAnalysis.buildupThreshold', 0.5),
+                breakdownThreshold: config.get('audioAnalysis.breakdownThreshold', 0.3),
+                chillThreshold: config.get('audioAnalysis.chillThreshold', 0.3),
+                bassWeight: config.get('audioAnalysis.bassWeight', 0.6),
+                trebleWeight: config.get('audioAnalysis.trebleWeight', 0.3),
+                maxHistorySize: config.get('audioAnalysis.maxHistorySize', 30)
+            } : {};
+            this.audioAnalyzer = new AdvancedAudioAnalyzer(analyzerConfig, this.audioContext, this.audioSource);
+            this.advancedModulesReady = true;
+            console.log('[IntelligentSelector] AdvancedAudioAnalyzer initialized');
+        }
     }
 
     /**
@@ -514,14 +456,8 @@ class IntelligentPresetSelector {
      * Load all preset pack JS files
      */
     async loadAllPresetPacks() {
-        const packNames = [
-            'butterchurnPresets',
-            'butterchurnPresetsExtra',
-            'butterchurnPresetsExtra2',
-            'butterchurnPresetsMD1',
-            'butterchurnPresetsMinimal',
-            'butterchurnPresetsNonMinimal'
-        ];
+        // WARN-4 FIX: Use centralized preset pack names
+        const packNames = PRESET_PACK_NAMES;
 
         console.log('[IntelligentSelector] Loading preset packs...');
 
@@ -841,17 +777,21 @@ class IntelligentPresetSelector {
         const audioTime = this.audioContext?.currentTime || null;
         const beatInfo = this.audioAnalyzer?.trackBeatPhase ?
             this.audioAnalyzer.trackBeatPhase(audioTime) : null;
+        // CRIT-1 FIX: Pass raw features (with spectral data) to detection methods
+        // calculateAudioFeatures() returns { rawFeatures: {...} } but detectMood/etc expect features.spectral
+        const rawFeatures = features.rawFeatures || features;
+
         const buildupInfo = this.audioAnalyzer?.detectBuildup ?
-            this.audioAnalyzer.detectBuildup(features, audioTime) : { isBuildup: false };
+            this.audioAnalyzer.detectBuildup(rawFeatures, audioTime) : { isBuildup: false };
 
         // Get current mood for scoring
         const mood = this.audioAnalyzer?.detectMood ?
-            this.audioAnalyzer.detectMood(features) : null;
+            this.audioAnalyzer.detectMood(rawFeatures) : null;
 
         // Update genre detection periodically (not every frame for performance)
         this.genreUpdateCounter++;
         if (this.genreUpdateCounter >= this.genreUpdateInterval && this.audioAnalyzer?.detectGenre) {
-            this.detectedGenre = this.audioAnalyzer.detectGenre(features);
+            this.detectedGenre = this.audioAnalyzer.detectGenre(rawFeatures);
             this.genreUpdateCounter = 0;
 
             if (this.debugMode && this.detectedGenre.label !== 'unknown') {
@@ -1161,10 +1101,11 @@ class IntelligentPresetSelector {
             energy: energy,
             bassEnergy: features.bass,
             trebleEnergy: features.treble,
-            isDrop: musicalEvent === 'drop',
-            isBuildup: musicalEvent === 'buildup',
-            isChill: musicalEvent === 'chill',
-            isBreakdown: musicalEvent === 'breakdown',
+            // CRIT-2 FIX: musicalEvent is an object { type: 'Drop', confidence: 0.9 }, not a string
+            isDrop: musicalEvent?.type?.toLowerCase() === 'drop',
+            isBuildup: musicalEvent?.type?.toLowerCase() === 'buildup',
+            isChill: musicalEvent?.type?.toLowerCase() === 'chill' || musicalEvent?.type?.toLowerCase() === 'ambient',
+            isBreakdown: musicalEvent?.type?.toLowerCase() === 'breakdown',
             trend: features.dynamicRange > 0.1 ? 'changing' : 'stable',
             // Include raw features for advanced processing
             rawFeatures: features,
@@ -1274,8 +1215,22 @@ class IntelligentPresetSelector {
         // Minimum time acts as a debounce - prevent flicker
         // Genre timing multiplier adjusts switch frequency based on music style
         const genreMultiplier = this.detectedGenre?.timingMultiplier || 1.0;
+
+        // WARN-2 FIX: Apply BPM-based timing adjustment (EXT-3 acceptance criteria)
+        let bpmMultiplier = 1.0;
+        const currentBpm = this.audioAnalyzer?.currentBpm || 120;
+        if (currentBpm > BPM_THRESHOLDS.veryHigh) {
+            bpmMultiplier = 0.7;  // Faster switching for very fast music (D&B, fast EDM)
+        } else if (currentBpm > BPM_THRESHOLDS.high) {
+            bpmMultiplier = 0.85; // Slightly faster for upbeat music
+        } else if (currentBpm < BPM_THRESHOLDS.veryLow) {
+            bpmMultiplier = 1.4;  // Much slower switching for ambient/slow music
+        } else if (currentBpm < BPM_THRESHOLDS.low) {
+            bpmMultiplier = 1.2;  // Slower switching for chill/downtempo
+        }
+
         const minimumTime = Math.max(
-            this.minSwitchInterval * genreMultiplier,
+            this.minSwitchInterval * genreMultiplier * bpmMultiplier,
             (this.currentWarmupTime || 0) * 1000 + 2000 // Add 2 sec buffer after warmup
         );
 
@@ -1343,11 +1298,12 @@ class IntelligentPresetSelector {
         }
 
         // Force switch if too long (watchdog timer - prevents boredom)
-        // Apply genre multiplier to max interval as well
-        const adjustedMaxInterval = this.maxSwitchInterval * genreMultiplier;
+        // Apply genre multiplier AND BPM multiplier to max interval
+        // WARN-2 FIX: bpmMultiplier is calculated earlier in this function
+        const adjustedMaxInterval = this.maxSwitchInterval * genreMultiplier * bpmMultiplier;
         if (timeSinceSwitch > adjustedMaxInterval) {
             if (this.debugSceneChange) {
-                console.log(`[Switch Decision] Max time exceeded: ${timeSinceSwitch}ms > ${adjustedMaxInterval}ms (genre: ${this.detectedGenre?.label || 'unknown'})`);
+                console.log(`[Switch Decision] Max time exceeded: ${timeSinceSwitch}ms > ${adjustedMaxInterval}ms (genre: ${this.detectedGenre?.label || 'unknown'}, bpm: ${currentBpm})`);
             }
             return true;
         }
@@ -1503,8 +1459,10 @@ class IntelligentPresetSelector {
         }
 
         // Detect mood for enhanced scoring
+        // CRIT-1 FIX: Pass raw features (with spectral data) to detectMood
+        const rawFeatures = features.rawFeatures || features;
         const mood = this.audioAnalyzer?.detectMood ?
-            this.audioAnalyzer.detectMood(features) : null;
+            this.audioAnalyzer.detectMood(rawFeatures) : null;
 
         // Score each candidate (pass mood for enhanced scoring)
         const scores = candidates.map(hash => ({
@@ -1629,6 +1587,22 @@ class IntelligentPresetSelector {
         // EXISTING: Energy match (REDUCE from 0.3 to 0.25)
         const energyDiff = Math.abs((fp.energy || 0.5) - (features.energy || 0.5));
         score += (1 - energyDiff) * 0.25;
+
+        // WARN-3 FIX: Energy threshold bonus/penalty
+        // Good match: both audio and preset in same energy category
+        // Mismatch penalty: high-energy audio + low-energy preset (or vice versa)
+        const audioEnergy = features.energy || 0.5;
+        const presetEnergy = fp.energy || 0.5;
+        if (audioEnergy > ENERGY_THRESHOLDS.high && presetEnergy > ENERGY_THRESHOLDS.medium) {
+            score += 0.05; // High energy audio + high/medium energy preset = bonus
+        } else if (audioEnergy < ENERGY_THRESHOLDS.low && presetEnergy < ENERGY_THRESHOLDS.medium) {
+            score += 0.05; // Low energy audio + low/medium energy preset = bonus
+        } else if (
+            (audioEnergy > ENERGY_THRESHOLDS.high && presetEnergy < ENERGY_THRESHOLDS.low) ||
+            (audioEnergy < ENERGY_THRESHOLDS.low && presetEnergy > ENERGY_THRESHOLDS.high)
+        ) {
+            score -= 0.03; // Mismatch penalty (mild - don't over-penalize)
+        }
 
         // EXISTING: Bass reactivity match (keep at 0.15)
         const fpBass = fp.bass !== undefined ? fp.bass : fp.bassEnergy;

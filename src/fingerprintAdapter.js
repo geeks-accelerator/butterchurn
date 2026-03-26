@@ -18,8 +18,9 @@ class FingerprintAdapter {
     }
 
     // Build the database structure
+    // CRIT-3 FIX: Bump to v2.1.0 for expanded mood vocabulary
     this.db = {
-      version: '2.0.0',
+      version: '2.1.0',
       generated: new Date().toISOString(),
       presets: {},
       indices: this.loader.indices,
