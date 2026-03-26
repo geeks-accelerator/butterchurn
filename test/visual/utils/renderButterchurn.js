@@ -3,12 +3,13 @@ import path from 'path';
 
 
 async function renderButterchurn(page, serverUrl, width, height, presetName, audioData, frames, seed = 12345, presetType = 'js') {
-  const butterchurnPath = path.join(process.cwd(), 'dist/butterchurn.js');
-  if (!fs.existsSync(butterchurnPath)) {
+  // Check for ESM build (required for visual tests)
+  const butterchurnEsmPath = path.join(process.cwd(), 'dist/butterchurn.esm.js');
+  if (!fs.existsSync(butterchurnEsmPath)) {
     throw new Error(
-      'Butterchurn build not found!\n' +
+      'Butterchurn ESM build not found!\n' +
       'Please build Butterchurn first:\n' +
-      '  yarn build\n'
+      '  npm run dev-build\n'
     );
   }
 

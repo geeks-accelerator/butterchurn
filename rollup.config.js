@@ -23,7 +23,7 @@ const baseConfig = {
 };
 
 const configs = [
-  // Main butterchurn bundle
+  // Main butterchurn bundle (UMD for browser script tags)
   {
     ...baseConfig,
     input: 'src/index.js',
@@ -40,6 +40,22 @@ const configs = [
     plugins: [
       ...baseConfig.plugins,
       ...(isProduction ? [terser()] : []),
+    ],
+  },
+  // ES module bundle (for ES module imports in tests and modern bundlers)
+  {
+    ...baseConfig,
+    input: 'src/index.js',
+    output: [
+      {
+        file: 'dist/butterchurn.esm.js',
+        format: 'es',
+        sourcemap: true,
+        inlineDynamicImports: true,
+      },
+    ],
+    plugins: [
+      ...baseConfig.plugins,
     ],
   },
   // isSupported bundle
