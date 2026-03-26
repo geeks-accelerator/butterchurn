@@ -962,7 +962,15 @@ class IntelligentPresetSelector {
             nextSwitch: Math.max(0, this.minSwitchInterval - timeSinceSwitch),
             selectionLogic: selectionLogic,
             isEmergencyMode: this.isEmergencyMode,
-            deviceTier: this.deviceTier
+            deviceTier: this.deviceTier,
+            // v2: Enhanced recording data (for AI Concert)
+            beatInfo: beatInfo,
+            mood: mood,
+            musicalEvent: features?.musicalEvent || null,
+            matchScore: this.currentPresetScore || null,
+            // Alias for cleaner access
+            logic: selectionLogic,
+            reason: selectionLogic?.reason || null
         };
         // console.log('[Update] Result object created:', resultObject);
         // console.log('[Update] About to return from update() method');
@@ -989,6 +997,13 @@ class IntelligentPresetSelector {
                 selectionLogic: null,
                 isEmergencyMode: this.isEmergencyMode,
                 deviceTier: this.deviceTier,
+                // v2: Enhanced recording data (null on error)
+                beatInfo: null,
+                mood: null,
+                musicalEvent: null,
+                matchScore: null,
+                logic: null,
+                reason: null,
                 error: error.message
             };
         }
