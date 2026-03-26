@@ -32,6 +32,13 @@ This plan implements the **⚠️ PARTIALLY COMPLETED** features from the master
 |----------|----------|--------|
 | **[../reviews/2026-03-25-selector-fingerprint-implementation-codex.md](../reviews/2026-03-25-selector-fingerprint-implementation-codex.md)** | Codex | Complete |
 | **[../reviews/2026-03-25-selector-fingerprint-implementation-gemini.md](../reviews/2026-03-25-selector-fingerprint-implementation-gemini.md)** | Gemini | Complete |
+| **[../reviews/2026-03-26-intelligent-preset-selector-implementation-twin-technical.md](../reviews/2026-03-26-intelligent-preset-selector-implementation-twin-technical.md)** | Technical Twin | Complete |
+| **[../reviews/2026-03-26-intelligent-preset-selector-implementation-twin-creative.md](../reviews/2026-03-26-intelligent-preset-selector-implementation-twin-creative.md)** | Creative Twin | Complete |
+
+### Post-Implementation Twin Review Issues
+| Document | Status |
+|----------|--------|
+| **[../issues/2026-03-26-post-impl-twin-review-fixes.md](../issues/2026-03-26-post-impl-twin-review-fixes.md)** | Open - Minor fixes (N=2 validated) |
 
 ### Features This Plan Completes (from advanced-features.md)
 
