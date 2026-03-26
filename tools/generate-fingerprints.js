@@ -256,38 +256,45 @@ class PresetFingerprintGenerator {
     analyzeComplexity(preset) {
         let complexity = 0;
 
-        // TWIN-11: MODIFIED coefficients from 0.1 to 0.15 for better scaling
+        // TWIN-11/EXT-2: Increased coefficients for better distribution
         const activeShapes = (preset.shapes || []).filter(s => s.enabled).length;
-        complexity += activeShapes * 0.15;  // EXT-2: Increased from 0.1
+        complexity += activeShapes * 0.18;  // Further increased for more spread
 
         const activeWaves = (preset.waves || []).filter(w => w.enabled).length;
-        complexity += activeWaves * 0.15;   // EXT-2: Increased from 0.1
+        complexity += activeWaves * 0.18;   // Further increased for more spread
 
         // Equation length contributes more granularly
         const pixelEqs = preset.pixel_eqs_str || '';
         const warpEqs = preset.warp_eqs_str || '';
         const compEqs = preset.comp_eqs_str || '';
+        const frameEqs = preset.frame_eqs_str || preset.frame_eqs_eel || '';
 
-        // EXT-2: More granular equation length contribution
-        if (pixelEqs.length > 50) {
-            complexity += Math.min(0.3, pixelEqs.length / 500);
+        // EXT-2: More aggressive equation length contribution
+        if (pixelEqs.length > 30) {
+            complexity += Math.min(0.35, pixelEqs.length / 400);
         }
-        if (warpEqs.length > 50) {
-            complexity += Math.min(0.25, warpEqs.length / 600);
+        if (warpEqs.length > 30) {
+            complexity += Math.min(0.30, warpEqs.length / 500);
         }
-        if (compEqs.length > 50) {
-            complexity += Math.min(0.2, compEqs.length / 700);
+        if (compEqs.length > 30) {
+            complexity += Math.min(0.25, compEqs.length / 600);
+        }
+        if (frameEqs.length > 50) {
+            complexity += Math.min(0.20, frameEqs.length / 700);
         }
 
-        // Check for complex mathematical operations
+        // Check for complex mathematical operations - count occurrences
         const allEqs = this.getAllEquations(preset);
-        const complexOps = ['sin', 'cos', 'tan', 'atan', 'sqrt', 'pow', 'exp'];
+        const complexOps = ['sin', 'cos', 'tan', 'atan', 'sqrt', 'pow', 'exp', 'log', 'abs'];
+        let opCount = 0;
         for (const op of complexOps) {
-            if (allEqs.includes(op)) complexity += 0.05;
+            const matches = allEqs.match(new RegExp(op, 'g'));
+            if (matches) opCount += matches.length;
         }
+        // More ops = more complexity, with diminishing returns
+        complexity += Math.min(0.4, opCount * 0.03);
 
         // PRE-8 ENHANCEMENT: More specific fractal detection
-        // Simple zoom+rot check can misidentify non-fractals
         const baseVals = preset.baseVals || {};
 
         // Fractal-like patterns: zoom + rot + (high decay OR trig functions in pixel eqs)
@@ -437,11 +444,12 @@ class PresetFingerprintGenerator {
 
         if (waveR > 0.6 && waveR > waveG && waveR > waveB) warmScore += 2;
         // CLR-1: Lower threshold for cool detection (was > 0.6)
-        if (waveB > 0.5 && waveB > waveR && waveB > waveG) coolScore += 2;
+        if (waveB > 0.45 && waveB > waveR) coolScore += 2;  // Blue dominates red = cool
+        if (waveB > 0.5 && waveB > waveG) coolScore += 1;  // Extra for blue > green
         if (waveG > 0.6 && waveG > waveR && waveG > waveB) natureScore += 2;
 
         // CLR-2: Add purple/violet detection (maps to cool)
-        if (waveB > 0.5 && waveR > 0.4 && waveG < 0.4) coolScore += 2;  // Purple
+        if (waveB > 0.4 && waveR > 0.3 && waveG < 0.4) coolScore += 2;  // Purple/violet
 
         // Check for high saturation patterns (vivid colors)
         const colorRange = Math.max(waveR, waveG, waveB) - Math.min(waveR, waveG, waveB);
