@@ -1247,11 +1247,11 @@ console.log('Organic aggressive > 0.75:', (orgHighAgg.length / organics.length *
 
 ### Phase 7: Documentation ✅
 - [x] Update CLAUDE.md with new status
-- [ ] Update README.md with new features (optional)
-- [ ] Update architecture docs (optional)
-- [ ] Mark issues resolved in review document (optional)
+- [x] Update README.md with v2.1 features and expanded mood types
+- [x] Update architecture docs (`mathematical-fingerprinting.md` with v2.1 schema)
+- [x] Mark issues resolved in review document (added Resolution column)
 - [x] Close out this plan with completion summary
-- [ ] Final commit and push
+- [x] Final commit and push
 
 ---
 

@@ -332,7 +332,8 @@ The v2.0 fingerprint schema extends v1.0 with intelligent selector enhancements 
 
     // Color Profile (extracted from equation color assignments)
     "colorProfile": "warm",      // warm (red-dominant), cool (blue-dominant),
-                                 // nature (green-dominant), neutral (balanced)
+                                 // vivid (high saturation), nature (green-dominant),
+                                 // neutral (balanced)
 
     // Motion Speed (derived from equation complexity + energy)
     "motionSpeed": "fast",       // slow, medium, fast
@@ -356,6 +357,121 @@ The v2.0 fingerprint schema extends v1.0 with intelligent selector enhancements 
     // Experimental field markers (may change in future versions)
     "_experimental": ["colorProfile", "motionSpeed", "moodAffinities"]
 }
+```
+
+### v2.1 Schema (Fingerprint Quality Improvements - March 2026)
+
+The v2.1 schema extends v2.0 with expanded mood vocabulary, improved visual style detection, and enhanced complexity scaling. All changes are backward compatible.
+
+#### New Mood Types
+
+Five new mood types have been added to improve fingerprint diversity and enable better audio-visual matching:
+
+```javascript
+"moodAffinities": {
+    // Original 5 moods (v2.0)
+    "aggressive": "0.50",    // High-energy, bass-heavy, sharp transients
+    "relaxed": "0.50",       // Calm, ambient, low dynamics
+    "happy": "0.50",         // Upbeat, bright, high treble
+    "electronic": "0.50",    // EDM, synthetic, high spectral flatness
+    "acoustic": "0.50",      // Organic, instrumental, low flatness
+
+    // NEW v2.1 moods - expanded vocabulary
+    "mystical": "0.50",      // Organic + bright (high rolloff) + soft
+    "hypnotic": "0.50",      // Repetitive patterns, moderate energy, low dynamics
+    "psychedelic": "0.50",   // High flux, high dynamic range, vivid colors
+    "dreamy": "0.50",        // Low energy, high centroid, soft/airy
+    "meditative": "0.50"     // Very low energy/sharpness/dynamics
+}
+```
+
+#### Mood Detection Criteria
+
+**Static (Fingerprint Generation):**
+| Mood | Primary Triggers | Style Boosts |
+|------|------------------|--------------|
+| mystical | cool colors, low flatness | fractal +0.3 |
+| hypnotic | zoom+rot patterns, iteration | fractal +0.4 |
+| psychedelic | vivid + energy > 0.7 | - |
+| dreamy | cool colors, low sharpness | - |
+| meditative | slow motion, low energy | - |
+
+**Runtime (Audio Analysis):**
+| Mood | Audio Features |
+|------|----------------|
+| mystical | low-mod energy, low flatness, high rolloff, soft |
+| hypnotic | moderate energy (0.3-0.6), low dynamic range, mid-focused |
+| psychedelic | high flux (>0.3), high dynamic range (>0.4), treble |
+| dreamy | low energy (<0.35), high centroid (>0.5), low bass |
+| meditative | very low energy (<0.2), sharpness (<0.2), dynamics (<0.25) |
+
+#### Enhanced Complexity Scaling
+
+Complexity calculation has been improved to reach the full 0-1 range:
+
+```javascript
+// v2.0: Max complexity ~0.35 (threshold 0.5 unreachable)
+// v2.1: Max complexity ~0.90 (378 presets > 0.5)
+
+// New scaling factors:
+- Shape/wave contributions: 0.10 → 0.15 per element
+- Fractal pattern boost: +0.30 (zoom+rot+decay/trig)
+- Math operation counting: sin/cos/tan/pow/sqrt/abs
+- Normalized to 0-1 range
+```
+
+#### Visual Style Keyword Detection
+
+v2.1 adds keyword-based style detection to reduce misclassification:
+
+```javascript
+// Keyword patterns matched against preset name
+const styleKeywords = {
+    fractal: ['fractal', 'spiral', 'mandala', 'zoom', 'iteration'],
+    particle: ['particle', 'spark', 'star', 'dot', 'pixel', 'sperm'],
+    organic: ['plasma', 'liquid', 'fluid', 'flow', 'wave', 'ocean']
+};
+
+// Uses word boundary regex to avoid false positives
+// e.g., "fractalize" matches, "refractal" does not
+```
+
+#### Style-Specific Mood Caps
+
+Organic and fractal styles now have mood constraints for consistency:
+
+```javascript
+// Organic presets
+if (visualStyle === 'organic') {
+    affinities.aggressive = Math.min(aggressive, 0.75);  // Cap
+    affinities.relaxed = Math.max(relaxed, 0.50);        // Floor
+    // Ensure acoustic >= electronic
+    if (electronic > acoustic) {
+        const avg = (electronic + acoustic) / 2;
+        affinities.acoustic = avg + 0.1;
+        affinities.electronic = avg - 0.1;
+    }
+}
+
+// Fractal presets
+if (visualStyle === 'fractal') {
+    affinities.aggressive -= 0.3;  // Reduce (fractals aren't aggressive)
+    affinities.hypnotic += 0.4;    // Boost (fractals are hypnotic)
+    affinities.mystical += 0.3;    // Boost (fractals are mystical)
+}
+```
+
+#### Validation Metrics (v2.1)
+
+| Metric | v2.0 | v2.1 | Target |
+|--------|------|------|--------|
+| Fractal aggressive > 0.8 | 100% | 0% | 0% ✅ |
+| Fractal hypnotic > 0.6 | 0% | 100% | 80%+ ✅ |
+| Complexity > 0.5 | 0 | 378 | >50 ✅ |
+| Max complexity | 0.35 | 0.90 | 0.8+ ✅ |
+| Abstract misclassification | 22% | 5% | <10% ✅ |
+| Cool presets | 7 | 60 | >20 ✅ |
+| Organic aggressive > 0.75 | 26% | 0% | <15% ✅ |
 ```
 
 #### v2.0 Field Extraction Methods

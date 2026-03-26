@@ -28,10 +28,12 @@ Butterchurn is an intelligent WebGL implementation of the Milkdrop Visualizer wi
 - **BPM Detection & Beat Tracking** - Onset-based BPM detection with 4-beat bars and 16-beat phrase tracking
 - **Phrase-Aligned Switching** - Preset changes synchronized to musical phrase boundaries (every 16 beats)
 - **Pre-Drop Anticipation** - Detects energy buildups and switches 1.5 seconds before the drop
-- **Mood-Aware Selection** - Real-time mood classification (aggressive, relaxed, happy, electronic, acoustic)
+- **Mood-Aware Selection** - Real-time mood classification with 10 mood types:
+  - *Primary:* aggressive, relaxed, happy, electronic, acoustic
+  - *Extended (v2.1):* mystical, hypnotic, psychedelic, dreamy, meditative
 - **Genre Detection** - Automatic genre classification (EDM, dubstep, hip-hop, rock, classical, ambient, pop) with timing adjustments
 - **Performance Degradation Tracking** - Automatic preset switching when match quality drops 40%+ from baseline
-- **v2.0 Fingerprint Schema** - Enhanced fingerprints with mood affinities, optimal BPM ranges, and visual styles
+- **v2.1 Fingerprint Schema** - Enhanced fingerprints with expanded mood vocabulary, improved complexity scaling, and keyword-based style detection
 - **CLIP Visual Classification** - ML-based preset categorization into 8 visual style categories
 - **Adaptive FFT Recommendations** - Device-aware FFT size optimization suggestions
 
