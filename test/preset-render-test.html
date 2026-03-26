@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Preset Render Test</title>
+    <style>
+        body { margin: 0; background: #000; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512"></canvas>
+    <script type="module">
+        import butterchurn from '/dist/butterchurn.esm.js';
+
+        const canvas = document.getElementById('canvas');
+
+        // Create visualizer without AudioContext (not needed for rendering)
+        try {
+            window.visualizer = butterchurn.createVisualizer(null, canvas, {
+                width: 512,
+                height: 512,
+                pixelRatio: 1,
+                textureRatio: 1
+            });
+            window.butterchurnReady = true;
+            console.log('Butterchurn initialized for rendering');
+        } catch (e) {
+            console.error('Butterchurn initialization failed:', e);
+            window.butterchurnReady = false;
+        }
+    </script>
+</body>
+</html>
