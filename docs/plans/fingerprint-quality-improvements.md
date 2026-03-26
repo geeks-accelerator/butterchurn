@@ -1,9 +1,11 @@
 # Fingerprint Quality Improvements Plan
 
 **Created:** 2026-03-25
-**Status:** Draft
+**Status:** Draft - All PRE-1 through PRE-9 fixes applied
 **Priority:** High
+**Depends On:** [intelligent-preset-selector-improvements.md](intelligent-preset-selector-improvements.md) Phase 5
 **Review Reference:** [fingerprint-quality-review-2026-03-25.md](../reviews/fingerprint-quality-review-2026-03-25.md)
+**Pre-Implementation Review:** [2026-03-25-fingerprint-plan-review-findings.md](../issues/2026-03-25-fingerprint-plan-review-findings.md)
 
 ---
 
@@ -44,14 +46,14 @@ The system uses **two complementary analysis approaches** - NOT duplicates:
 
 | Feature | Static (Fingerprint) | Dynamic (Audio) | Selection |
 |---------|---------------------|-----------------|-----------|
-| Mood | `deriveMoodAffinities()` | `detectMood()` | `scoreForMood()` |
-| Energy | `analyzeEnergy()` | `calculateFeatures()` | `calculateMatchScore()` |
-| Complexity | `analyzeComplexity()` | - | `scoreContinuity()` |
-| Visual Style | `detectVisualStyle()` | - | **NOT USED** |
-| Color Profile | `extractColorProfile()` | - | **NOT USED** |
+| Mood | `deriveMoodAffinities()` | `detectMood()` | `scorePreset()` |
+| Energy | `analyzeEnergy()` | `calculateFeatures()` | `scorePreset()` |
+| Complexity | `analyzeComplexity()` | - | `scorePreset()` |
+| Visual Style | `detectVisualStyle()` | - | **NOT USED** → Wire in Phase 3.5 |
+| Color Profile | `extractColorProfile()` | - | **NOT USED** → Wire in Phase 3.5 |
 | Beat Sync | `analyzeBeatSync()` | - | Minimal use |
 | Genre | - | `detectGenre()` | `shouldSwitchPreset()` |
-| BPM | `calculateOptimalBpm()` | `detectBPM()` | **NOT WIRED** |
+| BPM | `calculateOptimalBpm()` | `detectBPM()` | `scorePreset():1608-1617` (PRE-3: already wired) |
 | Buildup | - | `detectBuildup()` | `shouldSwitchPreset()` |
 
 ### Findings: No True Duplication
@@ -62,15 +64,15 @@ The system uses **two complementary analysis approaches** - NOT duplicates:
 
 ### Findings: Underutilized Features (Wiring Gaps)
 
-These fingerprint fields are **generated but NOT used** in preset selection:
+These fingerprint fields are **generated but NOT fully used** in preset selection:
 
-| Field | Generated In | Should Be Used In | Action Required |
-|-------|-------------|-------------------|-----------------|
-| `colorProfile` | `generate-fingerprints.js:371` | `intelligentPresetSelector.js` | Wire to scoring |
-| `visualStyle` | `generate-fingerprints.js:316` | `intelligentPresetSelector.js` | Wire to scoring |
-| `optimalBpm` | `generate-fingerprints.js:448` | `intelligentPresetSelector.js` | Wire to BPM matching |
+| Field | Generated In | Current Status | Action Required |
+|-------|-------------|----------------|-----------------|
+| `colorProfile` | `generate-fingerprints.js:371` | **NOT WIRED** | Wire to scoring in Phase 3.5 |
+| `visualStyle` | `generate-fingerprints.js:316` | **NOT WIRED** | Wire to scoring in Phase 3.5 |
+| `optimalBpm` | `generate-fingerprints.js:448` | **ALREADY WIRED** (lines 1608-1617) | PRE-3: No action needed |
 
-**Recommendation:** Phase 3 should include wiring these unused fields to the selector.
+**Recommendation:** Phase 3.5 wires `colorProfile` and `visualStyle` only. BPM is already implemented.
 
 ### Findings: Test File Wiring Gap
 
@@ -141,10 +143,48 @@ scoreForBpmMatch(preset, detectedBpm) {
 
 ---
 
+## Phase 0: Prerequisites (PRE-2)
+
+**Estimated Effort:** 15 minutes
+**Dependencies:** None
+**Files:** `tools/generate-fingerprints.js`
+
+### 0.1 Add Import Guard for Test Compatibility
+
+**Issue (PRE-2):** The file executes `main()` unconditionally at line 1005. Importing for tests would trigger CLI execution.
+
+**Solution:** Add import guard before `main()` call.
+
+```javascript
+// At end of tools/generate-fingerprints.js, replace:
+main().catch(error => {
+    console.error('Fatal error:', error);
+    process.exit(1);
+});
+
+// With:
+// PRE-2 FIX: Only run CLI when executed directly, not when imported
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+    main().catch(error => {
+        console.error('Fatal error:', error);
+        process.exit(1);
+    });
+}
+
+// Export for testing
+export { PresetFingerprintGenerator };
+```
+
+**Acceptance Criteria:**
+- [ ] Generator can be imported in tests without side effects
+- [ ] CLI still works when run directly: `node tools/generate-fingerprints.js`
+
+---
+
 ## Phase 1: Critical Fixes
 
 **Estimated Effort:** 4-6 hours
-**Dependencies:** None
+**Dependencies:** Phase 0 complete
 **Files:** `tools/generate-fingerprints.js`
 
 ### 1.1 Fix Fractal Mood System (FRC-1, FRC-2)
@@ -152,6 +192,12 @@ scoreForBpmMatch(preset, detectedBpm) {
 **Issue:** All 95 fractal presets have identical aggressive mood structure.
 
 **Solution:** Expand mood vocabulary and add fractal-specific mood derivation.
+
+> **PRE-4 NOTE (Forward Compatibility):** The new mood types (mystical, hypnotic, psychedelic, dreamy, meditative) are generated in fingerprints but NOT yet matched at runtime. The `detectMood()` function in `advancedAnalyzer.js` only returns 5 labels (aggressive, relaxed, happy, electronic, acoustic).
+>
+> **Decision:** Accept as forward-compatible. These moods improve fingerprint diversity and enable future runtime detection enhancements without regenerating fingerprints.
+>
+> **Future Work:** Add runtime detection for new mood types in `src/audio/advancedAnalyzer.js:detectMood()`.
 
 ```javascript
 // In deriveMoodAffinities(), add new moods:
@@ -161,7 +207,7 @@ const affinities = {
     happy: 0.5,
     electronic: 0.5,
     acoustic: 0.5,
-    // NEW v2.1 moods:
+    // NEW v2.1 moods (PRE-4: forward-compatible, runtime detection is future work):
     mystical: 0.5,
     hypnotic: 0.5,
     psychedelic: 0.5,
@@ -185,6 +231,7 @@ const styleBoosts = {
 - [ ] 0% of fractals have aggressive > 0.8
 - [ ] 80%+ of fractals have hypnotic > 0.6
 - [ ] Unique mood combinations > 50 (currently 1)
+- [ ] PRE-4: New moods stored in fingerprints (runtime matching is future work)
 
 ### 1.2 Fix Complexity Scaling (EXT-2, FRC-3)
 
@@ -209,10 +256,21 @@ analyzeComplexity(preset) {
         complexity += Math.min(0.3, preset.pixel_eqs_str.length / 500);
     }
 
-    // Fractal patterns are inherently complex
+    // PRE-8 ENHANCEMENT: More specific fractal detection
+    // Simple zoom+rot check can misidentify non-fractals
     const allEqs = this.getAllEquations(preset);
-    if (allEqs.includes('zoom') && allEqs.includes('rot')) {
-        complexity += 0.25;  // Fractal boost
+    const baseVals = preset.baseVals || {};
+    const pixelEqs = preset.pixel_eqs_str || '';
+
+    // Fractal-like patterns: zoom + rot + (high decay OR trig functions)
+    const hasZoomRot = allEqs.includes('zoom') && allEqs.includes('rot');
+    const hasHighDecay = (baseVals.decay || 0) > 0.95;
+    const hasTrigFunctions = /\b(sin|cos|tan)\b/.test(pixelEqs);
+
+    if (hasZoomRot && (hasHighDecay || hasTrigFunctions)) {
+        complexity += 0.30;  // Strong fractal boost
+    } else if (hasZoomRot) {
+        complexity += 0.15;  // Weak fractal boost (might be simple zoom effect)
     }
 
     // Normalize to 0-1 (cap removed, use actual range)
@@ -239,17 +297,23 @@ detectVisualStyle(preset) {
     const presetName = (preset.name || '').toLowerCase();
 
     // Keyword-based detection (NEW)
+    // PRE-6 FIX: Use word boundary regex to avoid false positives
+    // e.g., "not a fractal" should NOT match "fractal"
     const fractalKeywords = ['fractal', 'spiral', 'mandala', 'zoom', 'iteration'];
     const particleKeywords = ['particle', 'spark', 'star', 'dot', 'pixel', 'sperm'];
     const organicKeywords = ['plasma', 'liquid', 'fluid', 'flow', 'wave', 'ocean'];
 
-    if (fractalKeywords.some(k => presetName.includes(k))) {
+    // PRE-6 FIX: Use word boundary regex instead of includes()
+    const matchesKeyword = (keywords) =>
+        keywords.some(k => new RegExp(`\\b${k}\\b`, 'i').test(presetName));
+
+    if (matchesKeyword(fractalKeywords)) {
         styles.push('fractal');
     }
-    if (particleKeywords.some(k => presetName.includes(k))) {
+    if (matchesKeyword(particleKeywords)) {
         styles.push('particle');
     }
-    if (organicKeywords.some(k => presetName.includes(k))) {
+    if (matchesKeyword(organicKeywords)) {
         styles.push('organic');
     }
 
@@ -282,8 +346,13 @@ detectVisualStyle(preset) {
 ```javascript
 // After initial mood derivation, apply style-specific caps:
 if (visualStyle === 'organic' || existingStyles.includes('organic')) {
-    // Organic should be more acoustic/relaxed
-    affinities.acoustic = Math.max(affinities.acoustic, affinities.electronic + 0.1);
+    // PRE-7 FIX: Directly enforce acoustic > electronic relationship
+    // Old formula Math.max(acoustic, electronic + 0.1) didn't work when electronic was high
+    if (affinities.electronic > affinities.acoustic) {
+        const avg = (affinities.electronic + affinities.acoustic) / 2;
+        affinities.acoustic = Math.min(1, avg + 0.1);
+        affinities.electronic = Math.max(0, avg - 0.1);
+    }
     affinities.aggressive = Math.min(affinities.aggressive, 0.75);  // Cap
     affinities.relaxed = Math.max(affinities.relaxed, 0.5);  // Floor
 }
@@ -326,12 +395,15 @@ if (allEqs.includes('purple') || allEqs.includes('violet')) coolScore += 1;
 
 ### 3.1 Reduce Neutral Color Dominance (ABS-1)
 
+> **PRE-9 NOTE (Consolidation):** This task is tightly coupled with Phase 2.2 (Cool Color Detection). Both modify `extractColorProfile()` and affect the same thresholds. **Recommendation:** Implement 3.1 immediately after 2.2 in a single editing session for coherent tuning.
+
 **Issue:** 80% of abstract presets have neutral colorProfile.
 
 **Solution:** Make color detection more sensitive.
 
 ```javascript
 // Lower thresholds for all color categories
+// PRE-9: Implement alongside Phase 2.2 for holistic tuning
 if (maxScore >= 1.5) {  // Was >= 2
     const dominant = Object.entries(scores).find(([_, v]) => v === maxScore)?.[0];
     return dominant;
@@ -342,31 +414,69 @@ if (maxScore >= 1.5) {  // Was >= 2
 
 **Issue:** BPM extremes (>160, <70) never triggered.
 
-**Solution:** Update threshold constants.
+**Solution:** Add threshold constants and wire into existing code.
+
+> **PRE-5 FIX:** These constants don't exist in the codebase yet. Add them and wire into the usage locations below.
 
 ```javascript
-// In intelligentPresetSelector.js or fingerprint matching:
+// ADD to src/intelligentPresetSelector.js at top of file (after imports):
 const BPM_THRESHOLDS = {
     veryLow: 80,    // Was 70
     low: 100,       // Was 90
     high: 140,      // Was 150
     veryHigh: 160   // Was 170
 };
+
+// USAGE LOCATION 1: In shouldSwitchPreset() genre-based timing
+// Replace hardcoded BPM checks with:
+if (this.audioAnalyzer?.detectedBPM > BPM_THRESHOLDS.high) {
+    // Fast music - more frequent switches
+}
+
+// USAGE LOCATION 2: In scorePreset() for BPM-based scoring
+// The existing code at lines 1608-1617 already handles optimalBpm matching.
+// These thresholds are for FILTERING candidates, not scoring.
+
+// USAGE LOCATION 3: In selectBestPresetWithLogic() for candidate filtering
+const bpm = this.audioAnalyzer?.detectedBPM;
+if (bpm && bpm > BPM_THRESHOLDS.veryHigh) {
+    // Filter to only high-energy presets for very fast music
+    candidates = candidates.filter(c =>
+        this.db.presets[c]?.fingerprint?.energy > 0.6
+    );
+}
 ```
 
 ### 3.3 Adjust Low Energy Threshold (EXT-1)
 
 **Issue:** Only 4.4% of presets below 0.2 energy threshold.
 
-**Solution:** Raise threshold to 0.35.
+**Solution:** Add threshold constants and wire into existing code.
+
+> **PRE-5 FIX:** These constants don't exist in the codebase yet. Add them and wire into the usage locations below.
 
 ```javascript
-// In preset matching/filtering:
+// ADD to src/intelligentPresetSelector.js at top of file (after BPM_THRESHOLDS):
 const ENERGY_THRESHOLDS = {
     low: 0.35,      // Was 0.2
     medium: 0.6,
     high: 0.8
 };
+
+// USAGE LOCATION 1: In selectBestPresetWithLogic() for energy-based filtering
+const audioEnergy = features.beatStrength || 0;
+if (audioEnergy < ENERGY_THRESHOLDS.low) {
+    // Low energy audio - prefer calm presets
+    candidates = candidates.filter(c =>
+        this.db.presets[c]?.fingerprint?.energy < ENERGY_THRESHOLDS.medium
+    );
+}
+
+// USAGE LOCATION 2: In scorePreset() to boost energy-appropriate presets
+const presetEnergy = fp.energy || 0.5;
+if (audioEnergy > ENERGY_THRESHOLDS.high && presetEnergy > ENERGY_THRESHOLDS.high) {
+    score += 0.05;  // Bonus for high-energy match
+}
 ```
 
 ### 3.4 Add Energy Penalty for Relaxed (MOD-1)
@@ -400,74 +510,63 @@ if (affinities.aggressive > 0.7 && affinities.relaxed > 0.7) {
 **Solution:** Add scoring functions in `src/intelligentPresetSelector.js` that use existing fingerprint data.
 
 ```javascript
-// In intelligentPresetSelector.js - ADD to calculateMatchScore():
+// PRE-1 FIX: Add to scorePreset() (not calculateMatchScore - that function doesn't exist)
+// In intelligentPresetSelector.js scorePreset() method, add these scoring components:
 
 // 1. Color profile matching (uses existing fingerprint.colorProfile)
-scoreForColorProfile(preset, detectedMood) {
-    const colorProfile = preset.fingerprint?.colorProfile || 'neutral';
-    const mood = detectedMood || this.currentMood;
-
+// Add to scorePreset() after existing mood scoring:
+if (fp.colorProfile) {
+    const colorProfile = fp.colorProfile;
     // Warm colors match happy/aggressive moods
-    if (colorProfile === 'warm' && (mood === 'happy' || mood === 'aggressive')) {
-        return 0.15;
+    if (colorProfile === 'warm' && (mood?.label === 'happy' || mood?.label === 'aggressive')) {
+        score += 0.05;
     }
     // Cool colors match relaxed/electronic moods
-    if (colorProfile === 'cool' && (mood === 'relaxed' || mood === 'electronic')) {
-        return 0.15;
+    if (colorProfile === 'cool' && (mood?.label === 'relaxed' || mood?.label === 'electronic')) {
+        score += 0.05;
     }
     // Vivid matches high energy
-    if (colorProfile === 'vivid' && this.currentEnergy > 0.7) {
-        return 0.2;
+    if (colorProfile === 'vivid' && (features.beatStrength || 0) > 0.7) {
+        score += 0.05;
     }
-    return 0;
 }
 
 // 2. Visual style continuity (uses existing fingerprint.visualStyle)
-scoreForVisualStyleContinuity(currentPreset, candidatePreset) {
-    const currentStyle = currentPreset?.fingerprint?.visualStyle;
-    const candidateStyle = candidatePreset?.fingerprint?.visualStyle;
+// Add to scorePreset() after color profile scoring:
+if (this.currentHash && fp.visualStyle) {
+    const currentFp = this.db.presets[this.currentHash]?.fingerprint;
+    const currentStyle = currentFp?.visualStyle;
+    const candidateStyle = fp.visualStyle;
 
-    if (!currentStyle || !candidateStyle) return 0;
-
-    // Same style = smooth transition
-    if (currentStyle === candidateStyle) return 0.1;
-
-    // Compatible styles
-    const compatible = {
-        organic: ['fractal', 'abstract'],
-        fractal: ['organic', 'geometric'],
-        particle: ['geometric', 'abstract'],
-        geometric: ['particle', 'fractal']
-    };
-
-    if (compatible[currentStyle]?.includes(candidateStyle)) return 0.05;
-    return -0.05; // Incompatible = penalty
+    if (currentStyle && candidateStyle) {
+        // Same style = smooth transition
+        if (currentStyle === candidateStyle) {
+            score += 0.05;
+        } else {
+            // Compatible styles
+            const compatible = {
+                organic: ['fractal', 'abstract'],
+                fractal: ['organic', 'geometric'],
+                particle: ['geometric', 'abstract'],
+                geometric: ['particle', 'fractal']
+            };
+            if (compatible[currentStyle]?.includes(candidateStyle)) {
+                score += 0.02;
+            }
+        }
+    }
 }
 
-// 3. BPM matching (uses existing fingerprint.optimalBpm)
-scoreForBpmMatch(preset, detectedBpm) {
-    if (!detectedBpm || !preset.fingerprint?.optimalBpm) return 0;
-
-    const { min, max, ideal } = preset.fingerprint.optimalBpm;
-
-    // Perfect match
-    if (Math.abs(detectedBpm - ideal) < 5) return 0.2;
-
-    // Within range
-    if (detectedBpm >= min && detectedBpm <= max) return 0.1;
-
-    // Out of range penalty
-    return -0.1;
-}
+// PRE-3 FIX: BPM scoring ALREADY EXISTS at lines 1608-1617
+// Do NOT add duplicate BPM scoring - it's already wired in scorePreset()
 ```
 
-**Reuse:** These functions use EXISTING fingerprint fields - no changes to `generate-fingerprints.js` needed.
+**Reuse:** These additions use EXISTING fingerprint fields - no changes to `generate-fingerprints.js` needed.
 
 **Acceptance Criteria:**
-- [ ] `scoreForColorProfile()` added to selector
-- [ ] `scoreForVisualStyleContinuity()` added to selector
-- [ ] `scoreForBpmMatch()` added to selector
-- [ ] `calculateMatchScore()` calls new scoring functions
+- [ ] Color profile scoring added to `scorePreset()`
+- [ ] Visual style continuity scoring added to `scorePreset()`
+- [ ] PRE-3: Verify existing BPM scoring at lines 1608-1617 (already wired, no changes needed)
 
 ---
 
@@ -947,15 +1046,20 @@ const fp = require('./presets/alaska-butter/alaskaButter.fingerprints.json');
 
 ## Implementation Checklist
 
+### Phase 0: Prerequisites
+- [ ] PRE-2: Add import guard to `tools/generate-fingerprints.js`
+- [ ] PRE-2: Add export for `PresetFingerprintGenerator`
+- [ ] PRE-2: Verify CLI still works after changes
+
 ### Phase 1: Critical (Must Do)
 - [ ] FRC-1: Expand mood vocabulary
 - [ ] FRC-2: Add fractal mood overrides
 - [ ] EXT-2: Fix complexity scaling
-- [ ] FRC-3: Add fractal complexity boost
-- [ ] ABS-2: Add keyword-based style detection
+- [ ] FRC-3: Add fractal complexity boost (PRE-8: use decay/trig detection)
+- [ ] ABS-2: Add keyword-based style detection (PRE-6: use word boundary regex)
 
 ### Phase 2: High Priority
-- [ ] ORG-1: Add style-aware mood caps
+- [ ] ORG-1: Add style-aware mood caps (PRE-7: enforce acoustic > electronic directly)
 - [ ] ORG-3: Cap organic aggressive at 0.75
 - [ ] CLR-1: Lower cool detection threshold
 - [ ] CLR-2: Add purple/violet detection
@@ -967,7 +1071,7 @@ const fp = require('./presets/alaska-butter/alaskaButter.fingerprints.json');
 - [ ] MOD-1: Add energy-relaxed cross-validation
 - [ ] WIRE-1: Wire colorProfile to selector scoring
 - [ ] WIRE-1: Wire visualStyle to selector scoring
-- [ ] WIRE-1: Wire optimalBpm to selector scoring
+- [x] PRE-3: optimalBpm already wired at lines 1608-1617 (no action needed)
 
 ### Phase 4: Low Priority (Optional)
 - [ ] CLR-3: Add yellow/gold detection
