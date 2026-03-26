@@ -20,6 +20,21 @@ import FingerprintLoader from './fingerprintLoader.js';
 import FingerprintAdapter from './fingerprintAdapter.js';
 import PresetCompatibilityChecker from './utils/presetCompatibilityChecker.js';
 
+// EXT-3/PRE-5: BPM threshold constants for genre-based timing
+const BPM_THRESHOLDS = {
+    veryLow: 80,    // Ambient, slow ballads
+    low: 100,       // Chill, downtempo
+    high: 140,      // Upbeat, dance
+    veryHigh: 160   // Fast EDM, drum & bass
+};
+
+// EXT-1/PRE-5: Energy threshold constants for filtering
+const ENERGY_THRESHOLDS = {
+    low: 0.35,      // Calm, ambient presets
+    medium: 0.6,    // Moderate energy
+    high: 0.8       // High energy, aggressive
+};
+
 /**
  * PresetPerformanceTracker
  * Tracks how well the current preset matches ongoing audio.
@@ -1393,11 +1408,43 @@ class IntelligentPresetSelector {
         };
 
         // Get candidate presets based on features
-        const candidates = this.getCandidates(features);
+        let candidates = this.getCandidates(features);
 
         if (!candidates || candidates.length === 0) {
             logic.reason = 'No suitable candidates';
             return { bestHash: null, logic };
+        }
+
+        // EXT-3: BPM-based candidate filtering for extreme tempos
+        const bpm = this.audioAnalyzer?.detectedBPM;
+        if (bpm && bpm > BPM_THRESHOLDS.veryHigh) {
+            // Very fast music - prefer high-energy presets
+            const filtered = candidates.filter(c =>
+                (this.db.presets[c]?.fingerprint?.energy || 0.5) > 0.6
+            );
+            if (filtered.length > 0) candidates = filtered;
+        } else if (bpm && bpm < BPM_THRESHOLDS.veryLow) {
+            // Very slow music - prefer calm presets
+            const filtered = candidates.filter(c =>
+                (this.db.presets[c]?.fingerprint?.energy || 0.5) < 0.5
+            );
+            if (filtered.length > 0) candidates = filtered;
+        }
+
+        // EXT-1: Energy-based candidate filtering
+        const audioEnergy = features.beatStrength || features.energy || 0;
+        if (audioEnergy < ENERGY_THRESHOLDS.low) {
+            // Low energy audio - prefer calm presets
+            const filtered = candidates.filter(c =>
+                (this.db.presets[c]?.fingerprint?.energy || 0.5) < ENERGY_THRESHOLDS.medium
+            );
+            if (filtered.length > 0) candidates = filtered;
+        } else if (audioEnergy > ENERGY_THRESHOLDS.high) {
+            // High energy audio - prefer high-energy presets
+            const filtered = candidates.filter(c =>
+                (this.db.presets[c]?.fingerprint?.energy || 0.5) > ENERGY_THRESHOLDS.medium
+            );
+            if (filtered.length > 0) candidates = filtered;
         }
 
         logic.candidates = candidates.slice(0, 5).map(h => h.substring(0, 8));
@@ -1634,6 +1681,47 @@ class IntelligentPresetSelector {
             if (currentFp) {
                 const complexityDiff = Math.abs((fp.complexity || 0.5) - (currentFp.complexity || 0.5));
                 score += (1 - complexityDiff) * 0.10;
+            }
+        }
+
+        // WIRE-1: Color profile matching (5%)
+        // Warm colors match happy/aggressive moods, cool colors match relaxed/electronic
+        if (fp.colorProfile && mood) {
+            const colorProfile = fp.colorProfile;
+            if (colorProfile === 'warm' && (mood.label === 'happy' || mood.label === 'aggressive')) {
+                score += 0.05;
+            }
+            if (colorProfile === 'cool' && (mood.label === 'relaxed' || mood.label === 'electronic')) {
+                score += 0.05;
+            }
+            // Vivid matches high energy audio
+            if (colorProfile === 'vivid' && (features.beatStrength || 0) > 0.7) {
+                score += 0.05;
+            }
+        }
+
+        // WIRE-1: Visual style continuity scoring (5%)
+        // Same style = smooth transition, compatible styles get partial bonus
+        if (this.currentHash && fp.visualStyle) {
+            const currentFp = this.db.presets[this.currentHash]?.fingerprint;
+            const currentStyle = currentFp?.visualStyle;
+            const candidateStyle = fp.visualStyle;
+
+            if (currentStyle && candidateStyle) {
+                if (currentStyle === candidateStyle) {
+                    score += 0.05;  // Same style = smooth transition
+                } else {
+                    // Compatible styles get partial bonus
+                    const compatible = {
+                        organic: ['fractal', 'abstract'],
+                        fractal: ['organic', 'geometric'],
+                        particle: ['geometric', 'abstract'],
+                        geometric: ['particle', 'fractal']
+                    };
+                    if (compatible[currentStyle]?.includes(candidateStyle)) {
+                        score += 0.02;
+                    }
+                }
             }
         }
 

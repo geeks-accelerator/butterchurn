@@ -251,28 +251,54 @@ class PresetFingerprintGenerator {
 
     /**
      * Analyze visual complexity
+     * EXT-2/FRC-3: Enhanced scaling to allow complexity > 0.5 threshold
      */
     analyzeComplexity(preset) {
         let complexity = 0;
 
-        // Count active shapes
+        // TWIN-11: MODIFIED coefficients from 0.1 to 0.15 for better scaling
         const activeShapes = (preset.shapes || []).filter(s => s.enabled).length;
-        complexity += activeShapes * 0.1;
+        complexity += activeShapes * 0.15;  // EXT-2: Increased from 0.1
 
-        // Count active waves
         const activeWaves = (preset.waves || []).filter(w => w.enabled).length;
-        complexity += activeWaves * 0.1;
+        complexity += activeWaves * 0.15;   // EXT-2: Increased from 0.1
 
-        // Check equation complexity
-        if (preset.pixel_eqs_str && preset.pixel_eqs_str.length > 100) complexity += 0.2;
-        if (preset.warp_eqs_str && preset.warp_eqs_str.length > 100) complexity += 0.2;
-        if (preset.comp_eqs_str && preset.comp_eqs_str.length > 100) complexity += 0.15;
+        // Equation length contributes more granularly
+        const pixelEqs = preset.pixel_eqs_str || '';
+        const warpEqs = preset.warp_eqs_str || '';
+        const compEqs = preset.comp_eqs_str || '';
+
+        // EXT-2: More granular equation length contribution
+        if (pixelEqs.length > 50) {
+            complexity += Math.min(0.3, pixelEqs.length / 500);
+        }
+        if (warpEqs.length > 50) {
+            complexity += Math.min(0.25, warpEqs.length / 600);
+        }
+        if (compEqs.length > 50) {
+            complexity += Math.min(0.2, compEqs.length / 700);
+        }
 
         // Check for complex mathematical operations
         const allEqs = this.getAllEquations(preset);
         const complexOps = ['sin', 'cos', 'tan', 'atan', 'sqrt', 'pow', 'exp'];
         for (const op of complexOps) {
             if (allEqs.includes(op)) complexity += 0.05;
+        }
+
+        // PRE-8 ENHANCEMENT: More specific fractal detection
+        // Simple zoom+rot check can misidentify non-fractals
+        const baseVals = preset.baseVals || {};
+
+        // Fractal-like patterns: zoom + rot + (high decay OR trig functions in pixel eqs)
+        const hasZoomRot = allEqs.includes('zoom') && allEqs.includes('rot');
+        const hasHighDecay = (baseVals.decay || 0) > 0.95;
+        const hasTrigInPixel = /\b(sin|cos|tan)\b/.test(pixelEqs);
+
+        if (hasZoomRot && (hasHighDecay || hasTrigInPixel)) {
+            complexity += 0.30;  // FRC-3: Strong fractal boost
+        } else if (hasZoomRot) {
+            complexity += 0.15;  // Weak fractal boost (might be simple zoom effect)
         }
 
         return Math.min(1, complexity);
@@ -312,19 +338,44 @@ class PresetFingerprintGenerator {
 
     /**
      * Detect visual style from patterns
+     * TWIN-10 FIX: Updated signature to accept presetName as explicit parameter
+     * ABS-2: Enhanced with keyword-based detection
      */
-    detectVisualStyle(preset) {
+    detectVisualStyle(preset, presetName = '') {
         const styles = [];
         const allEqs = this.getAllEquations(preset);
+        // TWIN-10: Use passed presetName or fallback to preset.name
+        const name = (presetName || preset.name || '').toLowerCase();
 
-        // Particle system detection
+        // ABS-2: Keyword-based detection (checked first for better classification)
+        // PRE-6 FIX: Use word boundary regex to avoid false positives
+        const fractalKeywords = ['fractal', 'spiral', 'mandala', 'zoom', 'iteration'];
+        const particleKeywords = ['particle', 'spark', 'star', 'dot', 'pixel', 'sperm'];
+        const organicKeywords = ['plasma', 'liquid', 'fluid', 'flow', 'wave', 'ocean'];
+
+        const matchesKeyword = (keywords) =>
+            keywords.some(k => new RegExp(`\\b${k}\\b`, 'i').test(name));
+
+        if (matchesKeyword(fractalKeywords)) {
+            styles.push('fractal');
+        }
+        if (matchesKeyword(particleKeywords)) {
+            styles.push('particle');
+        }
+        if (matchesKeyword(organicKeywords)) {
+            styles.push('organic');
+        }
+
+        // Particle system detection (equation-based)
         const shapes = preset.shapes || [];
-        if (shapes.filter(s => s.enabled && s.additive && s.rad < 0.2).length >= 2) {
+        if (!styles.includes('particle') &&
+            shapes.filter(s => s.enabled && s.additive && s.rad < 0.2).length >= 2) {
             styles.push('particle');
         }
 
-        // Fractal detection
-        if (allEqs.includes('zoom') && allEqs.includes('rot') &&
+        // Fractal detection (equation-based)
+        if (!styles.includes('fractal') &&
+            allEqs.includes('zoom') && allEqs.includes('rot') &&
             (allEqs.includes('sin') || allEqs.includes('cos'))) {
             if (preset.baseVals?.decay > 0.96) {
                 styles.push('fractal');
@@ -336,8 +387,9 @@ class PresetFingerprintGenerator {
             styles.push('geometric');
         }
 
-        // Organic/fluid detection
-        if (allEqs.includes('warp') || allEqs.includes('dx') || allEqs.includes('dy')) {
+        // Organic/fluid detection (equation-based)
+        if (!styles.includes('organic') &&
+            (allEqs.includes('warp') || allEqs.includes('dx') || allEqs.includes('dy'))) {
             if (!styles.includes('geometric')) {
                 styles.push('organic');
             }
@@ -384,8 +436,12 @@ class PresetFingerprintGenerator {
         const waveB = baseVals.wave_b ?? 0.5;
 
         if (waveR > 0.6 && waveR > waveG && waveR > waveB) warmScore += 2;
-        if (waveB > 0.6 && waveB > waveR && waveB > waveG) coolScore += 2;
+        // CLR-1: Lower threshold for cool detection (was > 0.6)
+        if (waveB > 0.5 && waveB > waveR && waveB > waveG) coolScore += 2;
         if (waveG > 0.6 && waveG > waveR && waveG > waveB) natureScore += 2;
+
+        // CLR-2: Add purple/violet detection (maps to cool)
+        if (waveB > 0.5 && waveR > 0.4 && waveG < 0.4) coolScore += 2;  // Purple
 
         // Check for high saturation patterns (vivid colors)
         const colorRange = Math.max(waveR, waveG, waveB) - Math.min(waveR, waveG, waveB);
@@ -409,8 +465,12 @@ class PresetFingerprintGenerator {
         });
 
         // Check equations for color manipulation patterns
-        if (allEqs.includes('red') || allEqs.includes('orange') || allEqs.includes('fire')) warmScore += 1;
-        if (allEqs.includes('blue') || allEqs.includes('ice') || allEqs.includes('cold')) coolScore += 1;
+        // CLR-3: Add yellow/gold to warm detection
+        if (allEqs.includes('red') || allEqs.includes('orange') || allEqs.includes('fire') ||
+            allEqs.includes('gold') || allEqs.includes('yellow') || allEqs.includes('sun')) warmScore += 1;
+        // CLR-2: Add purple/violet to cool detection
+        if (allEqs.includes('blue') || allEqs.includes('ice') || allEqs.includes('cold') ||
+            allEqs.includes('purple') || allEqs.includes('violet')) coolScore += 1;
         if (allEqs.includes('green') || allEqs.includes('nature') || allEqs.includes('forest')) natureScore += 1;
         if (allEqs.includes('rainbow') || allEqs.includes('hue') || allEqs.includes('hsv')) vividScore += 1;
 
@@ -424,7 +484,8 @@ class PresetFingerprintGenerator {
         const scores = { warm: warmScore, cool: coolScore, nature: natureScore, vivid: vividScore };
         const maxScore = Math.max(...Object.values(scores));
 
-        if (maxScore < 2) {
+        // ABS-1: Lower threshold to reduce neutral dominance (was < 2)
+        if (maxScore < 1.5) {
             // No strong color preference
             if (isDark) return 'dark';
             if (isBright) return 'bright';
@@ -477,25 +538,41 @@ class PresetFingerprintGenerator {
             relaxed: 0.5,
             happy: 0.5,
             electronic: 0.5,
-            acoustic: 0.5
+            acoustic: 0.5,
+            // FRC-1: New v2.1 moods for expanded vocabulary
+            // PRE-4: Forward-compatible - runtime detection is future work
+            mystical: 0.5,
+            hypnotic: 0.5,
+            psychedelic: 0.5,
+            dreamy: 0.5,
+            meditative: 0.5
         };
 
         // Style influences
+        // FRC-2: Updated fractal boosts to reduce aggressive and add new mood types
         const styleBoosts = {
-            fluid_organic: { relaxed: 0.3, acoustic: 0.2 },
-            organic: { relaxed: 0.25, acoustic: 0.2, happy: 0.1 },
-            particle: { electronic: 0.4, happy: 0.2 },
-            geometric: { electronic: 0.3, aggressive: 0.1 },
-            fractal: { electronic: 0.2, relaxed: 0.1 },
-            tunnel: { aggressive: 0.2, electronic: 0.3 },
-            abstract: { electronic: 0.15 }
+            fluid_organic: { relaxed: 0.3, acoustic: 0.2, dreamy: 0.2 },
+            organic: { relaxed: 0.25, acoustic: 0.2, happy: 0.1, meditative: 0.15 },
+            particle: { electronic: 0.4, happy: 0.2, psychedelic: 0.15 },
+            geometric: { electronic: 0.3, aggressive: 0.1, hypnotic: 0.1 },
+            fractal: {
+                // FRC-2: Fractal-specific mood profile
+                hypnotic: 0.4,
+                mystical: 0.3,
+                aggressive: -0.3,  // REDUCE aggressive for fractals
+                relaxed: 0.2,
+                meditative: 0.2
+            },
+            tunnel: { aggressive: 0.2, electronic: 0.3, hypnotic: 0.25 },
+            abstract: { electronic: 0.15, psychedelic: 0.1 }
         };
 
         // Apply style-based boosts for primary style
         const primaryStyle = Array.isArray(visualStyle) ? visualStyle[0] : visualStyle;
         if (primaryStyle && styleBoosts[primaryStyle]) {
             for (const [mood, boost] of Object.entries(styleBoosts[primaryStyle])) {
-                affinities[mood] = Math.min(1, affinities[mood] + boost);
+                // TWIN-4 FIX: Add floor check to handle negative boosts
+                affinities[mood] = Math.max(0, Math.min(1, affinities[mood] + boost));
             }
         }
 
@@ -505,15 +582,19 @@ class PresetFingerprintGenerator {
             affinities.relaxed -= 0.2;
             affinities.happy += 0.1;  // Fast motion can be energizing/happy
             affinities.electronic += 0.1;
+            affinities.psychedelic += 0.1;  // Fast motion can feel trippy
         } else if (motionSpeed === 'slow') {
             affinities.relaxed += 0.2;
             affinities.aggressive -= 0.2;
             affinities.acoustic += 0.15;
+            affinities.dreamy += 0.2;  // Slow motion feels dreamlike
+            affinities.meditative += 0.15;
         } else if (motionSpeed === 'medium') {
             affinities.happy += 0.1;  // Medium pace is often pleasant
+            affinities.hypnotic += 0.1;  // Steady rhythm
         }
 
-        // Color influences (expanded)
+        // Color influences (expanded with new moods)
         switch (colorProfile) {
             case 'warm':
                 affinities.aggressive += 0.1;
@@ -522,24 +603,31 @@ class PresetFingerprintGenerator {
             case 'cool':
                 affinities.relaxed += 0.15;
                 affinities.electronic += 0.15;
+                affinities.mystical += 0.2;  // Cool colors feel mystical
+                affinities.dreamy += 0.15;
                 break;
             case 'nature':
                 affinities.relaxed += 0.2;
                 affinities.acoustic += 0.2;
                 affinities.happy += 0.15;  // Nature colors feel pleasant
+                affinities.meditative += 0.15;
                 break;
             case 'vivid':
                 affinities.happy += 0.25;  // Vivid/rainbow is inherently happy
                 affinities.electronic += 0.15;
+                affinities.psychedelic += 0.3;  // Vivid colors are psychedelic
                 break;
             case 'bright':
                 affinities.happy += 0.2;
                 affinities.relaxed += 0.1;
+                affinities.dreamy += 0.1;
                 break;
             case 'dark':
                 affinities.aggressive += 0.15;
                 affinities.relaxed -= 0.1;
                 affinities.acoustic += 0.1;  // Dark can be intimate
+                affinities.mystical += 0.25;  // Dark feels mystical
+                affinities.hypnotic += 0.15;
                 break;
         }
 
@@ -548,18 +636,65 @@ class PresetFingerprintGenerator {
             affinities.aggressive += 0.15;
             affinities.electronic += 0.1;
             affinities.happy += 0.1;
+            affinities.psychedelic += 0.1;
         } else if (energy < 0.3) {
             affinities.relaxed += 0.2;
             affinities.acoustic += 0.15;
+            affinities.dreamy += 0.2;
+            affinities.meditative += 0.2;
         }
 
         // Beat sync influences (strong beat = more electronic/aggressive)
         if (beatSync > 0.7) {
             affinities.electronic += 0.15;
             affinities.aggressive += 0.1;
+            affinities.hypnotic += 0.15;  // Strong beat can be hypnotic
         } else if (beatSync < 0.3) {
             affinities.acoustic += 0.1;
             affinities.relaxed += 0.1;
+            affinities.dreamy += 0.15;
+            affinities.meditative += 0.1;
+        }
+
+        // MOD-1: Energy-relaxed cross-validation
+        // High energy should reduce relaxed mood
+        if (energy > 0.6) {
+            affinities.relaxed -= 0.15;
+        }
+
+        // Prevent contradictions: aggressive + relaxed both > 0.7
+        if (affinities.aggressive > 0.7 && affinities.relaxed > 0.7) {
+            if (energy > 0.5) {
+                affinities.relaxed -= 0.25;
+            } else {
+                affinities.aggressive -= 0.25;
+            }
+        }
+
+        // ABS-3: Add more variation to abstract presets
+        // Use energy to create mood variation for abstract style
+        // Note: primaryStyle is already defined above (line 571)
+        if (primaryStyle === 'abstract') {
+            // Use energy deviation from 0.5 to add variation
+            const variation = (energy - 0.5) * 0.2;
+            affinities.happy += variation;
+            affinities.electronic += variation;
+            affinities.psychedelic += Math.abs(variation);  // Always add some psychedelic for abstract
+        }
+
+        // ORG-1/ORG-3: Style-aware mood caps for organic presets
+        // Check if primary style is organic-like
+        if (primaryStyle === 'organic' || primaryStyle === 'fluid_organic') {
+            // PRE-7 FIX: Directly enforce acoustic > electronic relationship
+            if (affinities.electronic > affinities.acoustic) {
+                const avg = (affinities.electronic + affinities.acoustic) / 2;
+                affinities.acoustic = Math.min(1, avg + 0.1);
+                affinities.electronic = Math.max(0, avg - 0.1);
+            }
+            // ORG-3: Cap aggressive at 0.75 for organic
+            affinities.aggressive = Math.min(affinities.aggressive, 0.75);
+            // Ensure relaxed floor for organic
+            affinities.relaxed = Math.max(affinities.relaxed, 0.5);
         }
 
         // Normalize to 2 decimal places
@@ -572,9 +707,10 @@ class PresetFingerprintGenerator {
      * Generate complete fingerprint for a preset
      * Enhanced with v2.0 fields (Phase 5)
      * @param {Object} preset - The preset object
+     * @param {string} presetName - The preset name (for keyword detection)
      * @param {Object} visualStyleFromCLIP - Optional CLIP classification results
      */
-    generateFingerprint(preset, visualStyleFromCLIP = null) {
+    generateFingerprint(preset, presetName = '', visualStyleFromCLIP = null) {
         // EXISTING: Keep all original analysis
         const energy = this.analyzeEnergy(preset);
         const bassEnergy = this.analyzeBassReactivity(preset);
@@ -586,7 +722,14 @@ class PresetFingerprintGenerator {
         const optimalBpm = this.calculateOptimalBpm(motionSpeed, energy);
 
         // Determine visual style (prefer CLIP result if available)
-        const existingStyles = this.detectVisualStyle(preset);
+        // TWIN-10: Pass presetName for keyword-based detection
+        const existingStyles = this.detectVisualStyle(preset, presetName);
+
+        // ORG-4: Add psychedelic style for vivid + high energy presets
+        if (colorProfile === 'vivid' && energy > 0.7 && !existingStyles.includes('psychedelic')) {
+            existingStyles.push('psychedelic');
+        }
+
         const visualStyle = visualStyleFromCLIP?.visualStyle || existingStyles[0] || 'abstract';
         const visualStyleScores = visualStyleFromCLIP?.visualStyleScores || null;
 
@@ -663,7 +806,8 @@ class PresetFingerprintGenerator {
                     authors: [author],
                     names: [presetName],
                     firstSeen: author,
-                    fingerprint: this.generateFingerprint(preset),
+                    // TWIN-10: Pass presetName for keyword-based visual style detection
+                    fingerprint: this.generateFingerprint(preset, presetName),
                     files: [this.getRelativePath(filePath)]
                 };
 
@@ -1001,10 +1145,14 @@ async function main() {
     generator.printSummary();
 }
 
-// Run the main function directly since this is a CLI tool
-main().catch(error => {
-    console.error('Fatal error:', error);
-    process.exit(1);
-});
+// PRE-2 FIX: Only run CLI when executed directly, not when imported for tests
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+    main().catch(error => {
+        console.error('Fatal error:', error);
+        process.exit(1);
+    });
+}
+// TWIN-2 FIX: No additional export needed - default export already exists below.
+// Tests should use: import PresetFingerprintGenerator from '../tools/generate-fingerprints.js'
 
 export default PresetFingerprintGenerator;
