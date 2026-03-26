@@ -487,6 +487,7 @@ export class AdvancedAudioAnalyzer {
         if (!features.spectral) return { label: 'neutral', confidence: 0.5 };
 
         // CRIT-5 FIX: Use actual property names from calculateFeatures()
+        // eslint-disable-next-line no-unused-vars
         const { bass, mid, treble, beatStrength, dynamicRange, zeroCrossingRate } = features;
         const { centroid, flatness, sharpness, flux, rolloff } = features.spectral;
 

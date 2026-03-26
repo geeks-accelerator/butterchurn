@@ -267,7 +267,7 @@ describe('Fingerprint Generation v2.1', () => {
             for (const style of styles) {
                 const affinities = generator.deriveMoodAffinities(style, 'medium', 'neutral', 0.5, 0.5);
 
-                for (const [key, value] of Object.entries(affinities)) {
+                for (const [, value] of Object.entries(affinities)) {
                     expect(parseFloat(value)).toBeGreaterThanOrEqual(0);
                     expect(parseFloat(value)).toBeLessThanOrEqual(1);
                 }
@@ -286,11 +286,12 @@ describe('Integration: Fingerprint File Quality', () => {
     let fingerprints;
 
     beforeAll(async () => {
-        // Use dynamic import for ES modules
-        const module = await import('../../presets/alaska-butter/alaskaButter.fingerprints.json', {
-            assert: { type: 'json' }
-        });
-        fingerprints = module.default;
+        // Use fs to read JSON file (avoids import assertion parsing issues)
+        const fs = await import('fs');
+        const path = await import('path');
+        const filePath = path.join(process.cwd(), 'presets/alaska-butter/alaskaButter.fingerprints.json');
+        const content = fs.readFileSync(filePath, 'utf-8');
+        fingerprints = JSON.parse(content);
     });
 
     describe('Fractal Presets (FRC-1, FRC-2)', () => {
