@@ -99,6 +99,7 @@ Canvas Output ← Frame Stabilizer ← WebGL2 Context
 - Mathematical analysis of equation complexity
 - Content hashing for deduplication
 - Performance estimation based on shader complexity
+- See [mathematical-fingerprinting.md](mathematical-fingerprinting.md) for detailed algorithm documentation
 
 #### Audio Feature Extraction
 - FFT-based frequency analysis

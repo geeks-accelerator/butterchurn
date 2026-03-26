@@ -6,8 +6,8 @@
 
 ## 📚 Related Documentation
 
-- **[MATHEMATICAL_FINGERPRINTING.md](MATHEMATICAL_FINGERPRINTING.md)** - Pure JavaScript equation analysis algorithms (no WASM required)
-- **[../CLAUDE.md](../CLAUDE.md)** - Main project documentation and architecture overview
+- **[mathematical-fingerprinting.md](../architecture/mathematical-fingerprinting.md)** - Pure JavaScript equation analysis algorithms (no WASM required)
+- **[CLAUDE.md](../../CLAUDE.md)** - Main project documentation and architecture overview
 
 ## 🎯 Implementation Status (January 2025)
 
@@ -21,7 +21,7 @@
 7. **Test Interface Improvements** - Responsive layout, device detection, preference learning
 
 ### ⚠️ PARTIALLY COMPLETED Features (30-60% Done)
-1. **Better Fingerprint Accuracy** - Basic implementation, needs ML integration (see [MATHEMATICAL_FINGERPRINTING.md](MATHEMATICAL_FINGERPRINTING.md) for core algorithms)
+1. **Better Fingerprint Accuracy** - Basic implementation, needs ML integration (see [mathematical-fingerprinting.md](../architecture/mathematical-fingerprinting.md) for core algorithms)
 2. **Smarter Candidate Selection** - Basic scoring, missing continuity features
 3. **Intelligent Timing System** - Basic intervals, missing genre detection
 4. **Performance Optimizations** - Direct WebGL rendering done, caching needed
@@ -108,7 +108,7 @@ These combined innovations achieve 94-96% quality at 0.1s response time - mainta
 
 ### 1. Better Fingerprint Accuracy ✅ (JavaScript)
 
-**📚 Core Implementation**: See [MATHEMATICAL_FINGERPRINTING.md](MATHEMATICAL_FINGERPRINTING.md) for the complete JavaScript implementation of equation-based fingerprinting. This pure JavaScript approach extracts behavioral DNA from preset equations without requiring WebAssembly.
+**📚 Core Implementation**: See [mathematical-fingerprinting.md](../architecture/mathematical-fingerprinting.md) for the complete JavaScript implementation of equation-based fingerprinting. This pure JavaScript approach extracts behavioral DNA from preset equations without requiring WebAssembly.
 
 ```javascript
 // Improve equation analysis algorithms
