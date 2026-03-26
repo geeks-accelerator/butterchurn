@@ -20,6 +20,86 @@ import FingerprintLoader from './fingerprintLoader.js';
 import FingerprintAdapter from './fingerprintAdapter.js';
 import PresetCompatibilityChecker from './utils/presetCompatibilityChecker.js';
 
+/**
+ * PresetPerformanceTracker
+ * Tracks how well the current preset matches ongoing audio.
+ * Triggers switch when match quality degrades below threshold.
+ *
+ * CRIT-6 FIX: Does NOT compute its own scores - accepts scores from scorePreset()
+ */
+class PresetPerformanceTracker {
+    constructor(config = {}) {
+        this.scoreHistory = [];
+        this.maxHistorySize = config.maxHistorySize || 60;  // ~1 second at 60fps
+        this.degradationThreshold = config.degradationThreshold || 0.4;  // 40% drop triggers switch
+
+        // WARN-6 FIX: Use first N scores for stable baseline (not single value)
+        this.baselineScores = [];
+        this.BASELINE_SIZE = 30;  // First 0.5 seconds for baseline
+    }
+
+    /**
+     * Update performance tracking with score from scorePreset()
+     * CRIT-6 FIX: Accepts pre-calculated score, doesn't compute its own
+     *
+     * @param {number} currentScore - Score from main scorePreset() function
+     * @returns {Object} { shouldSwitch, degradation, reason }
+     */
+    update(currentScore) {
+        if (currentScore === undefined || currentScore === null) {
+            return { shouldSwitch: false, degradation: 0, reason: null };
+        }
+
+        // WARN-6 FIX: Build baseline from first N scores (more stable than single value)
+        if (this.baselineScores.length < this.BASELINE_SIZE) {
+            this.baselineScores.push(currentScore);
+            return { shouldSwitch: false, degradation: 0, reason: 'building_baseline' };
+        }
+
+        // Track ongoing score history
+        this.scoreHistory.push(currentScore);
+        if (this.scoreHistory.length > this.maxHistorySize) {
+            this.scoreHistory.shift();
+        }
+
+        // Need enough history to detect degradation
+        if (this.scoreHistory.length < 30) {
+            return { shouldSwitch: false, degradation: 0, reason: null };
+        }
+
+        // Calculate baseline from first N scores (stable reference point)
+        const baseline = this.baselineScores.reduce((a, b) => a + b, 0) /
+                         this.baselineScores.length;
+
+        // Calculate current average score
+        const current = this.scoreHistory.reduce((a, b) => a + b, 0) /
+                        this.scoreHistory.length;
+
+        // Calculate degradation from baseline
+        const degradation = baseline > 0 ? (baseline - current) / baseline : 0;
+
+        if (degradation > this.degradationThreshold) {
+            return {
+                shouldSwitch: true,
+                degradation: degradation,
+                reason: `performance_degraded_${(degradation * 100).toFixed(0)}%`,
+                baseline: baseline,
+                current: current
+            };
+        }
+
+        return { shouldSwitch: false, degradation, baseline, current };
+    }
+
+    /**
+     * Reset tracking (call when switching presets)
+     */
+    reset() {
+        this.scoreHistory = [];
+        this.baselineScores = [];
+    }
+}
+
 // Advanced modules (optional - will be disabled if not available)
 let frameAnalyzer, presetLogger, emergencyManager, blocklistManager, config, AdvancedAudioAnalyzer, MultiSignalCrossover;
 
@@ -60,9 +140,22 @@ const loadAdvancedModules = async () => {
 loadAdvancedModules();
 
 class IntelligentPresetSelector {
-    constructor(butterchurn, fingerprintDatabase) {
+    /**
+     * Create an intelligent preset selector
+     * CRIT-3 FIX: Accept audioContext/audioSource for Meyda integration
+     * @param {Object} butterchurn - Butterchurn visualizer instance
+     * @param {Object} fingerprintDatabase - Fingerprint database
+     * @param {Object} selectorConfig - Optional configuration
+     * @param {AudioContext} audioContext - Optional: Web Audio context for Meyda
+     * @param {AudioNode} audioSource - Optional: Audio source node for Meyda
+     */
+    constructor(butterchurn, fingerprintDatabase, selectorConfig = {}, audioContext = null, audioSource = null) {
         this.butterchurn = butterchurn;
         this.db = fingerprintDatabase;
+
+        // CRIT-3 FIX: Store audio context for timing and Meyda
+        this.audioContext = audioContext;
+        this.audioSource = audioSource;
 
         // Preset loading system
         this.loader = null;
@@ -78,6 +171,7 @@ class IntelligentPresetSelector {
         this.currentWarmupTime = 0; // Track warmup requirement for current preset
 
         // Initialize audio analyzer with config (optional)
+        // CRIT-3 FIX: Pass audioContext and audioSource for Meyda integration
         this.audioAnalyzer = null;
         if (AdvancedAudioAnalyzer) {
             const analyzerConfig = (typeof config !== 'undefined' && config?.get) ? {
@@ -89,14 +183,42 @@ class IntelligentPresetSelector {
                 trebleWeight: config.get('audioAnalysis.trebleWeight', 0.3),
                 maxHistorySize: config.get('audioAnalysis.maxHistorySize', 30)
             } : {};
-            this.audioAnalyzer = new AdvancedAudioAnalyzer(analyzerConfig);
+            this.audioAnalyzer = new AdvancedAudioAnalyzer(analyzerConfig, audioContext, audioSource);
         }
+
+        // NEW: Phrase-aligned switching (16 beats for musical coherence)
+        this.pendingSwitchOnPhrase = false;
+        this.pendingSwitchPreset = null;
+        this.pendingSwitchHash = null;
+        this.pendingSwitchReason = null;
+
+        // NEW: Pre-drop anticipation
+        this.preDropSwitchScheduled = false;
+        this.preDropSwitchTime = null;
+        this.PRE_DROP_LEAD_TIME = 1500; // Switch 1.5 seconds BEFORE drop
+
+        // NEW: Performance degradation tracking
+        this.performanceTracker = new PresetPerformanceTracker({
+            maxHistorySize: 60,
+            degradationThreshold: 0.4  // Switch at 40% degradation
+        });
+        this.currentPresetScore = 0;
+
+        // TWIN-WARN-1 FIX: Deterministic RNG for visual regression tests
+        // CLAUDE.md: "KEEP deterministic RNG context for visual regression tests"
+        this.rngSeed = selectorConfig.rngSeed || null;
+        this.rng = this.rngSeed !== null ? this._createSeededRng(this.rngSeed) : Math.random.bind(Math);
 
         // Load timing configuration (config is optional - use defaults if not available)
         this.minSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
             config.get('presetSelection.minSwitchInterval', 4000) : 4000;  // 4 seconds minimum
         this.maxSwitchInterval = (typeof config !== 'undefined' && config?.get) ?
             config.get('presetSelection.maxSwitchInterval', 60000) : 60000;  // 60 seconds max
+
+        // Genre-based timing adjustments (Phase 3 feature)
+        this.detectedGenre = { label: 'unknown', confidence: 0.5, timingMultiplier: 1.0, phraseLength: 16 };
+        this.genreUpdateInterval = 60; // Update genre detection every N frames
+        this.genreUpdateCounter = 0;
 
         // TODO: Implement audio lookahead (~1 second) to anticipate drops/energy changes
         // Currently we're reactive, switching AFTER energy changes happen, which can cause
@@ -273,6 +395,44 @@ class IntelligentPresetSelector {
         }, 100);
 
         this.startTime = Date.now();
+    }
+
+    /**
+     * Create a seeded random number generator for deterministic testing
+     * TWIN-WARN-1 FIX: Use deterministic RNG for visual regression tests
+     * @private
+     */
+    _createSeededRng(seed) {
+        let state = seed;
+        return () => {
+            // Mulberry32 PRNG - fast and good enough for our purposes
+            state |= 0;
+            state = (state + 0x6D2B79F5) | 0;
+            let t = Math.imul(state ^ (state >>> 15), 1 | state);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    }
+
+    /**
+     * Called when audio file loads (from client code)
+     * Triggers BPM detection for phrase-aligned switching
+     * CRIT-3 FIX: Use existing property name (audioAnalyzer)
+     */
+    async onAudioLoaded(audioBuffer) {
+        if (this.audioAnalyzer && audioBuffer) {
+            try {
+                const bpm = await this.audioAnalyzer.detectBPM(audioBuffer);
+                if (bpm) {
+                    console.log(`[IPS] Detected BPM: ${bpm.toFixed(1)}`);
+                } else {
+                    console.log('[IPS] BPM detection returned null, using immediate switching');
+                }
+            } catch (e) {
+                console.warn('[IPS] BPM detection failed, using immediate switching:', e.message);
+                // Graceful degradation: phrase-aligned switching disabled, immediate switching used
+            }
+        }
     }
 
     /**
@@ -661,27 +821,129 @@ class IntelligentPresetSelector {
             };
         }
 
+        // NEW: Get beat/phrase timing information
+        // WARN-1 FIX: Pass audioContext.currentTime for accurate timing
+        const audioTime = this.audioContext?.currentTime || null;
+        const beatInfo = this.audioAnalyzer?.trackBeatPhase ?
+            this.audioAnalyzer.trackBeatPhase(audioTime) : null;
+        const buildupInfo = this.audioAnalyzer?.detectBuildup ?
+            this.audioAnalyzer.detectBuildup(features, audioTime) : { isBuildup: false };
+
+        // Get current mood for scoring
+        const mood = this.audioAnalyzer?.detectMood ?
+            this.audioAnalyzer.detectMood(features) : null;
+
+        // Update genre detection periodically (not every frame for performance)
+        this.genreUpdateCounter++;
+        if (this.genreUpdateCounter >= this.genreUpdateInterval && this.audioAnalyzer?.detectGenre) {
+            this.detectedGenre = this.audioAnalyzer.detectGenre(features);
+            this.genreUpdateCounter = 0;
+
+            if (this.debugMode && this.detectedGenre.label !== 'unknown') {
+                console.log(`[IPS] Genre detected: ${this.detectedGenre.label} (${(this.detectedGenre.confidence * 100).toFixed(0)}% confidence, timing x${this.detectedGenre.timingMultiplier})`);
+            }
+        }
+
         // Throttle switch checking to reduce CPU usage and log spam
         const timeSinceLastCheck = now - this.lastSwitchCheck;
         const timeSinceSwitch = now - this.lastSwitch;
 
         let shouldSwitch = false;
-        if (timeSinceLastCheck >= this.switchCheckInterval) {
-            this.lastSwitchCheck = now;
-            shouldSwitch = this.shouldSwitchPreset(features, timeSinceSwitch);
+        let selectionLogic = null;
+        let switched = false;
+
+        // CRIT-4 FIX: Priority-based switch handling
+        // Priority 1 (HIGHEST): Pre-drop anticipation
+        if (buildupInfo.isBuildup && buildupInfo.confidence > 0.7 && !this.preDropSwitchScheduled) {
+            const dropTime = now + buildupInfo.dropETA;
+            const switchTime = dropTime - this.PRE_DROP_LEAD_TIME;
+
+            if (switchTime > now) {
+                // Pre-drop CANCELS any pending phrase switch
+                this.preDropSwitchScheduled = true;
+                this.preDropSwitchTime = switchTime;
+                this.pendingSwitchOnPhrase = false;  // Cancel lower priority
+
+                const dropResult = this._selectPresetForDrop(features, mood);
+                if (dropResult) {
+                    this.pendingSwitchPreset = dropResult.preset;
+                    this.pendingSwitchHash = dropResult.hash;
+                    this.pendingSwitchReason = 'pre_drop_anticipation';
+
+                    console.log(`[IPS] Pre-drop switch scheduled in ${(buildupInfo.dropETA - this.PRE_DROP_LEAD_TIME).toFixed(0)}ms`);
+                }
+            }
+        }
+
+        // Priority 1 execution: Pre-drop switch at scheduled time
+        if (this.preDropSwitchScheduled && now >= this.preDropSwitchTime) {
+            if (this.pendingSwitchHash) {
+                this.switchToPreset(this.pendingSwitchHash);
+                switched = true;
+                selectionLogic = { reason: 'pre_drop_anticipation' };
+            }
+            this.preDropSwitchScheduled = false;
+            this.pendingSwitchOnPhrase = false;
+        }
+
+        // Priority 2: Execute pending phrase-aligned switch (16 beats)
+        if (!switched && this.pendingSwitchOnPhrase && beatInfo?.isPhraseBoundary) {
+            if (this.pendingSwitchHash) {
+                this.switchToPreset(this.pendingSwitchHash);
+                switched = true;
+                selectionLogic = { reason: this.pendingSwitchReason || 'phrase_boundary' };
+            }
+            this.pendingSwitchOnPhrase = false;
+        }
+
+        // Priority 3: Performance degradation check (only if no pending switches)
+        if (!switched && this.currentHash && !this.pendingSwitchOnPhrase && !this.preDropSwitchScheduled) {
+            // Calculate score using the SAME function used for selection
+            this.currentPresetScore = this.scorePreset(this.currentHash, features, mood);
+
+            // Pass pre-calculated score to tracker
+            const perfResult = this.performanceTracker.update(this.currentPresetScore);
+
+            if (perfResult.shouldSwitch) {
+                console.log(`[IPS] Performance degraded ${(perfResult.degradation * 100).toFixed(0)}% - triggering switch`);
+                console.log(`[IPS] Baseline: ${perfResult.baseline?.toFixed(3)}, Current: ${perfResult.current?.toFixed(3)}`);
+
+                // Queue switch at next phrase boundary (if BPM detected)
+                const selectionResult = this.selectBestPresetWithLogic(features, mood);
+                if (selectionResult && selectionResult.bestHash) {
+                    if (beatInfo?.bpm) {
+                        this.pendingSwitchOnPhrase = true;
+                        this.pendingSwitchPreset = this.db.presets[selectionResult.bestHash];
+                        this.pendingSwitchHash = selectionResult.bestHash;
+                        this.pendingSwitchReason = perfResult.reason;
+                    } else {
+                        // No BPM detected - switch immediately
+                        this.switchToPreset(selectionResult.bestHash);
+                        switched = true;
+                        selectionLogic = { reason: perfResult.reason };
+                    }
+                }
+            }
+        }
+
+        // Priority 4 (LOWEST): Regular audio-triggered switch
+        // Only check if no higher-priority switch is pending and not already switched
+        if (!switched && !this.pendingSwitchOnPhrase && !this.preDropSwitchScheduled) {
+            if (timeSinceLastCheck >= this.switchCheckInterval) {
+                this.lastSwitchCheck = now;
+                shouldSwitch = this.shouldSwitchPreset(features, timeSinceSwitch);
+            }
         }
 
         // Debug logging
         if (this.updateCount <= 10) {
-            console.log(`[Update ${this.updateCount}] timeSinceSwitch: ${timeSinceSwitch}ms, shouldSwitch: ${shouldSwitch}, currentPreset: ${this.currentPreset}`);
+            const phraseInfo = beatInfo ? ` phrase: ${beatInfo.phrasePosition + 1}/16` : '';
+            console.log(`[Update ${this.updateCount}] timeSinceSwitch: ${timeSinceSwitch}ms, shouldSwitch: ${shouldSwitch}${phraseInfo}`);
         } else if (this.updateCount === 11) {
             console.log('[Update] Continuing past 10 updates...');
         }
 
-        // console.log('[Update] After debug log, about to check shouldSwitch');
-        let selectionLogic = null;
-        if (shouldSwitch) {
-            // console.log('[Update] shouldSwitch is true, processing switch logic');
+        if (shouldSwitch && !switched) {
             // Check if this is an emergency bypass situation
             const isEmergencyBypass = this.checkForEmergencyBypass();
             if (isEmergencyBypass && this.currentHash) {
@@ -703,15 +965,32 @@ class IntelligentPresetSelector {
 
             if (!this.isEmergencyMode) {
                 // Use fingerprint database selection with transparency
-                const selectionResult = this.selectBestPresetWithLogic(features);
+                const selectionResult = this.selectBestPresetWithLogic(features, mood);
                 if (selectionResult && selectionResult.bestHash !== this.currentHash) {
                     // Check if preset is blocked
                     const blockStatus = (this.presetLogger && typeof this.presetLogger.isBlocked === 'function')
                         ? this.presetLogger.isBlocked(selectionResult.bestHash)
                         : { blocked: false };
+
                     if (!blockStatus.blocked) {
-                        this.switchToPreset(selectionResult.bestHash);
-                        selectionLogic = selectionResult.logic;
+                        // Queue for phrase boundary if BPM detected
+                        if (beatInfo?.bpm) {
+                            this.pendingSwitchOnPhrase = true;
+                            this.pendingSwitchPreset = this.db.presets[selectionResult.bestHash];
+                            this.pendingSwitchHash = selectionResult.bestHash;
+                            this.pendingSwitchReason = selectionResult.logic?.reason || 'audio_triggered';
+                            selectionLogic = selectionResult.logic;
+
+                            const beatsToPhrase = 16 - beatInfo.phrasePosition;
+                            const msToPhrase = beatsToPhrase * (this.audioAnalyzer?.beatInterval || 500);
+
+                            console.log(`[IPS] Queued for phrase (${(msToPhrase/1000).toFixed(1)}s, beat ${beatInfo.phrasePosition + 1}/16)`);
+                        } else {
+                            // No BPM - switch immediately
+                            this.switchToPreset(selectionResult.bestHash);
+                            switched = true;
+                            selectionLogic = selectionResult.logic;
+                        }
                     } else {
                         console.log(`[IntelligentSelector] Preset ${selectionResult.bestHash} is blocked: ${blockStatus.reason}`);
                         // Try next best preset
@@ -721,7 +1000,7 @@ class IntelligentPresetSelector {
             }
         }
 
-        // console.log('[Update] About to return result object');
+        // Build result object
         const resultObject = {
             currentPreset: this.currentHash,
             features: features,
@@ -765,6 +1044,34 @@ class IntelligentPresetSelector {
         const returnValue = finalResult || { error: 'No result to return' };
         // console.log('[Update] Actually returning now with value:', returnValue);
         return returnValue;
+    }
+
+    /**
+     * Select high-energy preset suitable for a drop
+     * TWIN-WARN-1 FIX: Use deterministic RNG for visual regression tests
+     * @private
+     */
+    _selectPresetForDrop(features, mood = null) {
+        const candidates = this.getCandidates(features);
+        const dropCandidates = candidates.filter(hash => {
+            const fp = this.db.presets[hash]?.fingerprint;
+            return fp && fp.energy > 0.7 && (fp.bassEnergy || fp.bass) > 0.6;
+        });
+
+        if (dropCandidates.length > 0) {
+            // TWIN-WARN-1 FIX: Use deterministic RNG for visual regression tests
+            // CLAUDE.md: "KEEP deterministic RNG context for visual regression tests"
+            const hash = dropCandidates[Math.floor(this.rng() * dropCandidates.length)];
+            return { hash, preset: this.db.presets[hash] };
+        }
+
+        // Fallback to best scoring preset
+        const selectionResult = this.selectBestPresetWithLogic(features, mood);
+        if (selectionResult && selectionResult.bestHash) {
+            return { hash: selectionResult.bestHash, preset: this.db.presets[selectionResult.bestHash] };
+        }
+
+        return null;
     }
 
     /**
@@ -950,8 +1257,10 @@ class IntelligentPresetSelector {
      */
     shouldSwitchPreset(features, timeSinceSwitch) {
         // Minimum time acts as a debounce - prevent flicker
+        // Genre timing multiplier adjusts switch frequency based on music style
+        const genreMultiplier = this.detectedGenre?.timingMultiplier || 1.0;
         const minimumTime = Math.max(
-            this.minSwitchInterval,
+            this.minSwitchInterval * genreMultiplier,
             (this.currentWarmupTime || 0) * 1000 + 2000 // Add 2 sec buffer after warmup
         );
 
@@ -1019,9 +1328,11 @@ class IntelligentPresetSelector {
         }
 
         // Force switch if too long (watchdog timer - prevents boredom)
-        if (timeSinceSwitch > this.maxSwitchInterval) {
+        // Apply genre multiplier to max interval as well
+        const adjustedMaxInterval = this.maxSwitchInterval * genreMultiplier;
+        if (timeSinceSwitch > adjustedMaxInterval) {
             if (this.debugSceneChange) {
-                console.log(`[Switch Decision] Max time exceeded: ${timeSinceSwitch}ms > ${this.maxSwitchInterval}ms`);
+                console.log(`[Switch Decision] Max time exceeded: ${timeSinceSwitch}ms > ${adjustedMaxInterval}ms (genre: ${this.detectedGenre?.label || 'unknown'})`);
             }
             return true;
         }
@@ -1068,10 +1379,14 @@ class IntelligentPresetSelector {
 
     /**
      * Select best preset with transparency into selection logic
+     * Enhanced to accept and use mood for scoring (Phase 3)
+     * @param {Object} features - Audio features
+     * @param {Object} mood - Optional mood detection result { label, confidence }
      */
-    selectBestPresetWithLogic(features) {
+    selectBestPresetWithLogic(features, mood = null) {
         const logic = {
             targetEnergy: features.energy,
+            mood: mood?.label || null,
             candidates: [],
             topScores: [],
             reason: ''
@@ -1087,10 +1402,10 @@ class IntelligentPresetSelector {
 
         logic.candidates = candidates.slice(0, 5).map(h => h.substring(0, 8));
 
-        // Score each candidate
+        // Score each candidate (pass mood for enhanced scoring)
         const scores = candidates.map(hash => ({
             hash,
-            score: this.scorePreset(hash, features)
+            score: this.scorePreset(hash, features, mood)
         }));
 
         // Sort by score
@@ -1099,13 +1414,15 @@ class IntelligentPresetSelector {
             `${s.hash.substring(0, 8)}: ${s.score.toFixed(2)}`
         );
 
-        // Determine selection reason based on features
+        // Determine selection reason based on features and mood
         if (features.isDrop || features.energy > 0.8) {
             logic.reason = '🔥 Drop detected - high energy';
         } else if (features.isChill || features.energy < 0.3) {
             logic.reason = '🌊 Chill mode - calm visuals';
         } else if (features.bassEnergy > 0.7) {
             logic.reason = '🎸 Bass heavy - reactive presets';
+        } else if (mood?.label) {
+            logic.reason = `🎭 Mood: ${mood.label}`;
         } else {
             logic.reason = '➡️ Balanced - mixed selection';
         }
@@ -1126,6 +1443,8 @@ class IntelligentPresetSelector {
 
     /**
      * Select best preset based on audio features
+     * Enhanced to detect and use mood for scoring (Phase 3)
+     * @param {Object} features - Audio features
      */
     selectBestPreset(features) {
         // Get candidate presets based on features
@@ -1136,10 +1455,14 @@ class IntelligentPresetSelector {
             return null;
         }
 
-        // Score each candidate
+        // Detect mood for enhanced scoring
+        const mood = this.audioAnalyzer?.detectMood ?
+            this.audioAnalyzer.detectMood(features) : null;
+
+        // Score each candidate (pass mood for enhanced scoring)
         const scores = candidates.map(hash => ({
             hash,
-            score: this.scorePreset(hash, features)
+            score: this.scorePreset(hash, features, mood)
         }));
 
         // Sort by score
@@ -1242,8 +1565,12 @@ class IntelligentPresetSelector {
 
     /**
      * Score a preset based on how well it matches current audio
+     * Enhanced with mood, BPM, and spectral scoring (Phase 3)
+     * @param {string} hash - Preset hash
+     * @param {Object} features - Current audio features
+     * @param {Object} mood - Optional mood detection result { label, confidence }
      */
-    scorePreset(hash, features) {
+    scorePreset(hash, features, mood = null) {
         const preset = this.db.presets[hash];
         if (!preset || !preset.fingerprint) {
             return 0;
@@ -1252,35 +1579,73 @@ class IntelligentPresetSelector {
         const fp = preset.fingerprint;
         let score = 0;
 
-        // Energy match (most important)
-        const energyDiff = Math.abs(fp.energy - features.energy);
-        score += (1 - energyDiff) * this.weights.energyMatch;
+        // EXISTING: Energy match (REDUCE from 0.3 to 0.25)
+        const energyDiff = Math.abs((fp.energy || 0.5) - (features.energy || 0.5));
+        score += (1 - energyDiff) * 0.25;
 
-        // Bass reactivity match
-        if (features.bassEnergy > 0.6 && fp.bass > 0.6) {
-            score += this.weights.bassMatch;
-        } else if (features.bassEnergy < 0.3 && fp.bass < 0.3) {
-            score += this.weights.bassMatch * 0.5;
+        // EXISTING: Bass reactivity match (keep at 0.15)
+        const fpBass = fp.bass !== undefined ? fp.bass : fp.bassEnergy;
+        if (features.bassEnergy > 0.6 && fpBass > 0.6) {
+            score += 0.15;
+        } else if (features.bassEnergy < 0.3 && fpBass < 0.3) {
+            score += 0.075;
         }
 
-        // Visual continuity (if we have a current preset)
-        if (this.currentHash) {
-            const currentFp = this.db.presets[this.currentHash]?.fingerprint;
-            if (currentFp) {
-                const complexityDiff = Math.abs(fp.complexity - currentFp.complexity);
-                score += (1 - complexityDiff) * this.weights.continuity;
+        // NEW: Mood affinity (15%)
+        // CRIT-8 FIX: Validate moodAffinities has meaningful variation
+        if (mood && mood.label && fp.moodAffinities) {
+            const moodScore = fp.moodAffinities[mood.label];
+            if (moodScore !== undefined) {
+                // Only use if moodAffinities shows meaningful variation (not all 0.5)
+                const values = Object.values(fp.moodAffinities).map(v => parseFloat(v) || 0.5);
+                const variance = values.reduce((s, v) => s + (v - 0.5) ** 2, 0) / values.length;
+                if (variance > 0.01) {  // Has meaningful variation
+                    score += moodScore * mood.confidence * 0.15;
+                }
             }
         }
 
-        // Performance consideration (prefer high FPS presets)
-        score += (fp.fps / 60) * this.weights.performance;
+        // NEW: BPM range match (10%)
+        // WARN-3 FIX: Clamp at 0 to prevent negative scores
+        if (this.audioAnalyzer && this.audioAnalyzer.detectedBPM && fp.optimalBpm) {
+            const bpm = this.audioAnalyzer.detectedBPM;
+            if (bpm >= fp.optimalBpm.min && bpm <= fp.optimalBpm.max) {
+                const distFromIdeal = Math.abs(bpm - fp.optimalBpm.ideal);
+                const rangeSize = (fp.optimalBpm.max - fp.optimalBpm.min) / 2;
+                // WARN-3 FIX: Clamp at 0 - never subtract from score
+                score += Math.max(0, 1 - distFromIdeal / rangeSize) * 0.10;
+            }
+            // Outside optimal range: no bonus, but don't penalize
+        }
 
-        // Variety bonus (prefer different styles)
+        // CRIT-7 FIX: REMOVED spectralProfile matching
+        // Presets don't have intrinsic spectral profiles - they REACT to audio.
+        // Instead, match audio spectral features to preset's reactive properties:
+        if (features.spectral && (fp.bassEnergy !== undefined || fp.bass !== undefined)) {
+            // High bass audio + high bass preset = good match
+            const presetBass = fp.bassEnergy !== undefined ? fp.bassEnergy : fp.bass;
+            const bassMatch = 1 - Math.abs((features.bass || 0) - (presetBass || 0));
+            score += bassMatch * 0.10;
+        }
+
+        // EXISTING: Visual continuity (keep at 0.10)
+        if (this.currentHash) {
+            const currentFp = this.db.presets[this.currentHash]?.fingerprint;
+            if (currentFp) {
+                const complexityDiff = Math.abs((fp.complexity || 0.5) - (currentFp.complexity || 0.5));
+                score += (1 - complexityDiff) * 0.10;
+            }
+        }
+
+        // EXISTING: Performance consideration (keep at 0.10)
+        score += ((fp.fps || 60) / 60) * 0.10;
+
+        // EXISTING: Variety bonus (keep at 0.05)
         if (fp.styles && fp.styles.length > 0) {
             if (features.isDrop && fp.styles.includes('particle')) {
-                score += this.weights.variety;
+                score += 0.05;
             } else if (features.isChill && fp.styles.includes('organic')) {
-                score += this.weights.variety;
+                score += 0.05;
             }
         }
 
@@ -1374,6 +1739,19 @@ class IntelligentPresetSelector {
 
         // Clear recent features history after switch to avoid false positives
         this.recentFeatures = [];
+
+        // Reset performance tracking for new preset
+        if (this.performanceTracker) {
+            this.performanceTracker.reset();
+        }
+
+        // Clear pending phrase switches
+        this.pendingSwitchOnPhrase = false;
+        this.pendingSwitchPreset = null;
+        this.pendingSwitchHash = null;
+        this.pendingSwitchReason = null;
+        this.preDropSwitchScheduled = false;
+        this.preDropSwitchTime = null;
 
         // Store audio state at switch time (for reference, though we now use rate-of-change)
         const features = this.calculateAudioFeatures();
@@ -2096,6 +2474,37 @@ class IntelligentPresetSelector {
             console.log(`[Scene Debug] Updated thresholds - Scene: ${this.sceneScoreThreshold}, ` +
                        `Energy: ${this.energyChangeThreshold}, Bass: ${this.bassChangeThreshold}`);
         }
+    }
+
+    /**
+     * Clean up resources (Meyda analyzer, performance tracker, etc.)
+     * CRIT-3 FIX: Use existing property name (audioAnalyzer)
+     */
+    destroy() {
+        // Clean up audio analyzer (includes Meyda cleanup)
+        if (this.audioAnalyzer?.destroy) {
+            this.audioAnalyzer.destroy();
+        }
+
+        // Reset performance tracker
+        if (this.performanceTracker) {
+            this.performanceTracker.reset();
+        }
+
+        // Clear pending switches
+        this.pendingSwitchOnPhrase = false;
+        this.pendingSwitchPreset = null;
+        this.pendingSwitchHash = null;
+        this.pendingSwitchReason = null;
+        this.preDropSwitchScheduled = false;
+        this.preDropSwitchTime = null;
+
+        // Clear history
+        this.audioHistory = [];
+        this.recentPresets = [];
+        this.featureHistory = [];
+
+        console.log('[IntelligentSelector] Destroyed and cleaned up resources');
     }
 }
 
