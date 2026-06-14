@@ -289,7 +289,14 @@ class IntelligentPresetSelector {
 
         // Recently used presets (avoid repetition)
         this.recentPresets = [];
-        this.recentPresetsMax = 10;
+        // H4 (plan §H Pre-Import Readiness Audit, 2026-06-14):
+        // Bumped from 10 → 100 for the ~20K scale-up. At 495 presets, 10 was
+        // enough to suppress immediate repeats; at 20K, a 10-deep memory is
+        // invisible — the user never returns to a preset they liked. 100
+        // covers ~10-15 minutes of switching at typical scene-change cadence
+        // without limiting the variety pool meaningfully (still 99.5% of
+        // 20K = ~19,900 candidates available).
+        this.recentPresetsMax = 100;
 
         // P2.1: rolling ring buffer of recent `features.beatDetected` booleans.
         // We expose the windowed *rate* as `features.beatDetectionRate` so the

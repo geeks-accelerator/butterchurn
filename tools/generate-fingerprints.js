@@ -892,6 +892,12 @@ class PresetFingerprintGenerator {
             // Supplements existing colorProfile with finer granularity
             ...analyzePresetColor(preset),
 
+            // H1 (plan §H): per-record content-hash algorithm version.
+            // v2.2 was declared canonical 2026-06-14. Tests assert this
+            // matches FINGERPRINT_ALGORITHM_VERSION; any divergence means
+            // the generator's hash function has drifted from its contract.
+            fingerprintAlgorithm: '2.2',
+
             // CRIT-8 FIX: Mark heuristic-based fields as experimental
             // These should be validated before use in scoring
             _experimental: [

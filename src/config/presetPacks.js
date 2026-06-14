@@ -6,24 +6,28 @@
  * by both FingerprintLoader and IntelligentPresetSelector
  */
 
+// H1 (plan §H Pre-Import Readiness Audit, 2026-06-14): v2.2 is the
+// CANONICAL content-hash algorithm. The 7 legacy v1.0 packs were retired
+// from this list because:
+//
+//   - Their content-hash algorithm differs from the v2.2 unified file.
+//     353 v1.0 hashes did not collide with the 495 v2.2 hashes — they
+//     represent the SAME presets under different IDs, which made the
+//     matcher double-count and complicated continuity tracking.
+//
+//   - butterchurnPresetsAll covers 504 unique preset names; v1.0 packs
+//     combined cover 359 names, 358 of which are already in v2.2.
+//     The single non-overlapping preset (`flexi + amandio c -
+//     organic12-3d-2.milk`) will be picked back up when the next ~20K
+//     import regenerates the full corpus under v2.2.
+//
+//   - The pack file `butterchurnPresetsMixedDugan.fingerprints.json`
+//     never existed on disk despite being in this list — its load
+//     produced a 404 every startup. Retired now along with the others.
+//
+// To re-enable a v1.0 pack temporarily, add its name back to this array.
+// The matcher's defensive null reads tolerate missing v2.2 fields.
 export const PRESET_PACK_NAMES = [
-    'butterchurnPresets',
-    'butterchurnPresetsExtra',
-    'butterchurnPresetsExtra2',
-    'butterchurnPresetsMD1',
-    'butterchurnPresetsMixedDugan',
-    'butterchurnPresetsMinimal',
-    'butterchurnPresetsNonMinimal',
-    // P1.1a (issue 2026-06-14-butterchurn-taxonomy-implementation-review):
-    // The unified v2.2 fingerprint file. Loaded LAST so its v2.2 records
-    // (energyLabel, musicalResponsiveness, reliabilityTier, dominantHue) win
-    // for any hash collisions with the v1.0 individual packs above.
-    //
-    // KNOWN DIVERGENCE: the 353 hashes in the individual v1.0 packs do NOT
-    // match the 495 hashes in butterchurnPresetsAll — they were generated
-    // under a different content-hash algorithm. Both sets are loaded; the
-    // matcher's defensive null reads handle the heterogeneity. Reconciling
-    // the hash algorithms across packs is a separate follow-up.
     'butterchurnPresetsAll'
 ];
 
