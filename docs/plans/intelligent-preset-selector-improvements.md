@@ -29,6 +29,7 @@ This plan implements the **✅ COMPLETED** features from the master roadmap:
 |----------|---------|
 | **[../issues/2026-03-25-fingerprint-plan-review-findings.md](../issues/2026-03-25-fingerprint-plan-review-findings.md)** | Pre-implementation review findings for fingerprint plan |
 | **[../issues/2026-03-25-post-impl-review-fixes.md](../issues/2026-03-25-post-impl-review-fixes.md)** | Post-implementation review fixes (N=2 validated) |
+| **[../issues/2026-06-14-taxonomy-implementation-audit.md](../issues/2026-06-14-taxonomy-implementation-audit.md)** | Taxonomy v2.2 implementation audit (wiring completed) |
 
 ### Post-Implementation Reviews
 | Document | Reviewer | Status |

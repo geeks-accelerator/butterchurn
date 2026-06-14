@@ -16,6 +16,8 @@
 > - ✅ Genre-flap hysteresis (`genreConfidenceThreshold`, default 0.6) prevents phrase tracker desync on noisy frames
 >
 > Post-implementation review (two rounds) fixed all known bugs and design gaps. Audio analysis foundation is solid. Full audit: [`../../../docs/issues/2026-06-13-butterchurn-audio-analyzer-review-followups.md`](../../../docs/issues/2026-06-13-butterchurn-audio-analyzer-review-followups.md). Audio lookahead (Phase 1) and reverse index scaling (Phase 2) can now proceed.
+>
+> **Update (2026-06-14):** Taxonomy v2.2 `HierarchicalMatcher` is now wired into `intelligentPresetSelector.js`. The selector now uses two-stage filter+score selection by default. The TODOs in this plan (audio lookahead, reverse index scaling) remain as future optimizations. See [taxonomy improvements plan](../../../docs/plans/2026-06-12-butterchurn-taxonomy-improvements.md).
 
 ---
 
@@ -38,6 +40,7 @@ Both optimizations enhance the intelligent preset selector without changing its 
 | **[fingerprint-quality-improvements.md](fingerprint-quality-improvements.md)** | Fingerprint v2.1 implementation | **SIBLING** - Audit that identified these TODOs |
 | **[../architecture/mathematical-fingerprinting.md](../architecture/mathematical-fingerprinting.md)** | Fingerprint algorithm docs | **REFERENCE** - Hash ID system |
 | **[marketing-studio:2025-10-02-audio-analysis-improvements.md](../../../docs/plans/2025-10-02-butterchurn-audio-analysis-improvements.md)** | Audio analysis enhancements | **PREREQUISITE** - Completed (Meyda, BPM, smoothing) |
+| **[marketing-studio:butterchurn-taxonomy-improvements](../../../docs/plans/2026-06-12-butterchurn-taxonomy-improvements.md)** | v2.2 schema + HierarchicalMatcher | **SIBLING** - Two-stage filter+score selection (complete 2026-06-14) |
 
 ---
 
