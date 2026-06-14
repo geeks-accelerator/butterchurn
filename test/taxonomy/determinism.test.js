@@ -163,13 +163,15 @@ describe('H3 — backfill derivation is deterministic across 100 iterations', ()
             return { presets, indices: buildIndices(presets) };
         };
         const actualSha = sha(compute());
-        // If you intentionally changed derivation logic, update this hash:
-        // 1. Run the test once to see the new SHA in the failure
-        // 2. Verify the output diff is what you expected (use a tmp file)
-        // 3. Paste the new SHA below with a comment documenting the change
-        const EXPECTED_SHA = actualSha; // self-pinning on first run; replace with literal once stable
+        // To intentionally update this pin after a deliberate derivation change:
+        //   1. Run with PRINT_DETERMINISM_SHA=1 to see the new SHA in the test output
+        //   2. Verify the output diff is what you expected
+        //   3. Paste the new hex below and document the change in the comment
+        // Updated: 2026-06-14 — initial pin against backfill + buildIndices output
+        //   for the 5 reference fingerprints inlined above.
+        const EXPECTED_SHA = '444eba0b88c598cb7c065d36819aa0ebf9a7716888d9e762b64c81f198cc3fad';
         expect(actualSha).toBe(EXPECTED_SHA);
-        // Log so a maintainer adopting this can see the value to pin.
+        // Log so a maintainer rotating the pin can see the value to copy.
         if (process.env.PRINT_DETERMINISM_SHA) {
             // eslint-disable-next-line no-console
             console.log('[determinism] reference SHA =', actualSha);
