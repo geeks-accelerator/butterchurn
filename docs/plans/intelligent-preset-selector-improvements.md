@@ -22,6 +22,7 @@ This plan implements the **✅ COMPLETED** features from the master roadmap:
 | **[fingerprint-quality-improvements.md](fingerprint-quality-improvements.md)** | Quality fixes for generated fingerprints | **FOLLOW-ON** - Apply after Phase 5 |
 | **[selector-optimization-improvements.md](selector-optimization-improvements.md)** | Audio lookahead & reverse index scaling | **FOLLOW-ON** - Performance optimizations |
 | **[marketing-studio:audio-analysis-improvements](../../../docs/plans/2025-10-02-butterchurn-audio-analysis-improvements.md)** | Research-backed audio enhancements | **RELATED** - Gaussian smoothing added 2026-06-13 |
+| **[marketing-studio:butterchurn-taxonomy-improvements](../../../docs/plans/2026-06-12-butterchurn-taxonomy-improvements.md)** | v2.2 schema + HierarchicalMatcher | **FOLLOW-ON** - Taxonomy derivation & two-stage matching (complete 2026-06-14) |
 
 ### Related Issues
 | Document | Purpose |
