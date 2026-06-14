@@ -130,6 +130,17 @@ class IntelligentPresetSelector {
         this.pendingSwitchHash = null;
         this.pendingSwitchReason = null;
 
+        // Phase 9 item 2: mood-shift detection. Track the last confident mood
+        // label; when the next detection lands on a different label with
+        // sufficient confidence, schedule a phrase-aligned switch. Without this,
+        // the selector ignores mood transitions unless energy/bass also cross
+        // the scene-change threshold — missing relaxed→aggressive style flips.
+        this.lastMoodLabel = null;
+        // Minimum confidence to trust the new label as a real shift, not a
+        // single-frame jitter. detectMood returns 0-1 confidence; v2.1's
+        // primary moods land 0.5-0.9, extended moods 0.5-0.8.
+        this.MOOD_SHIFT_CONFIDENCE_THRESHOLD = 0.6;
+
         // NEW: Pre-drop anticipation
         this.preDropSwitchScheduled = false;
         this.preDropSwitchTime = null;
@@ -859,6 +870,26 @@ class IntelligentPresetSelector {
         const mood = this.audioAnalyzer?.detectMood ?
             this.audioAnalyzer.detectMood(rawFeatures) : null;
 
+        // Phase 9 item 2: mood-shift trigger.
+        // If mood label changes with high enough confidence, schedule a
+        // phrase-aligned switch. Skipped if a higher-priority switch (pre-drop
+        // or pending phrase) is already queued — those take precedence per the
+        // existing CRIT-4 priority order. Always update lastMoodLabel on a
+        // confident read so we track the most recent stable mood, even when
+        // we don't act on the shift.
+        if (mood?.label && (mood.confidence ?? 0) >= this.MOOD_SHIFT_CONFIDENCE_THRESHOLD) {
+            const isShift = this.lastMoodLabel !== null && this.lastMoodLabel !== mood.label;
+            const canTrigger = !this.preDropSwitchScheduled && !this.pendingSwitchOnPhrase;
+            if (isShift && canTrigger && this.currentHash) {
+                this.pendingSwitchOnPhrase = true;
+                this.pendingSwitchReason = `mood_shift:${this.lastMoodLabel}→${mood.label}`;
+                if (this.debugMode) {
+                    console.log(`[IPS] Mood shift detected: ${this.lastMoodLabel} → ${mood.label} (confidence ${(mood.confidence * 100).toFixed(0)}%) — switch queued for next phrase boundary`);
+                }
+            }
+            this.lastMoodLabel = mood.label;
+        }
+
         // Update genre detection periodically (not every frame for performance)
         this.genreUpdateCounter++;
         if (this.genreUpdateCounter >= this.genreUpdateInterval && this.audioAnalyzer?.detectGenre) {
@@ -880,6 +911,13 @@ class IntelligentPresetSelector {
 
         // CRIT-4 FIX: Priority-based switch handling
         // Priority 1 (HIGHEST): Pre-drop anticipation
+        //
+        // Phase 9 item 3 — `buildupInfo.isBuildup` (from detectBuildup) is the
+        // CANONICAL drop trigger. Do not switch on `features.isDrop` (the
+        // per-frame `detectMusicalEvent` classifier output) — that signal lands
+        // *during* the drop, missing the anticipatory window this scheduling
+        // exists to provide. See the field-level contract comment in
+        // calculateAudioFeatures.
         if (buildupInfo.isBuildup && buildupInfo.confidence > 0.7 && !this.preDropSwitchScheduled) {
             const dropTime = now + buildupInfo.dropETA;
             const switchTime = dropTime - this.PRE_DROP_LEAD_TIME;
@@ -1026,11 +1064,20 @@ class IntelligentPresetSelector {
             }
         }
 
+        // Phase 9 item 1: genre.timingMultiplier is applied in shouldSwitchPreset
+        // for the actual gating (lines ~1339, ~1409). Mirror it here so the
+        // public `nextSwitch` ETA also reflects the genre/BPM scaling — without
+        // this, consumers see the bare minSwitchInterval and over-estimate
+        // when the next switch may fire (especially under slow genres where
+        // genreMultiplier > 1).
+        const _genreMul = this.detectedGenre?.timingMultiplier || 1.0;
+        const _scaledMinInterval = this.minSwitchInterval * _genreMul;
+
         // Build result object
         const resultObject = {
             currentPreset: this.currentHash,
             features: features,
-            nextSwitch: Math.max(0, this.minSwitchInterval - timeSinceSwitch),
+            nextSwitch: Math.max(0, _scaledMinInterval - timeSinceSwitch),
             selectionLogic: selectionLogic,
             isEmergencyMode: this.isEmergencyMode,
             deviceTier: this.deviceTier,
@@ -1039,6 +1086,8 @@ class IntelligentPresetSelector {
             mood: mood,
             musicalEvent: features?.musicalEvent || null,
             matchScore: this.currentPresetScore || null,
+            // Genre context exposed for telemetry / debug overlays
+            detectedGenre: this.detectedGenre || null,
             // Alias for cleaner access
             logic: selectionLogic,
             reason: selectionLogic?.reason || null
@@ -1207,6 +1256,19 @@ class IntelligentPresetSelector {
             // enabling the D5 colorSynergy "vivid + loud" branch
             beatStrength: features.beatStrength ?? 0,
             // CRIT-2 FIX: musicalEvent is an object { type: 'Drop', confidence: 0.9 }, not a string
+            //
+            // Phase 9 item 3 — DROP-SOURCE CONTRACT:
+            //   These boolean flags (`isDrop`, `isBuildup`, `isChill`, `isBreakdown`)
+            //   are derived from `detectMusicalEvent()` — a per-frame classifier.
+            //   They are CONFIRMATION/CLASSIFICATION signals and MUST NOT be used as
+            //   switch triggers. The canonical drop trigger is `buildupInfo.isBuildup`
+            //   from `detectBuildup()` at the top of update() — it anticipates the
+            //   drop (via dropETA) so the pre-drop switch fires *before* the drop
+            //   lands instead of reacting after. See the pre-drop scheduling block
+            //   in update() for the canonical site.
+            //
+            //   Use these booleans for: selection reasoning, scoring bonuses,
+            //   logging, UI labels. Do NOT add code that gates a switch on them.
             isDrop: musicalEvent?.type?.toLowerCase() === 'drop',
             isBuildup: musicalEvent?.type?.toLowerCase() === 'buildup',
             isChill: musicalEvent?.type?.toLowerCase() === 'chill' || musicalEvent?.type?.toLowerCase() === 'ambient',
