@@ -7,15 +7,15 @@
 
 > **Note (2026-06-13):** This plan builds on the completed audio analysis improvements. Prerequisite work is done:
 > - ✅ BPM detection with iterative clamping + correct `beatInterval` derivation
-> - ✅ Genre-aware phrase tracking (16/32/64 beats, properly wired)
+> - ✅ Genre-aware phrase tracking (16/32/64 beats, properly wired with confidence hysteresis)
 > - ✅ Pre-drop anticipation with 8-bar buildup window (configurable)
 > - ✅ Gaussian smoothing for stable trend detection
-> - ✅ Meyda.js spectral analysis with readiness signal
+> - ✅ Meyda.js spectral analysis with readiness signal (`meydaReady` getter + `waitForMeyda()`)
 > - ✅ `features.energy` properly set (selector branches now live)
-> - ✅ Beat skip handling for long pauses (phrase tracker stays in sync)
+> - ✅ Beat skip handling for long pauses — O(1) arithmetic, safe for hour-long tab suspensions
+> - ✅ Genre-flap hysteresis (`genreConfidenceThreshold`, default 0.6) prevents phrase tracker desync on noisy frames
 >
-> Post-implementation review bugs fixed — audio analysis foundation is solid.
-> Audio lookahead (Phase 1) and reverse index scaling (Phase 2) can now proceed.
+> Post-implementation review (two rounds) fixed all known bugs and design gaps. Audio analysis foundation is solid. Full audit: [`../../../docs/issues/2026-06-13-butterchurn-audio-analyzer-review-followups.md`](../../../docs/issues/2026-06-13-butterchurn-audio-analyzer-review-followups.md). Audio lookahead (Phase 1) and reverse index scaling (Phase 2) can now proceed.
 
 ---
 

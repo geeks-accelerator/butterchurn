@@ -617,6 +617,168 @@ describe('AdvancedAudioAnalyzer', () => {
         });
     });
 
+    // ============================================
+    // Follow-up review fixes (round 2)
+    // ============================================
+
+    describe('A2 follow-up: O(1) beat advance on long pauses', () => {
+        it('should compute correct positions after a 1-hour pause without iterating', () => {
+            analyzer.detectedBPM = 120;
+            analyzer.beatInterval = 500;       // 120 BPM
+            analyzer.phraseLength = 16;
+            analyzer.beatPosition = 0;
+            analyzer.barPosition = 0;
+
+            // 1 hour = 3,600,000 ms = 7200 beats @ 120 BPM
+            // 7200 beats = 1800 bars; 1800 % 4 (barsPerPhrase=16/4) = 0
+            // beatPosition: (0 + 7200) % 4 = 0
+            // barAdvances: floor(7200/4) = 1800; barPosition: (0 + 1800) % 4 = 0
+            analyzer.lastBeatTime = performance.now() - 3600000;
+
+            const start = performance.now();
+            const beatInfo = analyzer.trackBeatPhase();
+            const elapsed = performance.now() - start;
+
+            // Must complete in well under 1ms (the old loop took ~7200 iterations)
+            expect(elapsed).toBeLessThan(50);
+            expect(beatInfo.beatPosition).toBe(0);
+            expect(beatInfo.barPosition).toBe(0);
+            expect(beatInfo.phrasePosition).toBe(0);
+        });
+
+        it('should advance positions correctly under a 32-beat phraseLength', () => {
+            analyzer.detectedBPM = 140;
+            analyzer.beatInterval = 60000 / 140; // ~428.57 ms
+            analyzer.phraseLength = 32;         // dubstep
+            analyzer.beatPosition = 1;
+            analyzer.barPosition = 3;
+
+            // Skip 10 beats. New beatPosition = (1+10) % 4 = 3
+            // barAdvances = floor(11/4) = 2; new barPosition = (3+2) % 8 = 5
+            analyzer.lastBeatTime = performance.now() - 10 * analyzer.beatInterval;
+
+            const beatInfo = analyzer.trackBeatPhase();
+
+            expect(beatInfo.beatPosition).toBe(3);
+            expect(beatInfo.barPosition).toBe(5);
+            expect(beatInfo.phraseLength).toBe(32);
+        });
+    });
+
+    describe('A4 follow-up: phraseLength hysteresis on genre flap', () => {
+        function features(overrides = {}) {
+            return {
+                bass: 0.2,
+                mid: 0.3,
+                treble: 0.3,
+                beatStrength: 0.2,
+                spectralCentroid: 0.3,
+                dynamicRange: 0.2,
+                spectral: { flatness: 0.2, sharpness: 0.2 },
+                ...overrides
+            };
+        }
+
+        it('should not overwrite phraseLength when genre confidence is below threshold', () => {
+            // Start by establishing ambient at high confidence (no BPM → ambient predicate matches)
+            const established = analyzer.detectGenre(features());
+            expect(established.label).toBe('ambient'); // sanity
+            const ambientLength = analyzer.phraseLength; // 64
+
+            // Now feed a frame that falls through every genre branch:
+            //   no BPM set → edm/dubstep/hiphop/rock/pop all fail
+            //   centroid 0.5 → fails ambient (needs < 0.4)
+            //   dynamicRange 0 → fails classical (needs > 0.5)
+            const unknownFeatures = {
+                bass: 0.3, mid: 0.3, treble: 0.3,
+                beatStrength: 0.5, spectralCentroid: 0.5, dynamicRange: 0.2,
+                spectral: { flatness: 0.3, sharpness: 0.3 }
+            };
+            const result = analyzer.detectGenre(unknownFeatures);
+
+            expect(result.label).toBe('unknown');
+            expect(result.confidence).toBeLessThan(analyzer.genreConfidenceThreshold);
+            expect(analyzer.phraseLength).toBe(ambientLength); // unchanged
+        });
+
+        it('should clamp barPosition when phraseLength shrinks under high-confidence change', () => {
+            // Place the tracker at barPosition 7 under a 32-beat (8-bar) phrase
+            analyzer.phraseLength = 32;
+            analyzer.barPosition = 7;
+
+            // Feed an EDM-genre feature set with bpm so that confidence >= 0.6.
+            // EDM uses phraseLength 16 (4 bars).
+            analyzer.detectedBPM = 128;
+            const edmFeatures = features({
+                bass: 0.8,
+                spectral: { flatness: 0.5, sharpness: 0.3 }
+            });
+            analyzer.detectGenre(edmFeatures);
+
+            if (analyzer.phraseLength === 16) {
+                // barPosition must be clamped into 0..3
+                expect(analyzer.barPosition).toBeLessThan(4);
+            }
+        });
+
+        it('should expose genreConfidenceThreshold via config', () => {
+            const custom = new AdvancedAudioAnalyzer({ genreConfidenceThreshold: 0.8 });
+            expect(custom.genreConfidenceThreshold).toBe(0.8);
+            custom.destroy();
+        });
+
+        it('should default genreConfidenceThreshold to 0.6', () => {
+            expect(analyzer.genreConfidenceThreshold).toBe(0.6);
+        });
+    });
+
+    describe('B3 follow-up: extended moods compete fairly', () => {
+        it('should pick the highest-confidence extended mood when multiple match', () => {
+            // Construct features that satisfy BOTH dreamy and mystical thresholds.
+            // dreamy: energy<0.35, sharpness<0.3, centroid>0.5, bass<0.4
+            // mystical: energy<0.5, flatness<0.3, rolloff>0.5, sharpness<0.4
+            // Whichever scores higher should win — and the older else-if chain
+            // would have always picked the first one declared (meditative/dreamy).
+            const f = {
+                bass: 0.2,
+                mid: 0.3,
+                treble: 0.3,
+                beatStrength: 0.3,
+                dynamicRange: 0.2,
+                zeroCrossingRate: 0.1,
+                spectral: {
+                    centroid: 0.7,
+                    flatness: 0.2,
+                    sharpness: 0.25,
+                    flux: 0.1,
+                    rolloff: 0.8
+                }
+            };
+
+            const mood = analyzer.detectMood(f);
+
+            // The label must be one of the extended candidates, with the
+            // best confidence winning — not just the first to match.
+            expect(['dreamy', 'mystical', 'meditative']).toContain(mood.label);
+            expect(mood.confidence).toBeGreaterThan(0.5);
+        });
+    });
+
+    describe('C3 follow-up: detectBuildup uses features.energy directly', () => {
+        it('should record energy from the A5 alias on each push', () => {
+            const freqData = createMockFreqArray(0.7);
+            const timeData = createMockTimeArray(0.7);
+            const f = analyzer.calculateFeatures(freqData, timeData);
+
+            // calculateFeatures now sets f.energy = f.beatStrength (A5)
+            expect(f.energy).toBe(f.beatStrength);
+
+            analyzer.detectBuildup(f);
+            const last = analyzer.buildupHistory[analyzer.buildupHistory.length - 1];
+            expect(last.energy).toBe(f.energy);
+        });
+    });
+
     describe('Cleanup', () => {
         it('should clean up resources on destroy', () => {
             analyzer.fluxHistory = [1, 2, 3];

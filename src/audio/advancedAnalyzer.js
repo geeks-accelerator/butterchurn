@@ -71,6 +71,10 @@ export class AdvancedAudioAnalyzer {
         this.trendStabilityThreshold = config.trendStabilityThreshold || 0.05;
         this.onsetThreshold = config.onsetThreshold || 1.5;
         this.onsetEnergyFloor = config.onsetEnergyFloor || 0.01;
+        // A4 hysteresis: only adopt a new phraseLength when genre confidence
+        // exceeds this threshold. Prevents phrase tracker from flapping when a
+        // single low-confidence frame returns 'unknown' (phraseLength 16).
+        this.genreConfidenceThreshold = config.genreConfidenceThreshold || 0.6;
 
         // NEW: BPM tracking
         this.detectedBPM = null;
@@ -512,23 +516,21 @@ export class AdvancedAudioAnalyzer {
         const timeSinceLastBeat = now - this.lastBeatTime;
 
         // A2 FIX: Handle multiple beats elapsed (tab pause, GC stall, frame drops)
-        // Previously only advanced by 1, causing phrase desync after any pause
+        // O(1) arithmetic — previously a for-loop that ran beatsElapsed times,
+        // pathological for long tab suspensions (e.g. 1 hour @ 120 BPM = 7200 iterations).
         if (timeSinceLastBeat >= this.beatInterval) {
             const beatsElapsed = Math.floor(timeSinceLastBeat / this.beatInterval);
             this.lastBeatTime = now - (timeSinceLastBeat % this.beatInterval);
 
-            // Advance beat/bar positions by actual elapsed count
-            for (let i = 0; i < beatsElapsed; i++) {
-                this.beatPosition = (this.beatPosition + 1) % 4;
-                if (this.beatPosition === 0) {
-                    this.barPosition = (this.barPosition + 1) % (this.phraseLength / 4);
-                }
-            }
+            const barsPerPhrase = this.phraseLength / 4;
+            const totalBeats = this.beatPosition + beatsElapsed;
+            const barAdvances = Math.floor(totalBeats / 4);
+            this.beatPosition = totalBeats % 4;
+            this.barPosition = (this.barPosition + barAdvances) % barsPerPhrase;
         }
 
         this.beatPhase = timeSinceLastBeat / this.beatInterval;
         // A4 FIX: Use actual phraseLength (may be 16/32/64 depending on genre)
-        const barsPerPhrase = this.phraseLength / 4;
         const phrasePosition = (this.barPosition * 4) + this.beatPosition;
 
         return {
@@ -556,8 +558,11 @@ export class AdvancedAudioAnalyzer {
         const timestamp = audioContextTime !== null ?
             audioContextTime * 1000 : performance.now();
 
+        // C3: features.energy is now always set (A5 alias for beatStrength),
+        // so the previous `features.energy || features.beatStrength || 0`
+        // fallback chain is redundant.
         this.buildupHistory.push({
-            energy: features.energy || features.beatStrength || 0,
+            energy: features.energy || 0,
             spectralCentroid: features.spectralCentroid || 0,
             timestamp: timestamp
         });
@@ -778,9 +783,19 @@ export class AdvancedAudioAnalyzer {
             };
         }
 
-        // A4 FIX: Update phraseLength when genre detected
-        // This wires the genre-specific phrase lengths (16/32/64) into trackBeatPhase
-        this.phraseLength = genre.phraseLength;
+        // A4 FIX: Update phraseLength when genre detected (with hysteresis)
+        // Only adopt a new phraseLength when genre confidence is high enough.
+        // Without this gate, a single 'unknown'-genre frame would flip the
+        // tracker to 16 mid-track, causing visible phrase-boundary artifacts
+        // for genres with longer phrases (dubstep 32, ambient 64).
+        if (genre.confidence >= this.genreConfidenceThreshold &&
+            genre.phraseLength !== this.phraseLength) {
+            // Clamp barPosition to the new range so a 7-of-8 position under
+            // a 32-beat phrase doesn't become out-of-range under a 16-beat one.
+            const newBarsPerPhrase = genre.phraseLength / 4;
+            this.barPosition = this.barPosition % newBarsPerPhrase;
+            this.phraseLength = genre.phraseLength;
+        }
 
         return genre;
     }
@@ -864,11 +879,6 @@ export class AdvancedAudioAnalyzer {
         if (Math.abs(change) < this.trendStabilityThreshold) return 'stable';
         return change > 0 ? 'rising' : 'falling';
     }
-
-    // B2: recommendFFTSize() DELETED
-    // The method was advisory-only (no consumer wired it through) and the only non-default
-    // recommendation (4096 for high-end devices) was the wrong direction for beat-reactive
-    // visualization — larger FFT smears transients. See review doc for full rationale.
 
     /**
      * Clean up Meyda analyzer and resources

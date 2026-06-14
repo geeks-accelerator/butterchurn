@@ -46,11 +46,13 @@ This file provides AI-optimized development context for Claude Code when working
   - Genre-aware phrase tracking (16/32/64 beats depending on genre)
   - Phrase-aligned preset switching (musical coherence)
   - Pre-drop anticipation (8-bar buildup window, configurable)
-  - Mood-aware selection with extended vocabulary (meditative, dreamy, hypnotic, mystical, psychedelic)
+  - Mood-aware selection with extended vocabulary (meditative, dreamy, hypnotic, mystical, psychedelic) — independent if-blocks let candidates compete on confidence
   - Genre detection with timing adjustments (EDM, dubstep, hiphop, rock, classical, ambient, pop)
+  - Genre-confidence hysteresis on `phraseLength` updates (`genreConfidenceThreshold`, default 0.6) — prevents tracker desync on noisy frames
+  - O(1) beat advancement in `trackBeatPhase` — safe under long tab suspensions (no per-beat iteration)
   - Meyda readiness signal (getter + waitForMeyda() promise)
   - Gaussian smoothing for trend calculations (reduces jitter while preserving peaks)
-  - Configurable thresholds (drop bass change, trend stability, onset detection)
+  - Configurable thresholds (drop bass change, trend stability, onset detection, buildup window, genre confidence)
 - **Fingerprint Quality Improvements (v2.1):**
   - Expanded mood vocabulary (mystical, hypnotic, psychedelic, dreamy, meditative)
   - Fractal-specific mood profiles (0% aggressive > 0.8)
