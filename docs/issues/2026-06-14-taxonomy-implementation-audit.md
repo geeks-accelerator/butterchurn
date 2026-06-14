@@ -320,12 +320,26 @@ Visual regression tests: 6 pre-existing WASM-related failures (unrelated to taxo
 
 ### Future Work (Not Blocking)
 - [ ] TODO-1: Audio lookahead (Phase 1 optimization)
-- [ ] TODO-2: Reverse index scaling (Phase 2 optimization)
+- [x] TODO-2: Reverse index scaling — **closed by H2 (alphabetically-sorted v2.2 indices) on `178d238`**
 - [ ] TODO-3: WebGL drawArraysInstanced (rendering optimization)
 - [ ] CI integration for validation pipeline
 
 ---
 
+## Cross-references to closure work (added 2026-06-14)
+
+This audit was superseded by a deeper review that found three runtime gaps it didn't catch ([parent-repo issue](../../../docs/issues/2026-06-14-butterchurn-taxonomy-implementation-review.md)). All 11 review items + Phase 9 follow-ups + §G2/G4/G10 + §H1–H5 pre-import readiness were closed across these commits:
+
+- `87a4704` — wire HierarchicalMatcher into selector (this audit's original finding)
+- `6e19777` — P1.1a/b, P1.2, P2.1, P2.2, P3.1, P3.2, P4.1, P4.2, P5.1, P5.2
+- `0b4a95d` — Phase 9 hooks (genre.timingMultiplier, mood-shift trigger, DROP-SOURCE CONTRACT)
+- `a942bc9` — §G2 mood smoothing, §G4 match-depth telemetry, §G10 logging spec
+- `178d238` — §H1–H5 pre-import readiness (algorithm canonical, indices rebuilt, determinism harness, `recentPresetsMax: 100`, latency benchmark)
+
+Test count over time: 60 → 72 → 80 → 99 → **111 taxonomy** / **256 non-visual** — all green.
+
+---
+
 *Created: 2026-06-14*
 *Audit performed by: Claude Opus 4.5*
-*Validation: Code audit + 60 passing tests*
+*Validation: Code audit + 60 passing tests (now 111 after closure work)*

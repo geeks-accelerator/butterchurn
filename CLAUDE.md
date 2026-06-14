@@ -35,26 +35,33 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Taxonomy Improvements — code complete, runtime gaps being closed**
+**Phase: Taxonomy Improvements — complete + pre-import ready**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
 - Phase 2 intelligent preset selection with equation-based fingerprinting
-- **Taxonomy Improvements (v2.2 schema):**
-  - `src/taxonomy/` modules: `energyLabel`, `musicalResponsiveness`, `reliability`, `colorAnalysis`, `visualStyleSimilarity`, `targetVisualStyle`, `hierarchicalMatcher`
-  - `HierarchicalMatcher` - two-stage filter+score preset selection (wired into `intelligentPresetSelector.js`)
-  - Visual style similarity map for Stage 1 relaxation
+- **Taxonomy Improvements (v2.2 schema, `fingerprintAlgorithm: '2.2'` canonical):**
+  - `src/taxonomy/` modules: `energyLabel`, `musicalResponsiveness`, `reliability`, `colorAnalysis`, `visualStyleSimilarity` (symmetric closure enforced by test), `targetVisualStyle`, `moodSmoother`, `hierarchicalMatcher`
+  - `HierarchicalMatcher` — two-stage filter+score preset selection wired into `intelligentPresetSelector.js`
   - Selector populates `target.visualStyle` (from mood) and `target.musicalResponsiveness` (from audio reactivity) so Stage 1 categorical filter actually runs
+  - **Gaussian-smoothed mood** (11-frame window, σ=2.0) suppresses single-frame jitter while preserving sustained transitions
+  - **Phase 9 hooks** wired: `genre.timingMultiplier` scales public `nextSwitch` ETA; mood-shift queues `pendingSwitchOnPhrase = true`; DROP-SOURCE CONTRACT documented in source (canonical trigger = `buildupInfo.isBuildup`, `features.isDrop` is classification-only)
   - Rolling `beatDetectionRate` (30-frame window) used for `target.beatSync` — semantic match to preset-side "reacts to beats" flag
+  - **Match-depth telemetry:** `getMatchDepthTelemetry()` exposes per-session distribution; success metric "full-categorical match rate ≥30%" measurable
+  - **Logging spec:** `[matcher] depth=N relaxed=[...] survivors=X top3=[h:s,h:s,h:s]` + `[selector] ... picked=H` when `logHierarchicalMatching` or `debugMode` is true
   - Fixed `moodAffinities` string-to-number encoding bug
-  - 60 unit tests for taxonomy modules (50 + 10 integration); 145 total non-visual tests
-  - **Validation pipeline** (tools/validation/): Python frame analysis, LLM vision validation, orchestrator
+  - **111 unit tests** for taxonomy modules; **256 total non-visual tests** — all green
+  - **Validation pipeline** (`tools/validation/`): Python frame analysis, Claude Sonnet 4.6 vision validation, orchestrator
+  - **Determinism harness** (`test/taxonomy/determinism.test.js`): 5 reference fingerprints × 100 iterations + known-SHA pin — drift in derivation code fails CI as a single test, not a 20K-line diff
+  - **Latency benchmark** (`test/taxonomy/benchmark.test.js`): worst-case p95 = 34 ms on 19,760 synthetic presets; §G1 memoization decision deferred indefinitely
 
-#### Data layer state (2026-06-14)
-- `butterchurnPresetsAll.fingerprints.json` (495 presets, v2.2.0) — unified file with all derived fields; loaded last in `PRESET_PACK_NAMES` so its v2.2 records win on hash collisions
-- `alaskaButter.fingerprints.json` (495 presets, v2.2.0) — backfilled with `energyLabel`, `musicalResponsiveness`, `reliabilityTier`, `dominantHue` via `tools/backfill-fingerprint-derived-fields.mjs` (CLIP-derived `visualStyle` preserved)
-- Individual v1.0 packs (`butterchurnPresets`, `Extra`, `Extra2`, etc.) still v1.0; loaded but overridden by `butterchurnPresetsAll` for shared hashes. Known divergence: their content-hash algorithm differs from the unified file, so 353 v1.0 hashes don't collide with the 495 v2.2 hashes — both sets coexist in the loaded DB
-- Per-pack indices (`high / bass / calm / particle / fractal / geometric / organic`) still legacy 7-key shape; v2.2 categorical keys not yet rebuilt into the index objects (matcher reads field values directly, not index lookups)
+#### Data layer state (2026-06-14, pre-import ready for 20K)
+- `PRESET_PACK_NAMES = ['butterchurnPresetsAll']` — single canonical pack (H1 retired the 7 legacy v1.0 packs from the loader; the never-existing `butterchurnPresetsMixedDugan` was 404-ing every startup pre-retirement)
+- `butterchurnPresetsAll.fingerprints.json` (495 presets, v2.2.0, `fingerprintAlgorithm: '2.2'`) — CLIP-derived `visualStyle` + all backfilled categoricals + alphabetically-sorted indices
+- `alaskaButter.fingerprints.json` (495 presets, v2.2.0) — separate loader path; backfilled to match `butterchurnPresetsAll`'s field set via `tools/backfill-fingerprint-derived-fields.mjs`
+- **Indices** rebuilt under H2: both legacy 7-key buckets (`high / bass / calm / particle / fractal / geometric / organic`) AND new v2.2 categorical buckets (`energyLabel / visualStyle / musicalResponsiveness / reliabilityTier / dominantHue`). Every bucket sorted alphabetically by hash for byte-stable regenerations.
+- **`recentPresets` memory bumped to 100** (was 10) for the 20K scale-up — H4
+- One non-overlapping preset (`flexi + amandio c - organic12-3d-2.milk`) was dropped when v1.0 packs retired; will be picked back up in the 20K regen
 - **Phase 3 Intelligent Preset Selector Improvements:**
   - Meyda.js spectral audio analysis (2048-sample buffer)
   - BPM detection with iterative clamping (60-180 BPM range)

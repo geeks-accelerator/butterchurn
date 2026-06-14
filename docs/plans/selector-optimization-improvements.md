@@ -17,7 +17,11 @@
 >
 > Post-implementation review (two rounds) fixed all known bugs and design gaps. Audio analysis foundation is solid. Full audit: [`../../../docs/issues/2026-06-13-butterchurn-audio-analyzer-review-followups.md`](../../../docs/issues/2026-06-13-butterchurn-audio-analyzer-review-followups.md). Audio lookahead (Phase 1) and reverse index scaling (Phase 2) can now proceed.
 >
-> **Update (2026-06-14):** Taxonomy v2.2 `HierarchicalMatcher` is now wired into `intelligentPresetSelector.js`. The selector now uses two-stage filter+score selection by default. The TODOs in this plan (audio lookahead, reverse index scaling) remain as future optimizations. See [taxonomy improvements plan](../../../docs/plans/2026-06-12-butterchurn-taxonomy-improvements.md).
+> **Update (2026-06-14):** Taxonomy v2.2 `HierarchicalMatcher` is now wired into `intelligentPresetSelector.js`. The selector now uses two-stage filter+score selection by default. See [taxonomy improvements plan](../../../docs/plans/2026-06-12-butterchurn-taxonomy-improvements.md).
+>
+> **Update (2026-06-14, later):** Phase 2 (Reverse Index Scaling) is **partially superseded** by §H2 in the taxonomy plan, which rebuilt all v2.2 indices (`energyLabel / visualStyle / musicalResponsiveness / reliabilityTier / dominantHue`) with deterministic alphabetical hash ordering. The reverse-index-at-build-time scheme described below in Phase 2 (preset name → hash ID lookup) is a *different* optimization and remains open — it addresses the name→hash lookup path, not the categorical-filter path. Decide whether to keep both layers or simplify after the 20K import lands.
+>
+> §H5 latency benchmark (also in the taxonomy plan) measured the matcher at 19,760 synthetic presets: worst-case p95 = 34 ms (mood+BPM scenario). At those numbers, Phase 1 (Audio Lookahead) is the higher-value optimization — anticipatory switching is a UX win, whereas the matcher itself is not bottlenecked.
 
 ---
 
