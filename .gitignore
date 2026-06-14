@@ -25,6 +25,11 @@ test/fingerprints*.json
 test/*.mp3
 coverage/
 .nyc_output/
+# jest-image-snapshot writes -diff.png and -received.png here when a visual
+# regression test fails. The baseline snapshots in test/visual/__image_snapshots__/*.png
+# ARE tracked — only the failure-artifact subdirectories are excluded.
+test/visual/__image_snapshots__/__diff_output__/
+test/visual/__image_snapshots__/__received_output__/
 
 # Deployment
 .netlify
