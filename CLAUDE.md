@@ -35,23 +35,26 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Taxonomy Improvements Complete - v2.2 Schema**
+**Phase: Taxonomy Improvements — code complete, runtime gaps being closed**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
 - Phase 2 intelligent preset selection with equation-based fingerprinting
 - **Taxonomy Improvements (v2.2 schema):**
-  - v2.2 fingerprints for full-collection (495 presets with all new fields)
-  - `energyLabel` - 6-level categorical label derived from energy float
-  - `musicalResponsiveness` - 5-type audio responsiveness classification
-  - `reliabilityTier` - 4-tier complexity-based device compatibility
-  - `dominantHue`, `colorPaletteType`, `brightness`, `colorComplexity` - extended color taxonomy
+  - `src/taxonomy/` modules: `energyLabel`, `musicalResponsiveness`, `reliability`, `colorAnalysis`, `visualStyleSimilarity`, `targetVisualStyle`, `hierarchicalMatcher`
   - `HierarchicalMatcher` - two-stage filter+score preset selection (wired into `intelligentPresetSelector.js`)
   - Visual style similarity map for Stage 1 relaxation
-  - v2.2 indices for categorical filtering (energyLabel, visualStyle, musicalResponsiveness, reliabilityTier, dominantHue)
-  - Fixed moodAffinities string-to-number encoding bug
-  - 60 unit tests for taxonomy modules (50 + 10 integration)
+  - Selector populates `target.visualStyle` (from mood) and `target.musicalResponsiveness` (from audio reactivity) so Stage 1 categorical filter actually runs
+  - Rolling `beatDetectionRate` (30-frame window) used for `target.beatSync` — semantic match to preset-side "reacts to beats" flag
+  - Fixed `moodAffinities` string-to-number encoding bug
+  - 60 unit tests for taxonomy modules (50 + 10 integration); 145 total non-visual tests
   - **Validation pipeline** (tools/validation/): Python frame analysis, LLM vision validation, orchestrator
+
+#### Data layer state (2026-06-14)
+- `butterchurnPresetsAll.fingerprints.json` (495 presets, v2.2.0) — unified file with all derived fields; loaded last in `PRESET_PACK_NAMES` so its v2.2 records win on hash collisions
+- `alaskaButter.fingerprints.json` (495 presets, v2.2.0) — backfilled with `energyLabel`, `musicalResponsiveness`, `reliabilityTier`, `dominantHue` via `tools/backfill-fingerprint-derived-fields.mjs` (CLIP-derived `visualStyle` preserved)
+- Individual v1.0 packs (`butterchurnPresets`, `Extra`, `Extra2`, etc.) still v1.0; loaded but overridden by `butterchurnPresetsAll` for shared hashes. Known divergence: their content-hash algorithm differs from the unified file, so 353 v1.0 hashes don't collide with the 495 v2.2 hashes — both sets coexist in the loaded DB
+- Per-pack indices (`high / bass / calm / particle / fractal / geometric / organic`) still legacy 7-key shape; v2.2 categorical keys not yet rebuilt into the index objects (matcher reads field values directly, not index lookups)
 - **Phase 3 Intelligent Preset Selector Improvements:**
   - Meyda.js spectral audio analysis (2048-sample buffer)
   - BPM detection with iterative clamping (60-180 BPM range)

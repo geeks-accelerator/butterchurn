@@ -1,10 +1,23 @@
 # Taxonomy Implementation Audit
 
 **Created:** 2026-06-14
-**Resolved:** 2026-06-14
-**Status:** ✅ Resolved
+**Resolved:** 2026-06-14 (this audit)
+**Status:** ✅ Resolved — but see superseding review below
 **Priority:** Medium (wiring gap blocking Phase 5 runtime functionality)
 **Validation Level:** N=1 (code audit + test verification)
+
+> **Post-audit findings (2026-06-14):** A subsequent code review surfaced
+> three additional runtime gaps this audit didn't catch:
+> (1) the unified v2.2 fingerprint file `butterchurnPresetsAll.fingerprints.json`
+> exists but isn't in `PRESET_PACK_NAMES` so the loader never loads it;
+> (2) `alaskaButter.fingerprints.json` is v2.2 but missing the four new
+> derived fields; (3) the selector doesn't populate `target.visualStyle` /
+> `target.musicalResponsiveness`, so Stage 1 categorical filtering is a
+> no-op in production even with the matcher correctly wired.
+>
+> Full review: [parent-repo:docs/issues/2026-06-14-butterchurn-taxonomy-implementation-review.md](../../../docs/issues/2026-06-14-butterchurn-taxonomy-implementation-review.md).
+> This audit's "comprehensive" framing was too narrow; it focused on
+> imports/exports/tests but not on data-layer or target-population gaps.
 
 ---
 
@@ -13,6 +26,7 @@
 | Document | Relationship |
 |----------|--------------|
 | [2026-06-12-butterchurn-taxonomy-improvements.md](../../../docs/plans/2026-06-12-butterchurn-taxonomy-improvements.md) | Implementation plan (parent repo) |
+| [parent-repo:docs/issues/2026-06-14-butterchurn-taxonomy-implementation-review.md](../../../docs/issues/2026-06-14-butterchurn-taxonomy-implementation-review.md) | **Superseding post-implementation review** with full runtime audit |
 | [intelligent-preset-selector-improvements.md](../plans/intelligent-preset-selector-improvements.md) | Related selector improvements |
 | [selector-optimization-improvements.md](../plans/selector-optimization-improvements.md) | Future optimizations |
 
@@ -26,6 +40,12 @@ A comprehensive audit was performed on the taxonomy implementation to identify:
 3. Incomplete component wiring
 
 **Result:** One critical wiring gap found and fixed. Pre-existing TODOs documented for future work. Validation pipeline is complete but standalone.
+
+**Scope note (2026-06-14, post-hoc):** "Comprehensive" was overstated. This
+audit verified that taxonomy *code* is complete and wired; it did **not**
+verify that the *data* the code operates on actually contains the new fields,
+nor that the selector populates the target shape the matcher needs at Stage 1.
+Those gaps are tracked in the superseding review linked above.
 
 ---
 

@@ -25,6 +25,10 @@ import { PRESET_PACK_NAMES } from './config/presetPacks.js';
 import { PresetPerformanceTracker } from './analysis/presetPerformanceTracker.js';
 // Phase 5: Taxonomy HierarchicalMatcher for two-stage filter+score selection
 import { HierarchicalMatcher } from './taxonomy/hierarchicalMatcher.js';
+// P1.2: target-categorical helpers for the matcher's Stage 1 filter.
+// Without these the filter was a no-op in production (issue 2026-06-14).
+import { determineTargetResponsiveness } from './taxonomy/musicalResponsiveness.js';
+import { determineTargetVisualStyle } from './taxonomy/targetVisualStyle.js';
 
 // EXT-3/PRE-5: BPM threshold constants for genre-based timing
 const BPM_THRESHOLDS = {
@@ -258,6 +262,14 @@ class IntelligentPresetSelector {
         this.recentPresets = [];
         this.recentPresetsMax = 10;
 
+        // P2.1: rolling ring buffer of recent `features.beatDetected` booleans.
+        // We expose the windowed *rate* as `features.beatDetectionRate` so the
+        // matcher can compare against `fp.beatSync` (a "reacts to beats" flag)
+        // semantically — was previously comparing against `beatStrength` which
+        // is a loudness signal, not a rhythm-density one.
+        this.beatDetectedHistory = [];
+        this.BEAT_HISTORY_SIZE = 30; // ~0.5s at 60fps — long enough to smooth single-frame jitter
+
         // Initialize compatibility checker for transition analysis
         this.compatibilityChecker = new PresetCompatibilityChecker({
             minSafeDecay: 0.1,
@@ -296,6 +308,32 @@ class IntelligentPresetSelector {
             console.error('[IntelligentSelector] Failed to initialize HierarchicalMatcher:', e);
             this.hierarchicalMatcher = null;
         }
+    }
+
+    /**
+     * P5.2: pick a stable default for cold start (no audio + no current preset).
+     * Prefers `dynamic`-energy `cool`-color presets — calm but not static — and
+     * filters out problematic/recent. Falls back to any non-problematic preset.
+     * @returns {string|null} hash to load, or null when DB isn't ready
+     * @private
+     */
+    _pickColdStartDefault() {
+        if (!this.db?.presets) return null;
+
+        const allHashes = Object.keys(this.db.presets);
+        const eligible = allHashes.filter(h =>
+            !this.problematicPresets.has(h) && !this.recentPresets.includes(h)
+        );
+        if (eligible.length === 0) return null;
+
+        // Preferred bucket: dynamic + cool. Many alaska-butter presets land here.
+        const preferred = eligible.filter(h => {
+            const fp = this.db.presets[h].fingerprint;
+            return fp.energyLabel === 'dynamic' && fp.colorProfile === 'cool';
+        });
+
+        const pool = preferred.length > 0 ? preferred : eligible;
+        return pool[Math.floor(Math.random() * pool.length)];
     }
 
     /**
@@ -1145,10 +1183,29 @@ class IntelligentPresetSelector {
         // Calculate overall energy from available bands
         const energy = (features.bass + features.mid + features.treble) / 3;
 
+        // P2.1: maintain a rolling beat-detection rate (fraction of recent frames
+        // where beatDetected was true). This is what `fp.beatSync` actually
+        // means at the preset side — "reacts to beats" — so the matcher should
+        // compare against rhythm density, not loudness.
+        if (features.beatDetected !== undefined) {
+            this.beatDetectedHistory.push(features.beatDetected ? 1 : 0);
+            if (this.beatDetectedHistory.length > this.BEAT_HISTORY_SIZE) {
+                this.beatDetectedHistory.shift();
+            }
+        }
+        const beatDetectionRate = this.beatDetectedHistory.length > 0
+            ? this.beatDetectedHistory.reduce((a, b) => a + b, 0) / this.beatDetectedHistory.length
+            : 0;
+
         return {
             energy: energy,
             bassEnergy: features.bass,
             trebleEnergy: features.treble,
+            // P2.1: rolling beat density (0–1) for matcher's beatSync comparison
+            beatDetectionRate: beatDetectionRate,
+            // P2.2: pass beatStrength through so target.beatStrength is set,
+            // enabling the D5 colorSynergy "vivid + loud" branch
+            beatStrength: features.beatStrength ?? 0,
             // CRIT-2 FIX: musicalEvent is an object { type: 'Drop', confidence: 0.9 }, not a string
             isDrop: musicalEvent?.type?.toLowerCase() === 'drop',
             isBuildup: musicalEvent?.type?.toLowerCase() === 'buildup',
@@ -1567,6 +1624,25 @@ class IntelligentPresetSelector {
             return { bestHash: null, logic };
         }
 
+        // P5.2: cold-start handling. When there is no audio yet, every score
+        // component ties at its default (energy=0.5 vs fp.energy=0.5 etc.) and
+        // visual continuity favors `currentHash`, leaving the same preset on
+        // forever. Pick a stable default from `dynamic`+`cool` presets so the
+        // first frame after audio is meaningful instead of frozen.
+        const hasAudio = features && (
+            (features.energy ?? 0) > 0 ||
+            (features.bassEnergy ?? 0) > 0 ||
+            (features.trebleEnergy ?? 0) > 0
+        );
+        if (!hasAudio && !this.currentHash) {
+            const defaultHash = this._pickColdStartDefault();
+            if (defaultHash) {
+                logic.method = 'cold_start_default';
+                logic.reason = '🌙 Cold start (no audio yet)';
+                return { bestHash: defaultHash, logic };
+            }
+        }
+
         // Build pre-filtered candidate pool (Stage 0 from plan audit D1/D2)
         const allHashes = Object.keys(this.db.presets);
         const eligibleHashes = allHashes.filter(h =>
@@ -1581,14 +1657,29 @@ class IntelligentPresetSelector {
         }
 
         // Build target object for matcher (convert features to matcher format)
+        // P1.2: populate the categorical targets (visualStyle, musicalResponsiveness)
+        //   from mood + audio reactivity. Without these, Stage 1 categorical
+        //   filtering was a no-op in production.
+        // P2.1: use rolling beatDetectionRate (rhythm density), not beatStrength
+        //   (current loudness), for `beatSync` comparison — semantic match to
+        //   the preset-side `fp.beatSync` "reacts to beats" flag.
+        // P2.2: include beatStrength so the matcher's D5 colorSynergy
+        //   "vivid + loud" branch can fire.
         const target = {
             energy: features.energy ?? 0.5,
             bassEnergy: features.bassEnergy ?? 0.5,
             trebleEnergy: features.trebleEnergy ?? 0.5,
-            beatSync: features.beatStrength ?? 0,
-            // Categorical targets for Stage 1 filtering (optional)
-            visualStyle: features.targetVisualStyle ?? null,
-            musicalResponsiveness: features.targetResponsiveness ?? null
+            beatSync: features.beatDetectionRate ?? 0,
+            beatStrength: features.beatStrength ?? 0,
+            // Categorical targets for Stage 1 filtering
+            // null => matcher skips that dimension (e.g. when mood is unknown)
+            visualStyle: determineTargetVisualStyle(mood),
+            musicalResponsiveness: determineTargetResponsiveness({
+                beatStrength: features.beatStrength ?? 0,
+                bassEnergy: features.bassEnergy ?? 0,
+                trebleEnergy: features.trebleEnergy ?? 0,
+                energy: features.energy ?? 0
+            })
         };
 
         // Call matcher with all context

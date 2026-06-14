@@ -9,14 +9,22 @@
  * fluid_organic, particle, geometric, fractal, abstract, kaleidoscope, tunnel, waveform
  */
 
-// Per Audit finding — CLIP-grounded similarity for archetype-level Stage 1 relaxation
+// CLIP-grounded similarity for archetype-level Stage 1 relaxation.
+//
+// P5.1 (issue 2026-06-14-...-taxonomy-implementation-review): this map is the
+// SYMMETRIC CLOSURE. If A lists B, B lists A. The matcher's styleContinuity
+// scoring reads from `currentFp.visualStyle`'s neighbour list only, so an
+// asymmetric map would silently award different bonuses for A→B vs B→A
+// transitions. The symmetric-closure test in
+// test/taxonomy/visualStyleSimilarity.test.js enforces the invariant on every
+// future edit.
 export const VISUAL_STYLE_SIMILARITY = {
-  fluid_organic: ['fractal', 'abstract'],
-  particle:      ['fluid_organic', 'abstract'],
+  fluid_organic: ['fractal', 'abstract', 'particle'],
+  particle:      ['fluid_organic', 'abstract', 'waveform'],
   geometric:     ['kaleidoscope', 'abstract'],
-  fractal:       ['kaleidoscope', 'fluid_organic'],
-  abstract:      ['fluid_organic', 'geometric'],
-  kaleidoscope:  ['fractal', 'geometric'],
+  fractal:       ['kaleidoscope', 'fluid_organic', 'tunnel'],
+  abstract:      ['fluid_organic', 'geometric', 'particle', 'waveform'],
+  kaleidoscope:  ['fractal', 'geometric', 'tunnel'],
   tunnel:        ['fractal', 'kaleidoscope'],
   waveform:      ['particle', 'abstract']
 };
