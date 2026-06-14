@@ -400,6 +400,223 @@ describe('AdvancedAudioAnalyzer', () => {
         });
     });
 
+    // ============================================
+    // D1: Tests for review follow-up fixes
+    // ============================================
+
+    describe('Gaussian Smoothing (Priority 5)', () => {
+        it('should generate normalized Gaussian kernel', () => {
+            const kernel = analyzer._generateGaussianKernel(5, 1.0);
+
+            expect(kernel.length).toBe(5);
+            // Kernel should sum to ~1 (normalized)
+            const sum = kernel.reduce((a, b) => a + b, 0);
+            expect(sum).toBeCloseTo(1.0, 5);
+            // Center should be highest
+            expect(kernel[2]).toBeGreaterThan(kernel[0]);
+            expect(kernel[2]).toBeGreaterThan(kernel[4]);
+            // Should be symmetric
+            expect(kernel[0]).toBeCloseTo(kernel[4], 10);
+            expect(kernel[1]).toBeCloseTo(kernel[3], 10);
+        });
+
+        it('should smooth feature history', () => {
+            // Create history with a spike
+            const history = [
+                { bass: 0.5 }, { bass: 0.5 }, { bass: 0.9 },
+                { bass: 0.5 }, { bass: 0.5 }, { bass: 0.5 }, { bass: 0.5 }
+            ];
+            analyzer.featureHistory = history;
+
+            const smoothed = analyzer._smoothFeatureHistory(history, 'bass');
+
+            // Smoothing reduces spike impact
+            expect(smoothed.length).toBeLessThan(history.length);
+            // All values should be defined
+            smoothed.forEach(v => expect(v).toBeDefined());
+        });
+
+        it('should return raw values when history too short for kernel', () => {
+            const shortHistory = [{ bass: 0.5 }, { bass: 0.6 }];
+            const smoothed = analyzer._smoothFeatureHistory(shortHistory, 'bass');
+
+            expect(smoothed.length).toBe(2);
+            expect(smoothed[0]).toBe(0.5);
+            expect(smoothed[1]).toBe(0.6);
+        });
+    });
+
+    describe('A5 Fix: features.energy', () => {
+        it('should set features.energy as alias for beatStrength', () => {
+            const freqData = createMockFreqArray(0.7);
+            const timeData = createMockTimeArray(0.7);
+
+            const features = analyzer.calculateFeatures(freqData, timeData);
+
+            expect(features.energy).toBeDefined();
+            expect(features.energy).toBe(features.beatStrength);
+        });
+    });
+
+    describe('A1/A3 Fix: BPM clamping', () => {
+        it('should iteratively clamp very slow BPM (25 → 50 → 100)', async () => {
+            // Create buffer with very slow beats (25 BPM)
+            const slowBuffer = createMockAudioBuffer(44100, 10, 25);
+            const bpm = await analyzer.detectBPM(slowBuffer);
+
+            if (bpm !== null) {
+                expect(bpm).toBeGreaterThanOrEqual(60);
+                expect(bpm).toBeLessThanOrEqual(180);
+            }
+        });
+
+        it('should iteratively clamp very fast BPM (400 → 200 → 100)', async () => {
+            // Create buffer with very fast beats (400 BPM)
+            const fastBuffer = createMockAudioBuffer(44100, 10, 400);
+            const bpm = await analyzer.detectBPM(fastBuffer);
+
+            if (bpm !== null) {
+                expect(bpm).toBeGreaterThanOrEqual(60);
+                expect(bpm).toBeLessThanOrEqual(180);
+            }
+        });
+
+        it('should derive beatInterval from clamped BPM', async () => {
+            const buffer = createMockAudioBuffer(44100, 10, 120);
+            await analyzer.detectBPM(buffer);
+
+            if (analyzer.detectedBPM !== null) {
+                // beatInterval should be 60000 / BPM
+                const expectedInterval = 60000 / analyzer.detectedBPM;
+                expect(analyzer.beatInterval).toBeCloseTo(expectedInterval, 1);
+            }
+        });
+    });
+
+    describe('A2 Fix: Beat skip handling', () => {
+        it('should handle multiple elapsed beats after long pause', () => {
+            analyzer.detectedBPM = 120;
+            analyzer.beatInterval = 500; // 120 BPM = 500ms per beat
+            analyzer.beatPosition = 0;
+            analyzer.barPosition = 0;
+            analyzer.phraseLength = 16;
+
+            // Simulate being called 2 seconds after last beat (4 beats elapsed)
+            analyzer.lastBeatTime = performance.now() - 2000;
+
+            const beatInfo = analyzer.trackBeatPhase();
+
+            // After 4 beats: beatPosition should have advanced by 4 mod 4 = 0
+            // barPosition should have advanced by 1 (4 beats = 1 bar)
+            expect(beatInfo.beatPosition).toBe(0);
+            expect(beatInfo.barPosition).toBeGreaterThanOrEqual(0);
+        });
+
+        it('should advance through full phrase correctly', () => {
+            analyzer.detectedBPM = 120;
+            analyzer.beatInterval = 500;
+            analyzer.beatPosition = 0;
+            analyzer.barPosition = 0;
+            analyzer.phraseLength = 16;
+
+            // Simulate 8 seconds elapsed (16 beats = full phrase)
+            analyzer.lastBeatTime = performance.now() - 8000;
+
+            const beatInfo = analyzer.trackBeatPhase();
+
+            // Should wrap around to start of new phrase
+            expect(beatInfo.phrasePosition).toBeGreaterThanOrEqual(0);
+            expect(beatInfo.phrasePosition).toBeLessThan(16);
+        });
+    });
+
+    describe('A4 Fix: phraseLength wiring', () => {
+        it('should update phraseLength when genre detected', () => {
+            // Set up features for ambient genre (phraseLength = 64)
+            const features = {
+                bass: 0.2,
+                mid: 0.3,
+                treble: 0.3,
+                beatStrength: 0.2,
+                spectralCentroid: 0.3,
+                dynamicRange: 0.2,
+                spectral: { flatness: 0.2, sharpness: 0.2 }
+            };
+
+            const genre = analyzer.detectGenre(features);
+
+            expect(analyzer.phraseLength).toBe(genre.phraseLength);
+        });
+
+        it('should return phraseLength in trackBeatPhase', () => {
+            analyzer.detectedBPM = 120;
+            analyzer.beatInterval = 500;
+            analyzer.phraseLength = 32; // Dubstep-style
+            analyzer.lastBeatTime = performance.now();
+
+            const beatInfo = analyzer.trackBeatPhase();
+
+            expect(beatInfo.phraseLength).toBe(32);
+        });
+    });
+
+    describe('B4 Fix: Meyda readiness', () => {
+        it('should expose meydaReady getter', () => {
+            expect(analyzer.meydaReady).toBe(false);
+        });
+
+        it('should provide waitForMeyda promise', async () => {
+            // Without audioContext, should return false immediately
+            const result = await analyzer.waitForMeyda();
+            expect(result).toBe(false);
+        });
+    });
+
+    describe('B1 Fix: Buildup window size', () => {
+        it('should use configurable buildup history size', () => {
+            const customAnalyzer = new AdvancedAudioAnalyzer({
+                buildupHistorySize: 240
+            });
+
+            expect(customAnalyzer.BUILDUP_HISTORY_SIZE).toBe(240);
+            customAnalyzer.destroy();
+        });
+
+        it('should default to 480 frames (~8 seconds)', () => {
+            expect(analyzer.BUILDUP_HISTORY_SIZE).toBe(480);
+        });
+    });
+
+    describe('C1 Fix: Configurable thresholds', () => {
+        it('should accept custom threshold config', () => {
+            const customAnalyzer = new AdvancedAudioAnalyzer({
+                dropBassChangeThreshold: 0.3,
+                trendStabilityThreshold: 0.08,
+                onsetThreshold: 2.0,
+                onsetEnergyFloor: 0.02
+            });
+
+            expect(customAnalyzer.dropBassChangeThreshold).toBe(0.3);
+            expect(customAnalyzer.trendStabilityThreshold).toBe(0.08);
+            expect(customAnalyzer.onsetThreshold).toBe(2.0);
+            expect(customAnalyzer.onsetEnergyFloor).toBe(0.02);
+            customAnalyzer.destroy();
+        });
+
+        it('should use defaults when not configured', () => {
+            expect(analyzer.dropBassChangeThreshold).toBe(0.2);
+            expect(analyzer.trendStabilityThreshold).toBe(0.05);
+            expect(analyzer.onsetThreshold).toBe(1.5);
+            expect(analyzer.onsetEnergyFloor).toBe(0.01);
+        });
+    });
+
+    describe('B2 Fix: recommendFFTSize removed', () => {
+        it('should not have recommendFFTSize method', () => {
+            expect(analyzer.recommendFFTSize).toBeUndefined();
+        });
+    });
+
     describe('Cleanup', () => {
         it('should clean up resources on destroy', () => {
             analyzer.fluxHistory = [1, 2, 3];

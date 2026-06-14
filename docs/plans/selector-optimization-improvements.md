@@ -6,11 +6,15 @@
 **Goal:** Optimize preset selector with audio lookahead and efficient preset indexing
 
 > **Note (2026-06-13):** This plan builds on the completed audio analysis improvements. Prerequisite work is done:
-> - ✅ BPM detection and phrase tracking (`advancedAnalyzer.js`)
-> - ✅ Pre-drop anticipation with ~2 bar ETA (`detectBuildup()`)
+> - ✅ BPM detection with iterative clamping + correct `beatInterval` derivation
+> - ✅ Genre-aware phrase tracking (16/32/64 beats, properly wired)
+> - ✅ Pre-drop anticipation with 8-bar buildup window (configurable)
 > - ✅ Gaussian smoothing for stable trend detection
-> - ✅ Meyda.js spectral analysis integration
+> - ✅ Meyda.js spectral analysis with readiness signal
+> - ✅ `features.energy` properly set (selector branches now live)
+> - ✅ Beat skip handling for long pauses (phrase tracker stays in sync)
 >
+> Post-implementation review bugs fixed — audio analysis foundation is solid.
 > Audio lookahead (Phase 1) and reverse index scaling (Phase 2) can now proceed.
 
 ---

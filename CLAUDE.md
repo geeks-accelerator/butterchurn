@@ -42,14 +42,15 @@ This file provides AI-optimized development context for Claude Code when working
 - Phase 2 intelligent preset selection with equation-based fingerprinting
 - **Phase 3 Intelligent Preset Selector Improvements:**
   - Meyda.js spectral audio analysis (2048-sample buffer)
-  - BPM detection and 16-beat phrase tracking
+  - BPM detection with iterative clamping (60-180 BPM range)
+  - Genre-aware phrase tracking (16/32/64 beats depending on genre)
   - Phrase-aligned preset switching (musical coherence)
-  - Pre-drop anticipation (switches 1.5s before drops)
-  - Mood-aware selection (aggressive, relaxed, happy, electronic, acoustic)
+  - Pre-drop anticipation (8-bar buildup window, configurable)
+  - Mood-aware selection with extended vocabulary (meditative, dreamy, hypnotic, mystical, psychedelic)
   - Genre detection with timing adjustments (EDM, dubstep, hiphop, rock, classical, ambient, pop)
-  - Preset performance degradation tracking
-  - Adaptive FFT size recommendation system
+  - Meyda readiness signal (getter + waitForMeyda() promise)
   - Gaussian smoothing for trend calculations (reduces jitter while preserving peaks)
+  - Configurable thresholds (drop bass change, trend stability, onset detection)
 - **Fingerprint Quality Improvements (v2.1):**
   - Expanded mood vocabulary (mystical, hypnotic, psychedelic, dreamy, meditative)
   - Fractal-specific mood profiles (0% aggressive > 0.8)

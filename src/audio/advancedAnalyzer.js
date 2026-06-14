@@ -46,10 +46,16 @@ export class AdvancedAudioAnalyzer {
         this.meydaAnalyzer = null;
         this.audioContext = audioContext;
         this.source = source;
-        this.meydaReady = false;
+        this._meydaReady = false;
+        // B4 FIX: Promise for callers to await Meyda initialization
+        this._meydaReadyPromise = null;
+        this._meydaReadyResolve = null;
 
         // Initialize Meyda asynchronously if audio context provided
         if (audioContext && source) {
+            this._meydaReadyPromise = new Promise(resolve => {
+                this._meydaReadyResolve = resolve;
+            });
             this._initMeyda(audioContext, source);
         }
 
@@ -59,6 +65,12 @@ export class AdvancedAudioAnalyzer {
 
         // SUG-1 FIX: Make flux spike multiplier configurable
         this.fluxSpikeMultiplier = config.fluxSpikeMultiplier || 2.5;
+
+        // C1 FIX: Configurable thresholds (previously hardcoded magic numbers)
+        this.dropBassChangeThreshold = config.dropBassChangeThreshold || 0.2;
+        this.trendStabilityThreshold = config.trendStabilityThreshold || 0.05;
+        this.onsetThreshold = config.onsetThreshold || 1.5;
+        this.onsetEnergyFloor = config.onsetEnergyFloor || 0.01;
 
         // NEW: BPM tracking
         this.detectedBPM = null;
@@ -72,8 +84,10 @@ export class AdvancedAudioAnalyzer {
         this.phraseLength = 16;     // 16 beats = 4 bars = 1 phrase
 
         // NEW: Buildup tracking for pre-drop anticipation
+        // B1 FIX: Configurable buildup window (default 4 bars at ~120 BPM ≈ 8 seconds)
+        // Real EDM buildups span 8-16 bars; 1 second was too short to characterize them
         this.buildupHistory = [];
-        this.BUILDUP_HISTORY_SIZE = 60; // ~1 second at 60fps
+        this.BUILDUP_HISTORY_SIZE = config.buildupHistorySize || 480; // ~8 seconds at 60fps
 
         // Gaussian smoothing for noise reduction in trend calculations
         // Window size 5, sigma 1.0 balances noise suppression with peak preservation
@@ -106,10 +120,29 @@ export class AdvancedAudioAnalyzer {
                 callback: null
             });
             this.meydaAnalyzer.start();
-            this.meydaReady = true;
+            this._meydaReady = true;
+            if (this._meydaReadyResolve) this._meydaReadyResolve(true);
         } catch (e) {
             console.warn('[AdvancedAnalyzer] Meyda init failed:', e.message);
+            if (this._meydaReadyResolve) this._meydaReadyResolve(false);
         }
+    }
+
+    /**
+     * B4 FIX: Getter for Meyda readiness state
+     * @returns {boolean} True if Meyda is initialized and ready
+     */
+    get meydaReady() {
+        return this._meydaReady;
+    }
+
+    /**
+     * B4 FIX: Wait for Meyda initialization to complete
+     * @returns {Promise<boolean>} Resolves to true if Meyda initialized, false if failed/unavailable
+     */
+    async waitForMeyda() {
+        if (!this._meydaReadyPromise) return false;
+        return this._meydaReadyPromise;
     }
 
     /**
@@ -221,6 +254,10 @@ export class AdvancedAudioAnalyzer {
         features.highMid = this.calculateBandEnergy(dataArray, bandSize * 2, bandSize * 3);
         features.treble = this.calculateBandEnergy(dataArray, bandSize * 3, dataArray.length);
 
+        // A5 FIX: Set features.energy as alias for beatStrength
+        // Many selector branches read features.energy - this was never set before
+        features.energy = features.beatStrength;
+
         // EXISTING: Add to history for trend detection
         this.featureHistory.push(features);
         if (this.featureHistory.length > this.maxHistorySize) {
@@ -319,7 +356,8 @@ export class AdvancedAudioAnalyzer {
         // WARN-4 FIX: Combine flux spike with bass change instead of early return
         // This prevents false positives from transient sounds (hand clap, static)
         const hasFluxSpike = features.spectral?.isFluxSpike || false;
-        const hasBassIncrease = bassChange > 0.2;
+        // C1 FIX: Use configurable threshold
+        const hasBassIncrease = bassChange > this.dropBassChangeThreshold;
 
         // Detect drops - ENHANCED with flux spike as confidence booster
         if (features.bass > this.dropThreshold && hasBassIncrease && features.beatDetected) {
@@ -367,15 +405,24 @@ export class AdvancedAudioAnalyzer {
 
     /**
      * Onset detection for BPM calculation
-     * CRIT-2 FIX: Implement _detectOnsets method (was missing)
      * Uses energy-based onset detection with adaptive threshold
+     *
+     * B5 LIMITATION: Only analyzes the chunk passed in (typically first 10 seconds).
+     * Tracks with slow intros (e.g., piano → drums at 1:30) may report inaccurate BPM.
+     * For production use, consider sampling multiple chunks across the buffer.
+     *
      * @private
+     * @param {Float32Array} channelData - Audio samples to analyze
+     * @param {number} sampleRate - Sample rate in Hz
+     * @returns {number[]} Array of onset times in seconds
      */
     _detectOnsets(channelData, sampleRate) {
         const onsets = [];
         const windowSize = Math.floor(sampleRate * 0.01); // 10ms windows
         let prevEnergy = 0;
-        const threshold = 1.5; // Energy must increase by 50%
+        // C1 FIX: Use configurable threshold
+        const threshold = this.onsetThreshold;
+        const energyFloor = this.onsetEnergyFloor;
 
         for (let i = 0; i < channelData.length - windowSize; i += windowSize) {
             let energy = 0;
@@ -385,7 +432,7 @@ export class AdvancedAudioAnalyzer {
             energy /= windowSize;
 
             // Onset = significant energy increase above minimum threshold
-            if (energy > prevEnergy * threshold && energy > 0.01) {
+            if (energy > prevEnergy * threshold && energy > energyFloor) {
                 onsets.push(i / sampleRate);
             }
             prevEnergy = energy;
@@ -432,11 +479,14 @@ export class AdvancedAudioAnalyzer {
             const medianInterval = intervals[Math.floor(intervals.length / 2)];
 
             this.detectedBPM = 60 / medianInterval;
-            this.beatInterval = medianInterval * 1000;
 
-            // Clamp to reasonable BPM range
-            if (this.detectedBPM < 60) this.detectedBPM *= 2;
-            if (this.detectedBPM > 180) this.detectedBPM /= 2;
+            // A3 FIX: Iterative BPM clamping to handle extreme values (e.g., 25 → 50 → 100)
+            while (this.detectedBPM < 60) this.detectedBPM *= 2;
+            while (this.detectedBPM > 180) this.detectedBPM /= 2;
+
+            // A1 FIX: Derive beatInterval from clamped BPM, not raw median
+            // Previously beatInterval was set before clamp, causing 2x timing errors
+            this.beatInterval = 60000 / this.detectedBPM;
 
             return this.detectedBPM;
         } catch (e) {
@@ -461,23 +511,33 @@ export class AdvancedAudioAnalyzer {
             audioContextTime * 1000 : performance.now();
         const timeSinceLastBeat = now - this.lastBeatTime;
 
+        // A2 FIX: Handle multiple beats elapsed (tab pause, GC stall, frame drops)
+        // Previously only advanced by 1, causing phrase desync after any pause
         if (timeSinceLastBeat >= this.beatInterval) {
+            const beatsElapsed = Math.floor(timeSinceLastBeat / this.beatInterval);
             this.lastBeatTime = now - (timeSinceLastBeat % this.beatInterval);
-            this.beatPosition = (this.beatPosition + 1) % 4;
-            if (this.beatPosition === 0) {
-                this.barPosition = (this.barPosition + 1) % 4;
+
+            // Advance beat/bar positions by actual elapsed count
+            for (let i = 0; i < beatsElapsed; i++) {
+                this.beatPosition = (this.beatPosition + 1) % 4;
+                if (this.beatPosition === 0) {
+                    this.barPosition = (this.barPosition + 1) % (this.phraseLength / 4);
+                }
             }
         }
 
         this.beatPhase = timeSinceLastBeat / this.beatInterval;
-        const phrasePosition = (this.barPosition * 4) + this.beatPosition; // 0-15
+        // A4 FIX: Use actual phraseLength (may be 16/32/64 depending on genre)
+        const barsPerPhrase = this.phraseLength / 4;
+        const phrasePosition = (this.barPosition * 4) + this.beatPosition;
 
         return {
             bpm: this.detectedBPM,
             beatPhase: this.beatPhase,
             beatPosition: this.beatPosition,        // 0-3: beat within bar
-            barPosition: this.barPosition,          // 0-3: bar within phrase
-            phrasePosition: phrasePosition,         // 0-15: beat within phrase
+            barPosition: this.barPosition,          // 0-(barsPerPhrase-1): bar within phrase
+            phrasePosition: phrasePosition,         // 0-(phraseLength-1): beat within phrase
+            phraseLength: this.phraseLength,        // Current phrase length (genre-dependent)
             isBarBoundary: this.beatPosition === 0 && this.beatPhase < 0.1,
             isPhraseBoundary: phrasePosition === 0 && this.beatPhase < 0.1
         };
@@ -546,7 +606,7 @@ export class AdvancedAudioAnalyzer {
         if (!features.spectral) return { label: 'neutral', confidence: 0.5 };
 
         // CRIT-5 FIX: Use actual property names from calculateFeatures()
-        // eslint-disable-next-line no-unused-vars
+        // C2 FIX: Removed stale eslint-disable - all destructured variables are now used
         const { bass, mid, treble, beatStrength, dynamicRange, zeroCrossingRate } = features;
         const { centroid, flatness, sharpness, flux, rolloff } = features.spectral;
 
@@ -584,12 +644,13 @@ export class AdvancedAudioAnalyzer {
         // ============================================
         // EXTENDED MOODS (v2.1 - new mood types)
         // These provide more nuanced detection when primary moods don't match strongly
+        // B3 FIX: Independent if blocks allow all candidates to compete fairly
+        // Previously else-if chain only evaluated the first matching branch
         // ============================================
 
         // Only check extended moods if primary mood confidence is low
         if (mood.confidence < 0.65) {
             // Meditative: Very calm, minimal activity
-            // Characteristics: very low energy, smooth (low ZCR), low dynamics
             if (energy < 0.2 && (sharpness || 0) < 0.2 && (dynamicRange || 0) < 0.25) {
                 const conf = 0.6 + ((1 - energy) * 0.2) + ((1 - (sharpness || 0)) * 0.1);
                 if (conf > mood.confidence) {
@@ -597,32 +658,28 @@ export class AdvancedAudioAnalyzer {
                 }
             }
             // Dreamy: Soft, floating, ethereal
-            // Characteristics: low energy, low sharpness, high centroid (bright but soft), low bass
-            else if (energy < 0.35 && (sharpness || 0) < 0.3 && centroid > 0.5 && bass < 0.4) {
+            if (energy < 0.35 && (sharpness || 0) < 0.3 && centroid > 0.5 && bass < 0.4) {
                 const conf = 0.55 + (centroid * 0.2) + ((1 - bass) * 0.1);
                 if (conf > mood.confidence) {
                     mood = { label: 'dreamy', confidence: Math.min(0.85, conf) };
                 }
             }
             // Hypnotic: Repetitive, trance-inducing, steady
-            // Characteristics: moderate energy, low dynamic range (consistent), mid-focused
-            else if (energy > 0.3 && energy < 0.6 && (dynamicRange || 0) < 0.3 && mid > 0.4) {
+            if (energy > 0.3 && energy < 0.6 && (dynamicRange || 0) < 0.3 && mid > 0.4) {
                 const conf = 0.55 + ((1 - (dynamicRange || 0)) * 0.2) + (mid * 0.1);
                 if (conf > mood.confidence) {
                     mood = { label: 'hypnotic', confidence: Math.min(0.8, conf) };
                 }
             }
             // Mystical: Ethereal, otherworldly
-            // Characteristics: low-moderate energy, organic (low flatness), bright (high rolloff), soft
-            else if (energy < 0.5 && (flatness || 0) < 0.3 && (rolloff || 0) > 0.5 && (sharpness || 0) < 0.4) {
+            if (energy < 0.5 && (flatness || 0) < 0.3 && (rolloff || 0) > 0.5 && (sharpness || 0) < 0.4) {
                 const conf = 0.5 + ((rolloff || 0) * 0.2) + ((1 - (flatness || 0)) * 0.15);
                 if (conf > mood.confidence) {
                     mood = { label: 'mystical', confidence: Math.min(0.8, conf) };
                 }
             }
             // Psychedelic: Trippy, constantly evolving, high variation
-            // Characteristics: high flux (changing), high dynamic range, mid-high treble, moderate+ flatness
-            else if ((flux || 0) > 0.3 && (dynamicRange || 0) > 0.4 && treble > 0.4 && (flatness || 0) > 0.3) {
+            if ((flux || 0) > 0.3 && (dynamicRange || 0) > 0.4 && treble > 0.4 && (flatness || 0) > 0.3) {
                 const conf = 0.5 + ((flux || 0) * 0.2) + ((dynamicRange || 0) * 0.15);
                 if (conf > mood.confidence) {
                     mood = { label: 'psychedelic', confidence: Math.min(0.8, conf) };
@@ -721,6 +778,10 @@ export class AdvancedAudioAnalyzer {
             };
         }
 
+        // A4 FIX: Update phraseLength when genre detected
+        // This wires the genre-specific phrase lengths (16/32/64) into trackBeatPhase
+        this.phraseLength = genre.phraseLength;
+
         return genre;
     }
 
@@ -785,7 +846,8 @@ export class AdvancedAudioAnalyzer {
         const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
         const change = recentAvg - oldAvg;
 
-        if (Math.abs(change) < 0.05) return 'stable';
+        // C1 FIX: Use configurable threshold
+        if (Math.abs(change) < this.trendStabilityThreshold) return 'stable';
         return change > 0 ? 'rising' : 'falling';
     }
 
@@ -798,64 +860,15 @@ export class AdvancedAudioAnalyzer {
         const recentAvg = recent.reduce((sum, f) => sum + (f[feature] || 0), 0) / recent.length;
         const change = recentAvg - oldAvg;
 
-        if (Math.abs(change) < 0.05) return 'stable';
+        // C1 FIX: Use configurable threshold
+        if (Math.abs(change) < this.trendStabilityThreshold) return 'stable';
         return change > 0 ? 'rising' : 'falling';
     }
 
-    /**
-     * Recommend optimal FFT size based on device capabilities and preset complexity
-     * Note: The actual AudioProcessor uses fixed 2048 samples (CLAUDE.md requirement)
-     * This method provides recommendations for future optimization or manual configuration
-     *
-     * @param {Object} deviceCapabilities - Device info from IntelligentPresetSelector.detectDeviceTier()
-     * @param {number} presetComplexity - Complexity score from preset fingerprint (0-1)
-     * @returns {Object} FFT recommendation with size, reason, and confidence
-     */
-    recommendFFTSize(deviceCapabilities = {}, presetComplexity = 0.5) {
-        const tier = deviceCapabilities.tier || 'medium';
-        const cores = deviceCapabilities.cores || 4;
-        const memory = deviceCapabilities.memory || 4;
-
-        // Default: 2048 (CLAUDE.md requirement: never go below this)
-        let recommended = 2048;
-        let reason = 'Default optimal balance';
-        let confidence = 0.8;
-
-        // High-end devices with low-complexity presets can use larger FFT
-        if (tier === 'high-end' && cores >= 8 && memory >= 8) {
-            if (presetComplexity < 0.5) {
-                recommended = 4096;
-                reason = 'High-end device with simple preset - maximum frequency resolution';
-                confidence = 0.9;
-            } else {
-                recommended = 2048;
-                reason = 'High-end device but complex preset - balanced performance';
-                confidence = 0.85;
-            }
-        }
-        // Medium devices - stick with default
-        else if (tier === 'medium' || tier === 'integrated') {
-            recommended = 2048;
-            reason = 'Medium device - standard FFT for reliable performance';
-            confidence = 0.8;
-        }
-        // Low-end devices - still use 2048 per CLAUDE.md, but flag as potentially stressed
-        else if (tier === 'low-end') {
-            recommended = 2048;
-            reason = 'Low-end device - minimum recommended (cannot go lower per CLAUDE.md)';
-            confidence = 0.6;
-        }
-
-        return {
-            recommendedSize: recommended,
-            currentSize: 2048,  // AudioProcessor fixed size
-            reason,
-            confidence,
-            canUpgrade: recommended > 2048,
-            deviceTier: tier,
-            presetComplexity
-        };
-    }
+    // B2: recommendFFTSize() DELETED
+    // The method was advisory-only (no consumer wired it through) and the only non-default
+    // recommendation (4096 for high-end devices) was the wrong direction for beat-reactive
+    // visualization — larger FFT smears transients. See review doc for full rationale.
 
     /**
      * Clean up Meyda analyzer and resources
@@ -865,7 +878,7 @@ export class AdvancedAudioAnalyzer {
             this.meydaAnalyzer.stop();
             this.meydaAnalyzer = null;
         }
-        this.meydaReady = false;
+        this._meydaReady = false;
         this.fluxHistory = [];
         this.buildupHistory = [];
         this.featureHistory = [];

@@ -280,14 +280,7 @@
                     <span class="label">Timing Multiplier:</span>
                     <span class="value" id="timingMultiplier">1.0x</span>
                 </div>
-                <div class="preset-info">
-                    <span class="label">FFT Size:</span>
-                    <span class="value" id="fftSize">2048</span>
-                </div>
-                <div class="preset-info">
-                    <span class="label">FFT Recommendation:</span>
-                    <span class="value" id="fftRecommendation">--</span>
-                </div>
+                <!-- B2 FIX: FFT recommendation display removed (method deleted) -->
             </div>
 
             <!-- Frame Analysis Panel -->
@@ -1409,22 +1402,7 @@
                                 `${genre.timingMultiplier.toFixed(1)}x`;
                         }
 
-                        // Show FFT recommendation
-                        if (selector.audioAnalyzer?.recommendFFTSize) {
-                            const deviceCaps = {
-                                tier: selector.deviceTier || 'medium',
-                                cores: navigator.hardwareConcurrency || 4,
-                                memory: navigator.deviceMemory || 4
-                            };
-                            const presetComplexity = selector.currentFingerprint?.complexity || 0.5;
-                            const fftRec = selector.audioAnalyzer.recommendFFTSize(deviceCaps, presetComplexity);
-
-                            document.getElementById('fftSize').textContent = `${fftRec.currentSize}`;
-                            document.getElementById('fftRecommendation').textContent =
-                                fftRec.canUpgrade ?
-                                    `⬆️ ${fftRec.recommendedSize} (${fftRec.reason.slice(0, 30)}...)` :
-                                    `✓ ${fftRec.recommendedSize} optimal`;
-                        }
+                        // B2 FIX: FFT recommendation code removed (method deleted from analyzer)
 
                         // Update musical event detection display (only if features exist)
                         const musicalEvent = result.features ? detectMusicalEvent(result.features) : { type: 'No Audio' };
