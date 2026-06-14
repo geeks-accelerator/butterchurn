@@ -46,11 +46,11 @@ This file provides AI-optimized development context for Claude Code when working
   - `musicalResponsiveness` - 5-type audio responsiveness classification
   - `reliabilityTier` - 4-tier complexity-based device compatibility
   - `dominantHue`, `colorPaletteType`, `brightness`, `colorComplexity` - extended color taxonomy
-  - `HierarchicalMatcher` - two-stage filter+score preset selection
+  - `HierarchicalMatcher` - two-stage filter+score preset selection (wired into `intelligentPresetSelector.js`)
   - Visual style similarity map for Stage 1 relaxation
   - v2.2 indices for categorical filtering (energyLabel, visualStyle, musicalResponsiveness, reliabilityTier, dominantHue)
   - Fixed moodAffinities string-to-number encoding bug
-  - 50 unit tests for taxonomy modules
+  - 60 unit tests for taxonomy modules (50 + 10 integration)
   - **Validation pipeline** (tools/validation/): Python frame analysis, LLM vision validation, orchestrator
 - **Phase 3 Intelligent Preset Selector Improvements:**
   - Meyda.js spectral audio analysis (2048-sample buffer)
@@ -87,14 +87,13 @@ This file provides AI-optimized development context for Claude Code when working
 
 ### What's Ready for Implementation 🚀
 - **Selector Optimizations** - Audio lookahead & reverse index scaling (see docs/plans/selector-optimization-improvements.md)
-- HierarchicalMatcher integration into intelligentPresetSelector.js
 - Phase 4: Machine learning-enhanced preset matching
 - User preference learning and personalization
 
 ### Critical Files Status
 - `src/taxonomy/` - ✅ Complete taxonomy modules (energyLabel, musicalResponsiveness, reliability, colorAnalysis, visualStyleSimilarity, hierarchicalMatcher)
 - `src/config/taxonomyConfig.js` - ✅ Stage 1/Stage 2 weights and categorical dimension config
-- `src/intelligentPresetSelector.js` - ✅ Complete with phrase-aligned switching, pre-drop anticipation, mood scoring
+- `src/intelligentPresetSelector.js` - ✅ Complete with phrase-aligned switching, pre-drop anticipation, mood scoring, HierarchicalMatcher integration
 - `src/audio/advancedAnalyzer.js` - ✅ Enhanced with Meyda, BPM detection, mood/buildup detection, Gaussian smoothing
 - `src/fingerprintLoader.js` - ✅ Modular fingerprint database loader
 - `src/fingerprintAdapter.js` - ✅ Database format adapter for selector compatibility

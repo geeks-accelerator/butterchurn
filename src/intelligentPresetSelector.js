@@ -23,6 +23,8 @@ import PresetCompatibilityChecker from './utils/presetCompatibilityChecker.js';
 import { PRESET_PACK_NAMES } from './config/presetPacks.js';
 // SUGG-1 FIX: Import extracted PresetPerformanceTracker
 import { PresetPerformanceTracker } from './analysis/presetPerformanceTracker.js';
+// Phase 5: Taxonomy HierarchicalMatcher for two-stage filter+score selection
+import { HierarchicalMatcher } from './taxonomy/hierarchicalMatcher.js';
 
 // EXT-3/PRE-5: BPM threshold constants for genre-based timing
 const BPM_THRESHOLDS = {
@@ -216,6 +218,10 @@ class IntelligentPresetSelector {
         // Problematic presets now managed by PresetFailureLogger
         this.problematicPresets = new Set();
 
+        // Phase 5: HierarchicalMatcher for two-stage filter+score selection
+        this.hierarchicalMatcher = null;
+        this.useHierarchicalMatcher = true; // Feature flag for gradual rollout
+
         // Enable automatic problematic detection
         this.detectProblematic = (typeof config !== 'undefined' && config?.get) ?
             config.get('userPreferences.skipProblematicPresets', true) : true;
@@ -266,6 +272,30 @@ class IntelligentPresetSelector {
         // Transition state tracking
         this.isTransitioning = false;
         this.transitionStartTime = 0;
+
+        // Initialize HierarchicalMatcher if database is available
+        this._initializeHierarchicalMatcher();
+    }
+
+    /**
+     * Initialize the HierarchicalMatcher with the current database
+     * Called when the fingerprint database is set or updated
+     * @private
+     */
+    _initializeHierarchicalMatcher() {
+        if (!this.db?.presets) {
+            return;
+        }
+
+        try {
+            this.hierarchicalMatcher = new HierarchicalMatcher(this.db, {
+                logMatching: this.debugMode
+            });
+            console.log('[IntelligentSelector] HierarchicalMatcher initialized with', Object.keys(this.db.presets).length, 'presets');
+        } catch (e) {
+            console.error('[IntelligentSelector] Failed to initialize HierarchicalMatcher:', e);
+            this.hierarchicalMatcher = null;
+        }
     }
 
     /**
@@ -450,6 +480,9 @@ class IntelligentPresetSelector {
         }
 
         console.log('[IntelligentSelector] Fingerprint database updated successfully');
+
+        // Initialize HierarchicalMatcher with new database
+        this._initializeHierarchicalMatcher();
     }
 
     /**
@@ -1367,13 +1400,21 @@ class IntelligentPresetSelector {
     /**
      * Select best preset with transparency into selection logic
      * Enhanced to accept and use mood for scoring (Phase 3)
+     * Phase 5: Uses HierarchicalMatcher when available for two-stage filter+score selection
      * @param {Object} features - Audio features
      * @param {Object} mood - Optional mood detection result { label, confidence }
      */
     selectBestPresetWithLogic(features, mood = null) {
+        // Phase 5: Use HierarchicalMatcher when available and enabled
+        if (this.useHierarchicalMatcher && this.hierarchicalMatcher) {
+            return this._selectWithHierarchicalMatcher(features, mood);
+        }
+
+        // Fallback to legacy selection path
         const logic = {
             targetEnergy: features.energy,
             mood: mood?.label || null,
+            method: 'legacy',
             candidates: [],
             topScores: [],
             reason: ''
@@ -1498,6 +1539,110 @@ class IntelligentPresetSelector {
         }
 
         return scores[0].hash;
+    }
+
+    /**
+     * Select preset using HierarchicalMatcher (Phase 5 taxonomy)
+     * Uses two-stage filter+score selection with categorical filtering and continuous scoring
+     * @param {Object} features - Audio features (selector-translated, post-calculateAudioFeatures)
+     * @param {Object} mood - Optional mood detection result { label, confidence }
+     * @returns {Object} { bestHash, logic } with match metadata
+     * @private
+     */
+    _selectWithHierarchicalMatcher(features, mood = null) {
+        const logic = {
+            targetEnergy: features.energy,
+            mood: mood?.label || null,
+            method: 'hierarchical_matcher',
+            matchDepth: null,
+            relaxedDimensions: [],
+            stage1Survivors: 0,
+            candidates: [],
+            topScores: [],
+            reason: ''
+        };
+
+        if (!this.hierarchicalMatcher) {
+            logic.reason = 'HierarchicalMatcher not initialized';
+            return { bestHash: null, logic };
+        }
+
+        // Build pre-filtered candidate pool (Stage 0 from plan audit D1/D2)
+        const allHashes = Object.keys(this.db.presets);
+        const eligibleHashes = allHashes.filter(h =>
+            !this.recentPresets.includes(h) &&
+            !this.problematicPresets.has(h) &&
+            (this.currentHash ? h !== this.currentHash : true)
+        );
+
+        if (eligibleHashes.length === 0) {
+            logic.reason = 'No eligible candidates (all recent/problematic)';
+            return { bestHash: null, logic };
+        }
+
+        // Build target object for matcher (convert features to matcher format)
+        const target = {
+            energy: features.energy ?? 0.5,
+            bassEnergy: features.bassEnergy ?? 0.5,
+            trebleEnergy: features.trebleEnergy ?? 0.5,
+            beatSync: features.beatStrength ?? 0,
+            // Categorical targets for Stage 1 filtering (optional)
+            visualStyle: features.targetVisualStyle ?? null,
+            musicalResponsiveness: features.targetResponsiveness ?? null
+        };
+
+        // Call matcher with all context
+        const result = this.hierarchicalMatcher.findMatches(target, {
+            candidateHashes: eligibleHashes,
+            currentHash: this.currentHash,
+            deviceTier: this.deviceTier,
+            mood,
+            detectedBpm: this.audioAnalyzer?.detectedBPM ?? null,
+            limit: 30
+        });
+
+        logic.matchDepth = result.matchDepth;
+        logic.relaxedDimensions = result.relaxedDimensions;
+        logic.stage1Survivors = result.stage1Survivors;
+        logic.candidates = result.matches.slice(0, 5).map(h => h.substring(0, 8));
+
+        if (result.matches.length === 0) {
+            logic.reason = 'No matches from HierarchicalMatcher';
+            return { bestHash: null, logic };
+        }
+
+        // Top 3 scores for logging
+        logic.topScores = result.matches.slice(0, 3).map(h =>
+            `${h.substring(0, 8)}: ${result.scores[h]?.toFixed(2) ?? 'N/A'}`
+        );
+
+        // Determine selection reason
+        if (features.isDrop || features.energy > 0.8) {
+            logic.reason = '🔥 Drop - high energy';
+        } else if (features.isChill || features.energy < 0.3) {
+            logic.reason = '🌊 Chill - calm visuals';
+        } else if (mood?.label) {
+            logic.reason = `🎭 Mood: ${mood.label}`;
+        } else {
+            logic.reason = '➡️ Balanced';
+        }
+
+        // Weighted random selection from top 3 (preserve existing randomization)
+        const topChoices = result.matches.slice(0, 3).map(h => ({
+            hash: h,
+            score: result.scores[h] ?? 0
+        }));
+
+        if (topChoices.length > 0) {
+            const weights = topChoices.map(c => c.score);
+            const selected = this.weightedRandom(topChoices, weights);
+            logic.reason += ` [d=${result.matchDepth}] → ${selected.hash.substring(0, 8)}`;
+            return { bestHash: selected.hash, logic };
+        }
+
+        const bestHash = result.matches[0];
+        logic.reason += ` [d=${result.matchDepth}] → ${bestHash.substring(0, 8)}`;
+        return { bestHash, logic };
     }
 
     /**
