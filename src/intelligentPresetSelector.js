@@ -29,6 +29,8 @@ import { HierarchicalMatcher } from './taxonomy/hierarchicalMatcher.js';
 // Without these the filter was a no-op in production (issue 2026-06-14).
 import { determineTargetResponsiveness } from './taxonomy/musicalResponsiveness.js';
 import { determineTargetVisualStyle } from './taxonomy/targetVisualStyle.js';
+// §G2: Gaussian-smoothed mood over a frame window to suppress single-frame jitter.
+import { MoodSmoother } from './taxonomy/moodSmoother.js';
 
 // EXT-3/PRE-5: BPM threshold constants for genre-based timing
 const BPM_THRESHOLDS = {
@@ -140,6 +142,22 @@ class IntelligentPresetSelector {
         // single-frame jitter. detectMood returns 0-1 confidence; v2.1's
         // primary moods land 0.5-0.9, extended moods 0.5-0.8.
         this.MOOD_SHIFT_CONFIDENCE_THRESHOLD = 0.6;
+
+        // §G2: Gaussian-smoothed mood window. The smoothed result feeds the
+        // mood-shift trigger AND downstream scoring — both benefit from being
+        // less reactive to single-frame label flips. Window of 11 frames
+        // (~180ms at 60fps) suppresses transient jitter while keeping real
+        // transitions responsive (smoothed label updates within ~window/2
+        // frames of a sustained shift).
+        this.moodSmoother = new MoodSmoother({ windowSize: 11, sigma: 2.0 });
+
+        // §G4: Match-depth telemetry. Per-session histogram of matchDepth
+        // values returned by the matcher's Stage 1 filter. A healthy
+        // distribution skews toward higher depths (filters succeeding); a
+        // session dominated by depth=0 means the categorical taxonomy isn't
+        // discriminating effectively and needs tuning or more coverage.
+        this.matchDepthHistogram = Object.create(null);
+        this.matchDepthTotal = 0;
 
         // NEW: Pre-drop anticipation
         this.preDropSwitchScheduled = false;
@@ -866,17 +884,21 @@ class IntelligentPresetSelector {
         const buildupInfo = this.audioAnalyzer?.detectBuildup ?
             this.audioAnalyzer.detectBuildup(rawFeatures, audioTime) : { isBuildup: false };
 
-        // Get current mood for scoring
-        const mood = this.audioAnalyzer?.detectMood ?
+        // Get current mood (raw per-frame). §G2: push into the smoother and
+        // use the smoothed result downstream so transient single-frame label
+        // flips don't trigger spurious shifts or skew scoring.
+        const rawMood = this.audioAnalyzer?.detectMood ?
             this.audioAnalyzer.detectMood(rawFeatures) : null;
+        this.moodSmoother.push(rawMood);
+        const mood = this.moodSmoother.get() ?? rawMood;
 
-        // Phase 9 item 2: mood-shift trigger.
-        // If mood label changes with high enough confidence, schedule a
-        // phrase-aligned switch. Skipped if a higher-priority switch (pre-drop
-        // or pending phrase) is already queued — those take precedence per the
-        // existing CRIT-4 priority order. Always update lastMoodLabel on a
-        // confident read so we track the most recent stable mood, even when
-        // we don't act on the shift.
+        // Phase 9 item 2: mood-shift trigger (now operating on smoothed mood).
+        // If smoothed mood label changes with high enough confidence, schedule
+        // a phrase-aligned switch. Skipped if a higher-priority switch
+        // (pre-drop or pending phrase) is already queued — those take
+        // precedence per the existing CRIT-4 priority order. Always update
+        // lastMoodLabel on a confident read so we track the most recent
+        // stable mood, even when we don't act on the shift.
         if (mood?.label && (mood.confidence ?? 0) >= this.MOOD_SHIFT_CONFIDENCE_THRESHOLD) {
             const isShift = this.lastMoodLabel !== null && this.lastMoodLabel !== mood.label;
             const canTrigger = !this.preDropSwitchScheduled && !this.pendingSwitchOnPhrase;
@@ -884,7 +906,7 @@ class IntelligentPresetSelector {
                 this.pendingSwitchOnPhrase = true;
                 this.pendingSwitchReason = `mood_shift:${this.lastMoodLabel}→${mood.label}`;
                 if (this.debugMode) {
-                    console.log(`[IPS] Mood shift detected: ${this.lastMoodLabel} → ${mood.label} (confidence ${(mood.confidence * 100).toFixed(0)}%) — switch queued for next phrase boundary`);
+                    console.log(`[IPS] Mood shift detected: ${this.lastMoodLabel} → ${mood.label} (smoothed confidence ${(mood.confidence * 100).toFixed(0)}%) — switch queued for next phrase boundary`);
                 }
             }
             this.lastMoodLabel = mood.label;
@@ -1636,9 +1658,14 @@ class IntelligentPresetSelector {
 
         // Detect mood for enhanced scoring
         // CRIT-1 FIX: Pass raw features (with spectral data) to detectMood
+        // §G2: prefer the smoothed mood (updated each frame by update()).
+        // Fall back to a per-call detection only if the smoother hasn't been
+        // fed yet (e.g. direct callers that bypass the main update() loop).
         const rawFeatures = features.rawFeatures || features;
-        const mood = this.audioAnalyzer?.detectMood ?
-            this.audioAnalyzer.detectMood(rawFeatures) : null;
+        const mood = this.moodSmoother.get() ?? (
+            this.audioAnalyzer?.detectMood ?
+                this.audioAnalyzer.detectMood(rawFeatures) : null
+        );
 
         // Score each candidate (pass mood for enhanced scoring)
         const scores = candidates.map(hash => ({
@@ -1786,16 +1813,96 @@ class IntelligentPresetSelector {
             score: result.scores[h] ?? 0
         }));
 
+        let pickedHash;
         if (topChoices.length > 0) {
             const weights = topChoices.map(c => c.score);
             const selected = this.weightedRandom(topChoices, weights);
-            logic.reason += ` [d=${result.matchDepth}] → ${selected.hash.substring(0, 8)}`;
-            return { bestHash: selected.hash, logic };
+            pickedHash = selected.hash;
+        } else {
+            pickedHash = result.matches[0];
         }
 
-        const bestHash = result.matches[0];
-        logic.reason += ` [d=${result.matchDepth}] → ${bestHash.substring(0, 8)}`;
-        return { bestHash, logic };
+        logic.reason += ` [d=${result.matchDepth}] → ${pickedHash.substring(0, 8)}`;
+
+        // §G4: record matchDepth into per-session histogram (also covers
+        // matchDepth = -1 when the matcher exhausted all categoricals).
+        this._recordMatchDepth(result.matchDepth);
+
+        // §G10: structured single-line log for the selector decision. The
+        // matcher emits its own `[matcher] depth=… relaxed=… survivors=… top3=…`
+        // line when its `logMatching` option is enabled — this `[selector]`
+        // line composes with it, adding the final picked hash. Format pinned in
+        // docs/plans/.../taxonomy-improvements.md §G10 and in
+        // test/taxonomy/logHierarchicalMatching.test.js.
+        //   [selector] depth=N relaxed=[a,b] survivors=X top3=[h:s,h:s,h:s] picked=H
+        if (this.debugMode || this.logHierarchicalMatching) {
+            const relaxed = (result.relaxedDimensions || []).join(',') || '-';
+            const top3 = result.matches.slice(0, 3).map(h =>
+                `${h.substring(0, 8)}:${(result.scores[h] ?? 0).toFixed(2)}`
+            ).join(',') || '-';
+            console.log(
+                `[selector] depth=${result.matchDepth} relaxed=[${relaxed}] survivors=${result.stage1Survivors} top3=[${top3}] picked=${pickedHash.substring(0, 8)}`
+            );
+        }
+
+        return { bestHash: pickedHash, logic };
+    }
+
+    /**
+     * §G4: increment per-session matchDepth histogram. Bucket keys are
+     * stringified depth values ('0', '1', '2', '3', '4', '-1') so the
+     * resulting object is JSON-friendly for telemetry.
+     * @param {number} depth - matchDepth value returned by the matcher
+     * @private
+     */
+    _recordMatchDepth(depth) {
+        const key = String(depth);
+        this.matchDepthHistogram[key] = (this.matchDepthHistogram[key] ?? 0) + 1;
+        this.matchDepthTotal++;
+    }
+
+    /**
+     * §G4: produce a summary of matchDepth distribution for telemetry.
+     *
+     * Returns an object with:
+     *   - total: how many switches were recorded
+     *   - histogram: {depthString: count} for every observed depth
+     *   - fractions: {depthString: fraction in [0,1]}
+     *   - fullCategoricalMatchRate: fraction at the deepest depth (no relax)
+     *   - allRelaxedRate: fraction at depth 0 (every categorical was relaxed)
+     *
+     * Per the plan's success metrics, a healthy session has
+     * fullCategoricalMatchRate ≥ 30% and allRelaxedRate ≤ 10%.
+     * @returns {Object}
+     */
+    getMatchDepthTelemetry() {
+        const histogram = { ...this.matchDepthHistogram };
+        const total = this.matchDepthTotal;
+        const fractions = {};
+        if (total > 0) {
+            for (const [k, v] of Object.entries(histogram)) {
+                fractions[k] = v / total;
+            }
+        }
+
+        // Categorical-dimension count comes from the matcher's configured list.
+        // Deepest depth equals categoricalDims.length; depth=0 means all relaxed.
+        const dims = this.hierarchicalMatcher?.categoricalDims ?? [];
+        const deepestDepthKey = String(dims.length);
+
+        return {
+            total,
+            histogram,
+            fractions,
+            fullCategoricalMatchRate: fractions[deepestDepthKey] ?? 0,
+            allRelaxedRate: fractions['0'] ?? 0
+        };
+    }
+
+    /** §G4: reset the per-session histogram (e.g. on track change). */
+    resetMatchDepthTelemetry() {
+        this.matchDepthHistogram = Object.create(null);
+        this.matchDepthTotal = 0;
     }
 
     /**
