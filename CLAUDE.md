@@ -49,6 +49,7 @@ This file provides AI-optimized development context for Claude Code when working
   - Genre detection with timing adjustments (EDM, dubstep, hiphop, rock, classical, ambient, pop)
   - Preset performance degradation tracking
   - Adaptive FFT size recommendation system
+  - Gaussian smoothing for trend calculations (reduces jitter while preserving peaks)
 - **Fingerprint Quality Improvements (v2.1):**
   - Expanded mood vocabulary (mystical, hypnotic, psychedelic, dreamy, meditative)
   - Fractal-specific mood profiles (0% aggressive > 0.8)
@@ -78,7 +79,7 @@ This file provides AI-optimized development context for Claude Code when working
 
 ### Critical Files Status
 - `src/intelligentPresetSelector.js` - ✅ Complete with phrase-aligned switching, pre-drop anticipation, mood scoring
-- `src/audio/advancedAnalyzer.js` - ✅ Enhanced with Meyda, BPM detection, mood/buildup detection
+- `src/audio/advancedAnalyzer.js` - ✅ Enhanced with Meyda, BPM detection, mood/buildup detection, Gaussian smoothing
 - `src/fingerprintLoader.js` - ✅ Modular fingerprint database loader
 - `src/fingerprintAdapter.js` - ✅ Database format adapter for selector compatibility
 - `presets/alaska-butter/` - ✅ Unified collection (388 presets + fingerprints)

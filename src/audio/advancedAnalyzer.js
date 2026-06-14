@@ -74,6 +74,13 @@ export class AdvancedAudioAnalyzer {
         // NEW: Buildup tracking for pre-drop anticipation
         this.buildupHistory = [];
         this.BUILDUP_HISTORY_SIZE = 60; // ~1 second at 60fps
+
+        // Gaussian smoothing for noise reduction in trend calculations
+        // Window size 5, sigma 1.0 balances noise suppression with peak preservation
+        this.gaussianKernel = this._generateGaussianKernel(
+            config.gaussianWindow || 5,
+            config.gaussianSigma || 1.0
+        );
     }
 
     /**
@@ -103,6 +110,58 @@ export class AdvancedAudioAnalyzer {
         } catch (e) {
             console.warn('[AdvancedAnalyzer] Meyda init failed:', e.message);
         }
+    }
+
+    /**
+     * Generate a normalized Gaussian kernel for smoothing
+     * @private
+     * @param {number} size - Kernel window size (odd number preferred)
+     * @param {number} sigma - Standard deviation (controls smoothing strength)
+     * @returns {number[]} Normalized Gaussian weights summing to 1.0
+     */
+    _generateGaussianKernel(size, sigma = 1.0) {
+        const kernel = [];
+        const center = Math.floor(size / 2);
+        let sum = 0;
+
+        for (let i = 0; i < size; i++) {
+            const x = i - center;
+            const value = Math.exp(-(x * x) / (2 * sigma * sigma));
+            kernel.push(value);
+            sum += value;
+        }
+
+        // Normalize so weights sum to 1
+        return kernel.map(v => v / sum);
+    }
+
+    /**
+     * Apply Gaussian smoothing to a signal (feature history array)
+     * Convolves signal with pre-computed Gaussian kernel to reduce noise
+     * while preserving genuine peaks and trends.
+     * @private
+     * @param {Object[]} history - Array of feature objects
+     * @param {string} feature - Feature key to extract and smooth
+     * @returns {number[]} Smoothed values (shorter by kernel.length - 1)
+     */
+    _smoothFeatureHistory(history, feature) {
+        if (history.length < this.gaussianKernel.length) {
+            return history.map(f => f[feature] || 0);
+        }
+
+        const values = history.map(f => f[feature] || 0);
+        const smoothed = [];
+        const halfWindow = Math.floor(this.gaussianKernel.length / 2);
+
+        for (let i = halfWindow; i < values.length - halfWindow; i++) {
+            let sum = 0;
+            for (let j = 0; j < this.gaussianKernel.length; j++) {
+                sum += values[i - halfWindow + j] * this.gaussianKernel[j];
+            }
+            smoothed.push(sum);
+        }
+
+        return smoothed;
     }
 
     /**
@@ -678,22 +737,56 @@ export class AdvancedAudioAnalyzer {
     }
 
     /**
-     * Get current feature trends
+     * Get current feature trends with Gaussian smoothing applied
+     * Smoothing reduces frame-to-frame jitter while preserving genuine musical changes
      */
     getTrends() {
         if (this.featureHistory.length < 10) {
             return null;
         }
 
-        const recent = this.featureHistory.slice(-5);
-        const older = this.featureHistory.slice(-10, -5);
+        // Apply Gaussian smoothing to reduce noise before trend calculation
+        const smoothedBass = this._smoothFeatureHistory(this.featureHistory, 'bass');
+        const smoothedEnergy = this._smoothFeatureHistory(this.featureHistory, 'beatStrength');
+        const smoothedBrightness = this._smoothFeatureHistory(this.featureHistory, 'spectralCentroid');
+        const smoothedPercussion = this._smoothFeatureHistory(this.featureHistory, 'zeroCrossingRate');
+
+        // Need enough smoothed samples for trend comparison
+        if (smoothedBass.length < 10) {
+            // Fall back to unsmoothed comparison if not enough data
+            const recent = this.featureHistory.slice(-5);
+            const older = this.featureHistory.slice(-10, -5);
+            return {
+                bass: this.calculateTrend(older, recent, 'bass'),
+                energy: this.calculateTrend(older, recent, 'beatStrength'),
+                brightness: this.calculateTrend(older, recent, 'spectralCentroid'),
+                percussion: this.calculateTrend(older, recent, 'zeroCrossingRate')
+            };
+        }
 
         return {
-            bass: this.calculateTrend(older, recent, 'bass'),
-            energy: this.calculateTrend(older, recent, 'beatStrength'),
-            brightness: this.calculateTrend(older, recent, 'spectralCentroid'),
-            percussion: this.calculateTrend(older, recent, 'zeroCrossingRate')
+            bass: this._calculateSmoothedTrend(smoothedBass),
+            energy: this._calculateSmoothedTrend(smoothedEnergy),
+            brightness: this._calculateSmoothedTrend(smoothedBrightness),
+            percussion: this._calculateSmoothedTrend(smoothedPercussion)
         };
+    }
+
+    /**
+     * Calculate trend from smoothed values array
+     * @private
+     */
+    _calculateSmoothedTrend(smoothedValues) {
+        const midpoint = Math.floor(smoothedValues.length / 2);
+        const older = smoothedValues.slice(0, midpoint);
+        const recent = smoothedValues.slice(midpoint);
+
+        const oldAvg = older.reduce((a, b) => a + b, 0) / older.length;
+        const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+        const change = recentAvg - oldAvg;
+
+        if (Math.abs(change) < 0.05) return 'stable';
+        return change > 0 ? 'rising' : 'falling';
     }
 
     /**

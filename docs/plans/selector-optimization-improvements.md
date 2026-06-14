@@ -1,9 +1,17 @@
 # Implementation Plan: Selector Optimization Improvements
 
 **Date:** 2026-03-25
-**Status:** Draft
+**Status:** 🔜 Ready for Implementation
 **Repository:** butterchurn
 **Goal:** Optimize preset selector with audio lookahead and efficient preset indexing
+
+> **Note (2026-06-13):** This plan builds on the completed audio analysis improvements. Prerequisite work is done:
+> - ✅ BPM detection and phrase tracking (`advancedAnalyzer.js`)
+> - ✅ Pre-drop anticipation with ~2 bar ETA (`detectBuildup()`)
+> - ✅ Gaussian smoothing for stable trend detection
+> - ✅ Meyda.js spectral analysis integration
+>
+> Audio lookahead (Phase 1) and reverse index scaling (Phase 2) can now proceed.
 
 ---
 
@@ -25,6 +33,7 @@ Both optimizations enhance the intelligent preset selector without changing its 
 | **[intelligent-preset-selector-improvements.md](intelligent-preset-selector-improvements.md)** | Core selector implementation | **PARENT** - These are optimizations on top |
 | **[fingerprint-quality-improvements.md](fingerprint-quality-improvements.md)** | Fingerprint v2.1 implementation | **SIBLING** - Audit that identified these TODOs |
 | **[../architecture/mathematical-fingerprinting.md](../architecture/mathematical-fingerprinting.md)** | Fingerprint algorithm docs | **REFERENCE** - Hash ID system |
+| **[marketing-studio:2025-10-02-audio-analysis-improvements.md](../../../docs/plans/2025-10-02-butterchurn-audio-analysis-improvements.md)** | Audio analysis enhancements | **PREREQUISITE** - Completed (Meyda, BPM, smoothing) |
 
 ---
 
