@@ -35,7 +35,7 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Taxonomy Improvements In Progress - v2.2 Schema**
+**Phase: Taxonomy Improvements Complete - v2.2 Schema**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
@@ -51,6 +51,7 @@ This file provides AI-optimized development context for Claude Code when working
   - v2.2 indices for categorical filtering (energyLabel, visualStyle, musicalResponsiveness, reliabilityTier, dominantHue)
   - Fixed moodAffinities string-to-number encoding bug
   - 50 unit tests for taxonomy modules
+  - **Validation pipeline** (tools/validation/): Python frame analysis, LLM vision validation, orchestrator
 - **Phase 3 Intelligent Preset Selector Improvements:**
   - Meyda.js spectral audio analysis (2048-sample buffer)
   - BPM detection with iterative clamping (60-180 BPM range)
@@ -85,7 +86,6 @@ This file provides AI-optimized development context for Claude Code when working
 - AlaskaButter demo site at https://alaskabutter.com
 
 ### What's Ready for Implementation 🚀
-- **Taxonomy Validation Pipeline** - Phase 8 (Python frame analysis, LLM vision validation) - see docs/plans/2026-06-12-butterchurn-taxonomy-improvements.md
 - **Selector Optimizations** - Audio lookahead & reverse index scaling (see docs/plans/selector-optimization-improvements.md)
 - HierarchicalMatcher integration into intelligentPresetSelector.js
 - Phase 4: Machine learning-enhanced preset matching
@@ -100,10 +100,12 @@ This file provides AI-optimized development context for Claude Code when working
 - `src/fingerprintAdapter.js` - ✅ Database format adapter for selector compatibility
 - `presets/alaska-butter/` - ✅ Unified collection (388 presets + fingerprints)
 - `presets/full-collection/` - ✅ Individual packs with 1:1 fingerprint mapping
-- `tools/generate-fingerprints.js` - ✅ v2.1 fingerprint schema with expanded moods, complexity scaling, color detection
+- `tools/generate-fingerprints.js` - ✅ v2.2 fingerprint schema with all taxonomy fields
 - `tools/classify-visual-style.py` - ✅ CLIP-based visual style classifier
 - `tools/render-preset-frames.js` - ✅ Headless preset frame renderer
+- `tools/validation/` - ✅ Taxonomy validation pipeline (analyze_frames.py, llm_validate.py, validate-taxonomy.js)
 - `test/fingerprint-test.html` - ✅ Working demo with new system
+- `test/validation-render.html` - ✅ Headless validation render page
 - `docs/cdn/presets/` - ✅ Updated CDN with all preset + fingerprint files
 
 ## ARCHITECTURE ESSENTIALS

@@ -12,5 +12,11 @@ clip @ git+https://github.com/openai/CLIP.git
 pillow>=9.0.0
 tqdm>=4.64.0
 
+# Phase 8: Taxonomy Validation dependencies
+colorthief>=0.2.1
+opencv-python-headless>=4.8.0
+numpy>=1.24.0
+anthropic>=0.25.0
+
 # Optional: for faster inference
 # onnxruntime>=1.15.0

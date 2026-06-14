@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Taxonomy Validation Render</title>
+  <style>
+    body { margin: 0; background: black; overflow: hidden; }
+    canvas { display: block; }
+    #error { color: red; padding: 20px; font-family: monospace; }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: monospace;
+      font-size: 12px;
+      background: rgba(0,0,0,0.7);
+      padding: 5px 10px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="600"></canvas>
+  <div id="info"></div>
+
+  <script src="/dist/butterchurn.min.js"></script>
+  <script src="/presets/full-collection/butterchurnPresetsAll.min.js"></script>
+  <script type="module">
+    import { generateTestAudio } from '/tools/validation/test-audio.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const presetHash = params.get('preset');
+    const showInfo = params.get('info') !== 'false';
+
+    const infoEl = document.getElementById('info');
+
+    function showError(msg) {
+      document.body.innerHTML = `<div id="error">Error: ${msg}</div>`;
+      throw new Error(msg);
+    }
+
+    if (!presetHash) {
+      showError('No preset specified. Use ?preset=HASH');
+    }
+
+    async function init() {
+      const canvas = document.getElementById('canvas');
+      const audioContext = new AudioContext();
+
+      const visualizer = butterchurn.createVisualizer(audioContext, canvas, {
+        width: 800,
+        height: 600,
+        pixelRatio: 1
+      });
+
+      const presets = butterchurnPresetsAll.getPresets();
+
+      let db;
+      try {
+        const resp = await fetch('/presets/full-collection/butterchurnPresetsAll.fingerprints.json');
+        db = await resp.json();
+      } catch (e) {
+        showError(`Failed to load fingerprint database: ${e.message}`);
+      }
+
+      const presetData = db.presets[presetHash];
+      if (!presetData) {
+        showError(`Preset hash not found: ${presetHash}`);
+      }
+
+      const presetName = presetData.names[0];
+      const preset = presets[presetName];
+
+      if (!preset) {
+        showError(`Preset not in pack: ${presetName}`);
+      }
+
+      visualizer.loadPreset(preset, 0);
+
+      const testBuffer = generateTestAudio(audioContext);
+      const source = audioContext.createBufferSource();
+      source.buffer = testBuffer;
+
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+
+      visualizer.connectAudio(analyser);
+
+      source.start();
+
+      let frameCount = 0;
+      function render() {
+        visualizer.render();
+        frameCount++;
+        if (showInfo) {
+          infoEl.textContent = `${presetName.substring(0, 50)} | Frame: ${frameCount}`;
+        }
+        requestAnimationFrame(render);
+      }
+      render();
+
+      console.log(`Rendering preset: ${presetName} (${presetHash})`);
+
+      if (!showInfo) {
+        infoEl.style.display = 'none';
+      }
+    }
+
+    init().catch(err => {
+      console.error('Init error:', err);
+      showError(err.message);
+    });
+  </script>
+</body>
+</html>
