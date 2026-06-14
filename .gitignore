@@ -65,3 +65,6 @@ tools/*visual-styles*.json
 tools/test-presets*.json
 tools/combined-presets.json
 tools/.venv/
+# Preset import intermediates
+presets/imports/
+.venv/

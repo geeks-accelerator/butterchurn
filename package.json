@@ -70,6 +70,7 @@
     "@types/node": "^20.19.17",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
+    "adm-zip": "^0.5.17",
     "assemblyscript": "^0.17.11",
     "butterchurn-presets": "^3.0.0-beta.4",
     "butterchurn-presets-js": "npm:butterchurn-presets@^2.4.7",

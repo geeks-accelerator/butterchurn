@@ -37,8 +37,13 @@ CATEGORY_KEYS = [
 
 
 def load_model():
-    """Load CLIP model, preferring GPU if available."""
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    """Load CLIP model, preferring GPU (CUDA or MPS) if available."""
+    if torch.cuda.is_available():
+        device = "cuda"
+    elif torch.backends.mps.is_available():
+        device = "mps"
+    else:
+        device = "cpu"
     print(f"[CLIP] Using device: {device}")
 
     model, preprocess = clip.load("ViT-B/32", device=device)
