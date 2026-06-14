@@ -16,6 +16,12 @@ import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
+// Phase 1+: Taxonomy modules
+import { deriveEnergyLabel } from '../src/taxonomy/energyLabel.js';
+import { deriveMusicalResponsiveness } from '../src/taxonomy/musicalResponsiveness.js';
+import { deriveReliabilityTier } from '../src/taxonomy/reliability.js';
+import { analyzePresetColor } from '../src/taxonomy/colorAnalysis.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -76,18 +82,39 @@ class PresetFingerprintGenerator {
         };
 
         this.database = {
-            // CRIT-3 FIX: Bump to v2.1.0 for expanded mood vocabulary and quality improvements
-            version: "2.1.0",  // v2.1 fingerprint schema with 10 moods, complexity scaling, color detection
+            // Phase 0: Bump to v2.2.0 to match alaska-butter schema
+            // Includes all v2.0+ fields: visualStyle, colorProfile, moodAffinities, optimalBpm
+            version: "2.2.0",
             generated: new Date().toISOString(),
             presets: {},
             indices: {
+                // Legacy keys (kept for backward compat with existing selector code)
                 high: [],
                 bass: [],
                 calm: [],
                 particle: [],
                 fractal: [],
                 geometric: [],
-                organic: []
+                organic: [],
+
+                // Phase 6: New v2.2+ index keys for Stage 1 categorical filtering
+                energyLabel: {
+                    calm: [], flowing: [], dynamic: [], energetic: [], intense: [], explosive: []
+                },
+                visualStyle: {
+                    fluid_organic: [], particle: [], geometric: [], fractal: [],
+                    abstract: [], kaleidoscope: [], tunnel: [], waveform: []
+                },
+                musicalResponsiveness: {
+                    spectral_analysis: [], beat_detection: [], volume_reactive: [],
+                    time_only: [], basic_audio: []
+                },
+                reliabilityTier: {
+                    rock_solid: [], stable: [], finicky: [], experimental: []
+                },
+                dominantHue: {
+                    warm: [], cool: [], natural: [], neutral: [], rainbow: []
+                }
             },
             authorIndex: {},
             nameIndex: {}
@@ -784,8 +811,9 @@ class PresetFingerprintGenerator {
         }
 
         // Normalize to 2 decimal places
+        // Phase 0.1 FIX: Emit numbers, not strings — parseFloat undoes toFixed's string output
         return Object.fromEntries(
-            Object.entries(affinities).map(([k, v]) => [k, Math.max(0, Math.min(1, v)).toFixed(2)])
+            Object.entries(affinities).map(([k, v]) => [k, Number(Math.max(0, Math.min(1, v)).toFixed(2))])
         );
     }
 
@@ -825,18 +853,23 @@ class PresetFingerprintGenerator {
         // Derive mood affinities from characteristics (pass all relevant factors)
         const moodAffinities = this.deriveMoodAffinities(visualStyle, motionSpeed, colorProfile, energy, beatSync);
 
+        // Phase 3: Compute complexity and warmup for reliability tier
+        const complexity = this.analyzeComplexity(preset);
+        const warmupTime = this.calculateWarmupTime(preset);
+        const reliabilityTier = deriveReliabilityTier({ complexity, warmupTime }, preset);
+
         return {
             // EXISTING v1.0 fields (keep all - backward compat):
             energy: energy,
             bassEnergy: bassEnergy,         // Changed from "bass" for clarity
             bass: bassEnergy,               // Keep "bass" for backward compat
             trebleEnergy: trebleEnergy,
-            complexity: this.analyzeComplexity(preset),
-            beatSync: this.analyzeBeatSync(preset),
-            beat: this.analyzeBeatSync(preset),  // Keep "beat" for backward compat
+            complexity: complexity,
+            beatSync: beatSync,
+            beat: beatSync,  // Keep "beat" for backward compat
             fps: this.estimatePerformance(preset),
             styles: existingStyles,          // Keep for backward compat
-            warmupTime: this.calculateWarmupTime(preset),
+            warmupTime: warmupTime,
 
             // NEW v2.0 fields:
             visualStyle: visualStyle,
@@ -846,9 +879,26 @@ class PresetFingerprintGenerator {
             moodAffinities: moodAffinities,
             optimalBpm: optimalBpm,
 
+            // Phase 1: Derived energy label for indexing/UI (float is source of truth)
+            energyLabel: deriveEnergyLabel(energy),
+
+            // Phase 2: Musical responsiveness derived from audio reactivity fields
+            musicalResponsiveness: deriveMusicalResponsiveness({ bassEnergy, trebleEnergy, beatSync }),
+
+            // Phase 3: Reliability tier from complexity heuristics (not fps)
+            reliabilityTier: reliabilityTier,
+
+            // Phase 7: Extended color taxonomy (4 flat fields)
+            // Supplements existing colorProfile with finer granularity
+            ...analyzePresetColor(preset),
+
             // CRIT-8 FIX: Mark heuristic-based fields as experimental
             // These should be validated before use in scoring
-            _experimental: ['colorProfile', 'motionSpeed', 'moodAffinities']
+            _experimental: [
+                'colorProfile', 'motionSpeed', 'moodAffinities',
+                'energyLabel', 'musicalResponsiveness', 'reliabilityTier',
+                'colorPaletteType', 'dominantHue', 'brightness', 'colorComplexity'
+            ]
 
             // CRIT-7 FIX: REMOVED spectralProfile
             // Presets don't have intrinsic spectral profiles - meaningless to add defaults
@@ -938,24 +988,49 @@ class PresetFingerprintGenerator {
 
     /**
      * Build category indices based on fingerprints
+     * Phase 6: Extended with v2.2+ index keys for Stage 1 categorical filtering
      */
     buildIndices() {
         for (const [hash, data] of Object.entries(this.database.presets)) {
             const fp = data.fingerprint;
 
-            // Energy-based categories
+            // Legacy indices (backward compat)
             if (fp.energy > 0.7) this.database.indices.high.push(hash);
             else if (fp.energy < 0.3) this.database.indices.calm.push(hash);
 
-            // Audio reactivity
             if ((fp.bass || fp.bassEnergy || 0) > 0.6) this.database.indices.bass.push(hash);
 
-            // Visual style categories (check if styles exists)
             if (fp.styles) {
                 if (fp.styles.includes('particle')) this.database.indices.particle.push(hash);
                 if (fp.styles.includes('fractal')) this.database.indices.fractal.push(hash);
                 if (fp.styles.includes('geometric')) this.database.indices.geometric.push(hash);
                 if (fp.styles.includes('organic')) this.database.indices.organic.push(hash);
+            }
+
+            // Phase 6: v2.2+ categorical indices
+            // energyLabel index
+            if (fp.energyLabel && this.database.indices.energyLabel[fp.energyLabel]) {
+                this.database.indices.energyLabel[fp.energyLabel].push(hash);
+            }
+
+            // visualStyle index
+            if (fp.visualStyle && this.database.indices.visualStyle[fp.visualStyle]) {
+                this.database.indices.visualStyle[fp.visualStyle].push(hash);
+            }
+
+            // musicalResponsiveness index
+            if (fp.musicalResponsiveness && this.database.indices.musicalResponsiveness[fp.musicalResponsiveness]) {
+                this.database.indices.musicalResponsiveness[fp.musicalResponsiveness].push(hash);
+            }
+
+            // reliabilityTier index
+            if (fp.reliabilityTier && this.database.indices.reliabilityTier[fp.reliabilityTier]) {
+                this.database.indices.reliabilityTier[fp.reliabilityTier].push(hash);
+            }
+
+            // dominantHue index
+            if (fp.dominantHue && this.database.indices.dominantHue[fp.dominantHue]) {
+                this.database.indices.dominantHue[fp.dominantHue].push(hash);
             }
         }
     }
@@ -1029,20 +1104,16 @@ class PresetFingerprintGenerator {
                     // New unique preset
                     this.stats.uniquePresets++;
 
-                    // Analyze the preset directly
-                    const fingerprint = {
-                        energy: this.analyzeEnergy(presetData),
-                        bassEnergy: this.analyzeBassReactivity(presetData),
-                        trebleEnergy: this.analyzeTrebleReactivity(presetData),
-                        complexity: this.analyzeComplexity(presetData),
-                        beatSync: this.analyzeBeatSync(presetData),
-                        fps: this.estimatePerformance(presetData)
-                    };
+                    // Phase 0 FIX: Use full generateFingerprint() with v2.0+ fields
+                    // Previously used a simplified fingerprint missing visualStyle, colorProfile, etc.
+                    const fingerprint = this.generateFingerprint(presetData, presetName);
 
                     // Store in database
                     this.database.presets[hash] = {
+                        hash: hash,  // Include hash in preset object for consistency with directory mode
                         authors: [author],
                         names: [presetName],
+                        firstSeen: author,
                         fingerprint,
                         pack: path.basename(jsonFile, '.json')
                     };

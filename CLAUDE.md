@@ -35,11 +35,22 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Fingerprint Quality Improvements Complete - v2.1 Released**
+**Phase: Taxonomy Improvements In Progress - v2.2 Schema**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
 - Phase 2 intelligent preset selection with equation-based fingerprinting
+- **Taxonomy Improvements (v2.2 schema):**
+  - v2.2 fingerprints for full-collection (495 presets with all new fields)
+  - `energyLabel` - 6-level categorical label derived from energy float
+  - `musicalResponsiveness` - 5-type audio responsiveness classification
+  - `reliabilityTier` - 4-tier complexity-based device compatibility
+  - `dominantHue`, `colorPaletteType`, `brightness`, `colorComplexity` - extended color taxonomy
+  - `HierarchicalMatcher` - two-stage filter+score preset selection
+  - Visual style similarity map for Stage 1 relaxation
+  - v2.2 indices for categorical filtering (energyLabel, visualStyle, musicalResponsiveness, reliabilityTier, dominantHue)
+  - Fixed moodAffinities string-to-number encoding bug
+  - 50 unit tests for taxonomy modules
 - **Phase 3 Intelligent Preset Selector Improvements:**
   - Meyda.js spectral audio analysis (2048-sample buffer)
   - BPM detection with iterative clamping (60-180 BPM range)
@@ -74,13 +85,15 @@ This file provides AI-optimized development context for Claude Code when working
 - AlaskaButter demo site at https://alaskabutter.com
 
 ### What's Ready for Implementation 🚀
+- **Taxonomy Validation Pipeline** - Phase 8 (Python frame analysis, LLM vision validation) - see docs/plans/2026-06-12-butterchurn-taxonomy-improvements.md
 - **Selector Optimizations** - Audio lookahead & reverse index scaling (see docs/plans/selector-optimization-improvements.md)
+- HierarchicalMatcher integration into intelligentPresetSelector.js
 - Phase 4: Machine learning-enhanced preset matching
 - User preference learning and personalization
-- Multi-device synchronization
-- Advanced visual effects based on genre detection
 
 ### Critical Files Status
+- `src/taxonomy/` - ✅ Complete taxonomy modules (energyLabel, musicalResponsiveness, reliability, colorAnalysis, visualStyleSimilarity, hierarchicalMatcher)
+- `src/config/taxonomyConfig.js` - ✅ Stage 1/Stage 2 weights and categorical dimension config
 - `src/intelligentPresetSelector.js` - ✅ Complete with phrase-aligned switching, pre-drop anticipation, mood scoring
 - `src/audio/advancedAnalyzer.js` - ✅ Enhanced with Meyda, BPM detection, mood/buildup detection, Gaussian smoothing
 - `src/fingerprintLoader.js` - ✅ Modular fingerprint database loader
