@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHash } from 'node:crypto';
+import { generateContentHash } from '../src/utils/contentHash.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,31 +20,8 @@ const PROJECT_ROOT = path.resolve(__dirname, '..');
 
 console.log('[merge-fp] Merging fingerprints for butterchurnPresetsAll\n');
 
-// Helper: sort object keys for consistent hashing (must match generate-fingerprints.js)
-function sortObject(obj) {
-    if (!obj || typeof obj !== 'object') return obj;
-    return Object.keys(obj)
-        .sort()
-        .reduce((sorted, key) => {
-            sorted[key] = obj[key];
-            return sorted;
-        }, {});
-}
-
-// Helper: compute content hash (must match generate-fingerprints.js exactly)
-function computeHash(preset) {
-    const equations = [
-        preset.init_eqs_str || preset.init_eqs_eel || '',
-        preset.frame_eqs_str || preset.frame_eqs_eel || '',
-        preset.pixel_eqs_str || preset.pixel_eqs_eel || '',
-        preset.warp_eqs_str || preset.warp?.eel || '',
-        preset.comp_eqs_str || preset.comp?.eel || '',
-        JSON.stringify(sortObject(preset.baseVals || {})),
-        JSON.stringify((preset.shapes || []).map(s => sortObject(s))),
-        JSON.stringify((preset.waves || []).map(w => sortObject(w)))
-    ].join('|');
-    return createHash('sha256').update(equations).digest('hex').substring(0, 8);
-}
+// Use shared content hash algorithm (handles all preset formats including flat warp/comp strings)
+const computeHash = generateContentHash;
 
 // Load preset bundle
 const presetsPath = path.join(PROJECT_ROOT, 'presets/full-collection/butterchurnPresetsAll.json');

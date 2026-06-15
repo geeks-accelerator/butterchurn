@@ -397,20 +397,18 @@ describe('Integration: Fingerprint File Quality', () => {
     });
 
     describe('Schema v2.1 Fields', () => {
-        it('should have all required v2.1 mood fields', () => {
+        it('should have all required v2.2 mood fields', () => {
             const sample = Object.values(fingerprints.presets)[0];
             const moods = sample.fingerprint.moodAffinities;
 
-            // Original moods
-            expect(moods).toHaveProperty('aggressive');
-            expect(moods).toHaveProperty('relaxed');
-            expect(moods).toHaveProperty('happy');
-            expect(moods).toHaveProperty('electronic');
-            expect(moods).toHaveProperty('acoustic');
-
-            // New v2.1 moods
-            expect(moods).toHaveProperty('mystical');
+            // v2.2 mood vocabulary (10 fields)
+            expect(moods).toHaveProperty('energetic');
+            expect(moods).toHaveProperty('calm');
+            expect(moods).toHaveProperty('dark');
+            expect(moods).toHaveProperty('bright');
             expect(moods).toHaveProperty('hypnotic');
+            expect(moods).toHaveProperty('aggressive');
+            expect(moods).toHaveProperty('mystical');
             expect(moods).toHaveProperty('psychedelic');
             expect(moods).toHaveProperty('dreamy');
             expect(moods).toHaveProperty('meditative');
