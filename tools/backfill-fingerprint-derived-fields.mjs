@@ -474,12 +474,20 @@ Options:
         const before = presetData.fingerprint || {};
 
         // Look up CLIP data by hash or by preset name
+        // CLIP keys use sanitized filenames (non-alphanumeric -> underscore, max 100 chars)
+        // so we need to normalize preset names to match
+        const normalizeForCLIP = (name) => name.replace(/[^a-z0-9]/gi, '_').substring(0, 100);
+
         let clipData = null;
         if (clipStyles) {
-            // Try hash first, then preset name
+            // Try hash first, then preset name, then normalized preset name
             clipData = clipStyles[hash];
             if (!clipData && presetData.names && presetData.names[0]) {
                 clipData = clipStyles[presetData.names[0]];
+            }
+            if (!clipData && presetData.names && presetData.names[0]) {
+                const normalizedName = normalizeForCLIP(presetData.names[0]);
+                clipData = clipStyles[normalizedName];
             }
         }
 
