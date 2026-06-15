@@ -55,13 +55,15 @@ This file provides AI-optimized development context for Claude Code when working
   - **Determinism harness** (`test/taxonomy/determinism.test.js`): 5 reference fingerprints × 100 iterations + known-SHA pin — drift in derivation code fails CI as a single test, not a 20K-line diff
   - **Latency benchmark** (`test/taxonomy/benchmark.test.js`): worst-case p95 = 34 ms on 19,760 synthetic presets; §G1 memoization decision deferred indefinitely
 
-#### Data layer state (2026-06-15, ansorre import in progress)
-- **ansorre import status:** 12,108 unique presets imported, 59,915/60,540 frames rendered (98.97%), CLIP classification next
+#### Data layer state (2026-06-14, Phase 1 COMPLETE)
+- **butterchurnPresetsAll:** 12,496 presets (388 original + 12,108 ansorre)
+- **alaskaButter:** 495 presets (original small pack, unchanged)
 - **Import artifacts:** `presets/imports/ansorre-unique.json`, `presets/imports/ansorre.fingerprints.json`, `presets/imports/frames/`
 
-#### Existing data layer (495 presets, pre-expansion)
-- `PRESET_PACK_NAMES = ['butterchurnPresetsAll']` — single canonical pack (H1 retired the 7 legacy v1.0 packs from the loader; the never-existing `butterchurnPresetsMixedDugan` was 404-ing every startup pre-retirement)
-- `butterchurnPresetsAll.fingerprints.json` (495 presets, v2.2.0, `fingerprintAlgorithm: '2.2'`) — CLIP-derived `visualStyle` + all backfilled categoricals + alphabetically-sorted indices
+#### Canonical packs
+- `PRESET_PACK_NAMES = ['butterchurnPresetsAll']` — single canonical pack (H1 retired the 7 legacy v1.0 packs)
+- `butterchurnPresetsAll.fingerprints.json` (12,461 matched, v2.2.0, `fingerprintAlgorithm: '2.2'`)
+- `alaskaButter.fingerprints.json` (495 presets, v2.2.0) — for `../alaskabutter/` demo site
 - `alaskaButter.fingerprints.json` (495 presets, v2.2.0) — separate loader path; backfilled to match `butterchurnPresetsAll`'s field set via `tools/backfill-fingerprint-derived-fields.mjs`
 - **Indices** rebuilt under H2: both legacy 7-key buckets (`high / bass / calm / particle / fractal / geometric / organic`) AND new v2.2 categorical buckets (`energyLabel / visualStyle / musicalResponsiveness / reliabilityTier / dominantHue`). Every bucket sorted alphabetically by hash for byte-stable regenerations.
 - **`recentPresets` memory bumped to 100** (was 10) for the 20K scale-up — H4
