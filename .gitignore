@@ -48,6 +48,11 @@ presets/*/alaskaButter.json
 !presets/*/*.fingerprints.min.json
 !presets/*/metadata.json
 
+# Large preset bundles (>100MB) - generate at build time via `npm run build:presets`
+# These are built from butterchurnPresetsAll.json which IS tracked
+presets/full-collection/butterchurnPresetsAll.js
+presets/full-collection/butterchurnPresetsAll.min.js
+
 # Archive and source directories
 presets/full-collection/archive/
 presets/full-collection/presets/
