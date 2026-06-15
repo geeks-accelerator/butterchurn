@@ -29,8 +29,9 @@ const PROJECT_ROOT = path.resolve(__dirname, '..');
 
 // Parse arguments
 const args = process.argv.slice(2);
-let fingerprintsPath = path.join(PROJECT_ROOT, 'presets/alaska-butter/alaskaButter.fingerprints.json');
-let presetsPath = path.join(PROJECT_ROOT, 'presets/alaska-butter/alaskaButter.json');
+// Default to canonical pack (butterchurnPresetsAll) per §H1
+let fingerprintsPath = path.join(PROJECT_ROOT, 'presets/full-collection/butterchurnPresetsAll.fingerprints.json');
+let presetsPath = path.join(PROJECT_ROOT, 'presets/full-collection/butterchurnPresetsAll.json');
 let fix = false;
 
 for (let i = 0; i < args.length; i++) {
