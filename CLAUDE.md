@@ -55,17 +55,20 @@ This file provides AI-optimized development context for Claude Code when working
   - **Determinism harness** (`test/taxonomy/determinism.test.js`): 5 reference fingerprints × 100 iterations + known-SHA pin — drift in derivation code fails CI as a single test, not a 20K-line diff
   - **Latency benchmark** (`test/taxonomy/benchmark.test.js`): worst-case p95 = 39 ms on 24,473 real presets; §G1 memoization decision deferred indefinitely
 
-#### Data layer state (2026-06-15, Phases 1-4 COMPLETE)
+#### Data layer state (2026-06-15, Phases 1-4 COMPLETE, 100% field completeness)
 - **butterchurnPresetsAll:** 24,473 presets (388 original + 12,108 ansorre + 6,023 COTC + 5,954 projectM Classic)
 - **alaskaButter:** 388 presets (curated demo pack from 6 original sources)
+- **Field completeness:** 100% across all 14 validated fields (Pass 17)
 - **visualStyleSource:** 6,064 CLIP-classified (from Phase 1), 18,409 equation-derived
-- **visualStyle distribution:** particle 5,164 | fractal 5,185 | organic 9,258 | abstract 4,047 | fluid_organic 566 | geometric 193 | waveform 60
+- **visualStyle distribution:** abstract 8,459 | organic 6,104 | particle 5,118 | fractal 3,888 | fluid_organic 569 | geometric 215 | waveform 97 | tunnel 14 | kaleidoscope 9
 - **Import artifacts:** `presets/imports/{ansorre,cream-of-the-crop,projectm-classic}.fingerprints.json`
+- **Git exclusions:** `butterchurnPresetsAll.js` and `.min.js` (166MB each) excluded from git; run `npm run build:presets` after clone
 
 #### Canonical packs
 - `PRESET_PACK_NAMES = ['butterchurnPresetsAll']` — single canonical pack (H1 retired the 7 legacy v1.0 packs)
-- `butterchurnPresetsAll.fingerprints.json` (24,473 presets, v2.2.1, `fingerprintAlgorithm: '2.2'`)
-- `alaskaButter.fingerprints.json` (388 presets, v2.2.0) — for `../alaskabutter/` demo site; backfilled to match `butterchurnPresetsAll`'s field set via `tools/backfill-fingerprint-derived-fields.mjs`
+- `butterchurnPresetsAll.fingerprints.json` (24,473 presets, v2.2.2, `fingerprintAlgorithm: '2.2'`, 100% field completeness)
+- `alaskaButter.fingerprints.json` (388 presets, v2.2.2) — for `../alaskabutter/` demo site; synced from canonical
+- **Vocabulary source:** `src/utils/vocabulary.js` — single source of truth for all 7 categorical fields
 - **Indices** rebuilt: both legacy 7-key buckets (`high / bass / calm / particle / fractal / geometric / organic`) AND v2.2 categorical buckets (`energyLabel / visualStyle / musicalResponsiveness / reliabilityTier / dominantHue`). visualStyle now uses CLIP labels for 6,064 presets + equation fallback for 18,409.
 - **`recentPresets` memory bumped to 100** (was 10) for the 24K scale
 - **Phase 3 Intelligent Preset Selector Improvements:**
@@ -166,12 +169,15 @@ src/
 ```bash
 npm install --legacy-peer-deps    # Required for eel-wasm compatibility
 npm run build                     # Production build (UMD + minified)
+npm run build:presets             # Generate butterchurnPresetsAll.js from JSON (required after clone)
 npm run dev                       # Development build with watch
 npm run dev:v2                    # V2 bundle development
 npm run analyze                   # Lint + typecheck + GLSL validation
-npm run build:cdn                 # Build and update CDN files
+npm run build:cdn                 # Build presets + core + update CDN files
 npm run deploy:cdn                # Deploy CDN to GitHub Pages
 ```
+
+**Note:** After cloning, run `npm run build:presets` to generate the large preset bundles (166MB each). These are excluded from git to stay under GitHub's 100MB limit.
 
 ### Test Commands
 ```bash
