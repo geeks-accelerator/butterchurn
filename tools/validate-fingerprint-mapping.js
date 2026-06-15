@@ -88,11 +88,15 @@ console.log(`[validate] Fingerprints: ${Object.keys(fpEntries).length}`);
 console.log(`[validate] Presets: ${presetNames.size}\n`);
 
 // Valid vocabulary for categorical fields (v2.2 schema)
+// CRITICAL: All categorical fields must be included here to prevent vocabulary drift
 const VALID_VOCABULARY = {
     energyLabel: new Set(['calm', 'flowing', 'dynamic', 'energetic', 'intense', 'explosive']),
     musicalResponsiveness: new Set(['spectral_analysis', 'beat_detection', 'volume_reactive', 'time_only', 'basic_audio']),
     reliabilityTier: new Set(['rock_solid', 'stable', 'finicky', 'experimental']),
     visualStyle: new Set(['abstract', 'organic', 'fractal', 'geometric', 'particle', 'tunnel', 'fluid_organic', 'kaleidoscope', 'waveform']),
+    dominantHue: new Set(['warm', 'cool', 'natural', 'neutral', 'rainbow']),
+    colorProfile: new Set(['warm', 'cool', 'neutral', 'vivid', 'nature']),
+    motionSpeed: new Set(['static', 'slow', 'medium', 'fast', 'chaotic']),
 };
 
 // Track issues

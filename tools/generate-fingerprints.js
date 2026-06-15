@@ -12,9 +12,9 @@
 
 import { promises as fs } from 'fs';
 import path from 'path';
-import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { generateContentHash, sortObjectDeep } from '../src/utils/contentHash.js';
 
 // Phase 1+: Taxonomy modules
 import { deriveEnergyLabel } from '../src/taxonomy/energyLabel.js';
@@ -122,43 +122,19 @@ class PresetFingerprintGenerator {
     }
 
     /**
-     * Generate content-based hash from preset equations
-     * This ensures identical presets get the same hash regardless of name/author
+     * Generate content-based hash from preset equations.
+     * Delegates to shared contentHash module for algorithm consistency.
      */
     generateContentHash(preset) {
-        // Collect all equation strings - handle both _eel and _str formats
-        const equations = [
-            preset.init_eqs_str || preset.init_eqs_eel || '',
-            preset.frame_eqs_str || preset.frame_eqs_eel || '',
-            preset.pixel_eqs_str || preset.pixel_eqs_eel || '',
-            preset.warp_eqs_str || preset.warp?.eel || '',
-            preset.comp_eqs_str || preset.comp?.eel || '',
-            // Include base values that affect rendering
-            JSON.stringify(this.sortObject(preset.baseVals || {})),
-            // Include shapes and waves configuration
-            JSON.stringify((preset.shapes || []).map(s => this.sortObject(s))),
-            JSON.stringify((preset.waves || []).map(w => this.sortObject(w)))
-        ].join('|');
-
-        // Generate SHA256 hash and take first 8 characters
-        return crypto.createHash('sha256')
-            .update(equations)
-            .digest('hex')
-            .substring(0, 8);
+        return generateContentHash(preset);
     }
 
     /**
-     * Sort object keys for consistent hashing
+     * Sort object keys for consistent hashing.
+     * Delegates to shared contentHash module for algorithm consistency.
      */
     sortObject(obj) {
-        if (!obj || typeof obj !== 'object') return obj;
-
-        return Object.keys(obj)
-            .sort()
-            .reduce((sorted, key) => {
-                sorted[key] = obj[key];
-                return sorted;
-            }, {});
+        return sortObjectDeep(obj);
     }
 
     /**

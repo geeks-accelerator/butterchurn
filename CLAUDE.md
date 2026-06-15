@@ -50,7 +50,7 @@ This file provides AI-optimized development context for Claude Code when working
   - **Match-depth telemetry:** `getMatchDepthTelemetry()` exposes per-session distribution; success metric "full-categorical match rate ≥30%" measurable
   - **Logging spec:** `[matcher] depth=N relaxed=[...] survivors=X top3=[h:s,h:s,h:s]` + `[selector] ... picked=H` when `logHierarchicalMatching` or `debugMode` is true
   - Fixed `moodAffinities` string-to-number encoding bug
-  - **111 unit tests** for taxonomy modules; **256 total non-visual tests** — all green
+  - **111 unit tests** for taxonomy modules; **280 total non-visual tests** — all green
   - **Validation pipeline** (`tools/validation/`): Python frame analysis, Claude Sonnet 4.6 vision validation, orchestrator
   - **Determinism harness** (`test/taxonomy/determinism.test.js`): 5 reference fingerprints × 100 iterations + known-SHA pin — drift in derivation code fails CI as a single test, not a 20K-line diff
   - **Latency benchmark** (`test/taxonomy/benchmark.test.js`): worst-case p95 = 34 ms on 19,760 synthetic presets; §G1 memoization decision deferred indefinitely

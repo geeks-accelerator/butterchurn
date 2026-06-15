@@ -4,16 +4,16 @@
  * Preset Deduplicator
  *
  * Removes duplicate presets by comparing SHA256 content hashes.
- * Uses the same hashing algorithm as generate-fingerprints.js.
+ * Uses the SAME hashing algorithm as generate-fingerprints.js via shared module.
  *
  * Usage: node deduplicate-presets.js --input ./new-presets.json --existing ./existing.fingerprints.json --output ./unique-presets.json
  */
 
 import { promises as fs } from 'fs';
 import path from 'path';
-import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { generateContentHash } from '../src/utils/contentHash.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -27,45 +27,6 @@ class PresetDeduplicator {
             unique: 0,
             duplicateNames: []
         };
-    }
-
-    /**
-     * Sort object keys for deterministic serialization
-     */
-    sortObject(obj) {
-        if (obj === null || typeof obj !== 'object') {
-            return obj;
-        }
-        if (Array.isArray(obj)) {
-            return obj.map(item => this.sortObject(item));
-        }
-        return Object.keys(obj)
-            .sort()
-            .reduce((result, key) => {
-                result[key] = this.sortObject(obj[key]);
-                return result;
-            }, {});
-    }
-
-    /**
-     * Generate content hash (same algorithm as generate-fingerprints.js)
-     */
-    generateContentHash(preset) {
-        const equations = [
-            preset.init_eqs_str || preset.init_eqs_eel || '',
-            preset.frame_eqs_str || preset.frame_eqs_eel || '',
-            preset.pixel_eqs_str || preset.pixel_eqs_eel || '',
-            preset.warp_eqs_str || preset.warp?.eel || '',
-            preset.comp_eqs_str || preset.comp?.eel || '',
-            JSON.stringify(this.sortObject(preset.baseVals || {})),
-            JSON.stringify(this.sortObject(preset.shapes || [])),
-            JSON.stringify(this.sortObject(preset.waves || []))
-        ].join('|');
-
-        return crypto.createHash('sha256')
-            .update(equations)
-            .digest('hex')
-            .substring(0, 8);
     }
 
     /**
@@ -100,7 +61,7 @@ class PresetDeduplicator {
         for (const [name, preset] of Object.entries(presets)) {
             this.stats.inputCount++;
 
-            const hash = this.generateContentHash(preset);
+            const hash = generateContentHash(preset);
 
             // Check against existing hashes
             if (this.existingHashes.has(hash)) {
