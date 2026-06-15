@@ -286,10 +286,11 @@ describe('Integration: Fingerprint File Quality', () => {
     let fingerprints;
 
     beforeAll(async () => {
-        // Use fs to read JSON file (avoids import assertion parsing issues)
+        // Use canonical pack (butterchurnPresetsAll) which has full CLIP classification
+        // Alaska-butter is a sparse demo pack (89% missing visualStyle)
         const fs = await import('fs');
         const path = await import('path');
-        const filePath = path.join(process.cwd(), 'presets/alaska-butter/alaskaButter.fingerprints.json');
+        const filePath = path.join(process.cwd(), 'presets/full-collection/butterchurnPresetsAll.fingerprints.json');
         const content = fs.readFileSync(filePath, 'utf-8');
         fingerprints = JSON.parse(content);
     });

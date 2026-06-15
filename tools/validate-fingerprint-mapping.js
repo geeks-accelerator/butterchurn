@@ -87,12 +87,21 @@ const presetNames = new Set(Object.keys(presets));
 console.log(`[validate] Fingerprints: ${Object.keys(fpEntries).length}`);
 console.log(`[validate] Presets: ${presetNames.size}\n`);
 
+// Valid vocabulary for categorical fields (v2.2 schema)
+const VALID_VOCABULARY = {
+    energyLabel: new Set(['calm', 'flowing', 'dynamic', 'energetic', 'intense', 'explosive']),
+    musicalResponsiveness: new Set(['spectral_analysis', 'beat_detection', 'volume_reactive', 'time_only', 'basic_audio']),
+    reliabilityTier: new Set(['rock_solid', 'stable', 'finicky', 'experimental']),
+    visualStyle: new Set(['abstract', 'organic', 'fractal', 'geometric', 'particle', 'tunnel', 'fluid_organic', 'kaleidoscope', 'waveform']),
+};
+
 // Track issues
 const issues = {
     missingPresets: [],      // fingerprint points to non-existent preset
     whitespaceNames: [],     // names with leading/trailing whitespace
     duplicateNames: new Map(), // name -> [hashes]
     numericKeys: 0,          // preset keys that are numeric (wrong format)
+    invalidVocabulary: [],   // fields with values outside allowed vocabulary
 };
 
 // Check 1: Every fingerprint must map to a loadable preset
@@ -126,7 +135,19 @@ for (const key of Object.keys(presets)) {
     }
 }
 
-// Check 3: Find actual collisions (same name, different content hashes)
+// Check 3: Vocabulary validity (v2.2 categorical fields must use valid values)
+console.log('[validate] Check 3: Vocabulary validity...');
+for (const [hash, data] of Object.entries(fpEntries)) {
+    const fp = data.fingerprint || {};
+    for (const [field, validSet] of Object.entries(VALID_VOCABULARY)) {
+        const value = fp[field];
+        if (value && !validSet.has(value)) {
+            issues.invalidVocabulary.push({ hash, field, value, valid: [...validSet] });
+        }
+    }
+}
+
+// Check 4: Find actual collisions (same name, different content hashes)
 const collisions = [];
 for (const [name, hashes] of issues.duplicateNames) {
     if (hashes.length > 1) {
@@ -191,6 +212,19 @@ if (issues.numericKeys > 0) {
     console.log();
 }
 
+if (issues.invalidVocabulary.length > 0) {
+    hasErrors = true;
+    console.log(`❌ INVALID VOCABULARY: ${issues.invalidVocabulary.length} fields have values outside allowed vocabulary`);
+    console.log('   First 10:');
+    issues.invalidVocabulary.slice(0, 10).forEach(({ hash, field, value }) => {
+        console.log(`     ${hash}: ${field}="${value}"`);
+    });
+    if (issues.invalidVocabulary.length > 10) {
+        console.log(`     ... and ${issues.invalidVocabulary.length - 10} more`);
+    }
+    console.log();
+}
+
 if (!hasErrors) {
     console.log('✅ All validations passed!');
     console.log(`   ${Object.keys(fpEntries).length} fingerprints`);
@@ -208,6 +242,7 @@ console.log(`Missing presets: ${issues.missingPresets.length}`);
 console.log(`Whitespace names: ${issues.whitespaceNames.length}`);
 console.log(`Name collisions: ${collisions.length}`);
 console.log(`Numeric keys: ${issues.numericKeys}`);
+console.log(`Invalid vocabulary: ${issues.invalidVocabulary.length}`);
 
 if (hasErrors) {
     console.log('\n❌ VALIDATION FAILED - See issues above');
