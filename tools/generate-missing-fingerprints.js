@@ -91,18 +91,95 @@ function deriveEnergy(preset) {
     return Math.min(1, Math.max(0, energy));
 }
 
+// Derive warmupTime from preset characteristics
+function deriveWarmupTime(preset) {
+    let warmupSeconds = 0;
+    const baseVals = preset.baseVals || {};
+
+    // High decay = needs time to build up trails
+    if (baseVals.decay) {
+        if (baseVals.decay > 0.98) warmupSeconds += 3;
+        else if (baseVals.decay > 0.96) warmupSeconds += 2;
+        else if (baseVals.decay > 0.94) warmupSeconds += 1;
+    }
+
+    // Echo effects need time to propagate
+    if (baseVals.echo_alpha && baseVals.echo_alpha > 0.5) {
+        warmupSeconds += 2;
+    }
+
+    // Invert effects often start from black
+    if (baseVals.invert && baseVals.invert > 0) {
+        warmupSeconds += 1;
+    }
+
+    // Check for accumulation patterns in equations
+    const allEqs = [
+        preset.frame_eqs_str || '',
+        preset.pixel_eqs_str || '',
+        preset.init_eqs_str || ''
+    ].join(' ');
+    if (allEqs.includes('old_') || allEqs.includes('prev_')) {
+        warmupSeconds += 2;
+    }
+
+    // Gamma/brightness adjustments might start dark
+    if (baseVals.gamma && baseVals.gamma < 0.5) {
+        warmupSeconds += 2;
+    }
+
+    return warmupSeconds;
+}
+
 // Generate fingerprint for a preset
 function generateFingerprint(name, preset) {
     const hash = generateContentHash(preset);
     const author = extractAuthor(name);
     const visualStyle = deriveVisualStyle({ ...preset, name });
     const energy = deriveEnergy(preset);
+    const warmupTime = deriveWarmupTime(preset);
 
-    const energyLabel = energy > 0.7 ? 'high' : energy < 0.3 ? 'low' : 'medium';
-    const musicalResponsiveness = 'medium';
+    // Derive energyLabel using canonical vocabulary
+    let energyLabel;
+    if (energy >= 0.85) energyLabel = 'explosive';
+    else if (energy >= 0.70) energyLabel = 'intense';
+    else if (energy >= 0.55) energyLabel = 'energetic';
+    else if (energy >= 0.40) energyLabel = 'dynamic';
+    else if (energy >= 0.25) energyLabel = 'flowing';
+    else energyLabel = 'calm';
+
+    const musicalResponsiveness = 'basic_audio';
     const reliabilityTier = 'stable';
     const dominantHue = 'neutral';
     const colorProfile = 'neutral';
+
+    // Derive color fields from baseVals
+    const baseVals = preset.baseVals || {};
+    const gamma = baseVals.gamma ?? 1;
+    const brightnessVal = baseVals.brightness ?? 1;
+    let brightness;
+    if (gamma < 0.8 || brightnessVal < 0.8) brightness = 'dark';
+    else if (gamma > 1.2 || brightnessVal > 1.2) brightness = 'bright';
+    else if (baseVals.invert && baseVals.invert > 0) brightness = 'inverted';
+    else brightness = 'balanced';
+
+    // Determine colorPaletteType from equations
+    const frameEqs = preset.frame_eqs_str || '';
+    const hasAudioReactive = /bass|mid|treb|time/i.test(frameEqs);
+    const hasCycling = /time|sin|cos/i.test(frameEqs);
+    let colorPaletteType;
+    if (hasAudioReactive) colorPaletteType = 'audio_reactive';
+    else if (hasCycling) colorPaletteType = 'time_cycling';
+    else colorPaletteType = 'static_monochrome';
+
+    // Determine colorComplexity from shapes/waves count
+    const shapesCount = (preset.shapes || []).length;
+    const wavesCount = (preset.waves || []).length;
+    const totalElements = shapesCount + wavesCount;
+    let colorComplexity;
+    if (totalElements >= 4) colorComplexity = 'complex';
+    else if (totalElements >= 2) colorComplexity = 'moderate';
+    else colorComplexity = 'simple';
 
     return {
         hash,
@@ -119,7 +196,7 @@ function generateFingerprint(name, preset) {
             beat: 0,
             fps: 60,
             styles: [],
-            warmupTime: 0,
+            warmupTime,
             visualStyle,
             visualStyleSource: 'equation',
             visualStyleScores: {
@@ -139,6 +216,9 @@ function generateFingerprint(name, preset) {
             dominantHue,
             colorProfile,
             motionSpeed: 'medium',
+            colorPaletteType,
+            colorComplexity,
+            brightness,
             moodAffinities: {
                 energetic: energy,
                 calm: 1 - energy,
@@ -151,7 +231,11 @@ function generateFingerprint(name, preset) {
                 dreamy: 0.3,
                 meditative: 1 - energy
             },
-            optimalBpm: Math.round(80 + energy * 80),
+            optimalBpm: {
+                min: Math.round(60 + energy * 40),
+                max: Math.round(120 + energy * 60),
+                ideal: Math.round(80 + energy * 60)
+            },
             fingerprintAlgorithm: '2.2'
         }
     };

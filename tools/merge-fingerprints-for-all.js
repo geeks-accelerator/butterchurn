@@ -47,6 +47,11 @@ const cotcFpPath = path.join(PROJECT_ROOT, 'presets/imports/cream-of-the-crop.fi
 const cotcFp = fs.existsSync(cotcFpPath) ? JSON.parse(fs.readFileSync(cotcFpPath, 'utf8')) : { presets: {} };
 console.log(`[merge-fp] COTC fingerprints: ${Object.keys(cotcFp.presets).length}`);
 
+// projectM Classic fingerprints
+const pmcFpPath = path.join(PROJECT_ROOT, 'presets/imports/projectm-classic.fingerprints.json');
+const pmcFp = fs.existsSync(pmcFpPath) ? JSON.parse(fs.readFileSync(pmcFpPath, 'utf8')) : { presets: {} };
+console.log(`[merge-fp] projectM Classic fingerprints: ${Object.keys(pmcFp.presets).length}`);
+
 let origTotal = 0;
 const origFps = [];
 for (const pack of ORIGINAL_PACKS) {
@@ -85,11 +90,18 @@ for (const [hash, data] of Object.entries(cotcFp.presets)) {
     }
 }
 
+// Then load projectM Classic fingerprints (won't overwrite previous)
+for (const [hash, data] of Object.entries(pmcFp.presets)) {
+    if (!hashToFp.has(hash)) {
+        hashToFp.set(hash, data);
+    }
+}
+
 console.log(`[merge-fp] Total unique fingerprints available: ${hashToFp.size}\n`);
 
 // Build merged fingerprints database keyed by preset name
 const mergedDb = {
-    version: '2.2.0',
+    version: '2.2.2',
     generated: new Date().toISOString(),
     fingerprintAlgorithm: '2.2',
     presets: {},
@@ -104,12 +116,12 @@ const mergedDb = {
         fractal: [],
         geometric: [],
         organic: [],
-        // v2.2 categorical buckets
-        energyLabel: { low: [], medium: [], high: [] },
-        visualStyle: { fluid_organic: [], particle: [], geometric: [], fractal: [], abstract: [], kaleidoscope: [], tunnel: [], waveform: [] },
-        musicalResponsiveness: { low: [], medium: [], high: [] },
-        reliabilityTier: { stable: [], moderate: [], erratic: [] },
-        dominantHue: { warm: [], cool: [], neutral: [] }
+        // v2.2 categorical buckets (canonical vocabulary)
+        energyLabel: { calm: [], flowing: [], dynamic: [], energetic: [], intense: [], explosive: [] },
+        visualStyle: { fluid_organic: [], particle: [], geometric: [], fractal: [], abstract: [], kaleidoscope: [], tunnel: [], waveform: [], organic: [] },
+        musicalResponsiveness: { spectral_analysis: [], beat_detection: [], volume_reactive: [], time_only: [], basic_audio: [] },
+        reliabilityTier: { rock_solid: [], stable: [], finicky: [], experimental: [] },
+        dominantHue: { warm: [], cool: [], neutral: [], natural: [], rainbow: [] }
     }
 };
 
