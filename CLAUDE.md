@@ -35,7 +35,7 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Preset Expansion — Phase 1 (ansorre import) COMPLETE**
+**Phase: Preset Expansion — Phases 1-4 COMPLETE, Phase 5-6 PENDING**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
@@ -53,20 +53,21 @@ This file provides AI-optimized development context for Claude Code when working
   - **111 unit tests** for taxonomy modules; **284 total non-visual tests** — all green
   - **Validation pipeline** (`tools/validation/`): Python frame analysis, Claude Sonnet 4.6 vision validation, orchestrator
   - **Determinism harness** (`test/taxonomy/determinism.test.js`): 5 reference fingerprints × 100 iterations + known-SHA pin — drift in derivation code fails CI as a single test, not a 20K-line diff
-  - **Latency benchmark** (`test/taxonomy/benchmark.test.js`): worst-case p95 = 34 ms on 19,760 synthetic presets; §G1 memoization decision deferred indefinitely
+  - **Latency benchmark** (`test/taxonomy/benchmark.test.js`): worst-case p95 = 39 ms on 24,473 real presets; §G1 memoization decision deferred indefinitely
 
-#### Data layer state (2026-06-15, Phase 1 COMPLETE)
-- **butterchurnPresetsAll:** 12,496 presets (388 original + 12,108 ansorre)
+#### Data layer state (2026-06-15, Phases 1-4 COMPLETE)
+- **butterchurnPresetsAll:** 24,473 presets (388 original + 12,108 ansorre + 6,023 COTC + 5,954 projectM Classic)
 - **alaskaButter:** 388 presets (curated demo pack from 6 original sources)
-- **Import artifacts:** `presets/imports/ansorre-unique.json`, `presets/imports/ansorre.fingerprints.json`, `presets/imports/frames/`
+- **visualStyleSource:** 6,064 CLIP-classified (from Phase 1), 18,409 equation-derived
+- **visualStyle distribution:** particle 5,164 | fractal 5,185 | organic 9,258 | abstract 4,047 | fluid_organic 566 | geometric 193 | waveform 60
+- **Import artifacts:** `presets/imports/{ansorre,cream-of-the-crop,projectm-classic}.fingerprints.json`
 
 #### Canonical packs
 - `PRESET_PACK_NAMES = ['butterchurnPresetsAll']` — single canonical pack (H1 retired the 7 legacy v1.0 packs)
-- `butterchurnPresetsAll.fingerprints.json` (12,496 presets, v2.2.0, `fingerprintAlgorithm: '2.2'`)
+- `butterchurnPresetsAll.fingerprints.json` (24,473 presets, v2.2.1, `fingerprintAlgorithm: '2.2'`)
 - `alaskaButter.fingerprints.json` (388 presets, v2.2.0) — for `../alaskabutter/` demo site; backfilled to match `butterchurnPresetsAll`'s field set via `tools/backfill-fingerprint-derived-fields.mjs`
-- **Indices** rebuilt under H2: both legacy 7-key buckets (`high / bass / calm / particle / fractal / geometric / organic`) AND new v2.2 categorical buckets (`energyLabel / visualStyle / musicalResponsiveness / reliabilityTier / dominantHue`). Every bucket sorted alphabetically by hash for byte-stable regenerations.
-- **`recentPresets` memory bumped to 100** (was 10) for the 20K scale-up — H4
-- One non-overlapping preset (`flexi + amandio c - organic12-3d-2.milk`) was dropped when v1.0 packs retired; will be picked back up in the 20K regen
+- **Indices** rebuilt: both legacy 7-key buckets (`high / bass / calm / particle / fractal / geometric / organic`) AND v2.2 categorical buckets (`energyLabel / visualStyle / musicalResponsiveness / reliabilityTier / dominantHue`). visualStyle now uses CLIP labels for 6,064 presets + equation fallback for 18,409.
+- **`recentPresets` memory bumped to 100** (was 10) for the 24K scale
 - **Phase 3 Intelligent Preset Selector Improvements:**
   - Meyda.js spectral audio analysis (2048-sample buffer)
   - BPM detection with iterative clamping (60-180 BPM range)
@@ -96,7 +97,7 @@ This file provides AI-optimized development context for Claude Code when working
 - Separate alpha buffer blending system (fixes fade-to-black bug)
 - 2048-sample audio processing with superior bass response
 - Visual regression testing with deterministic RNG
-- Updated CDN distribution with all preset and fingerprint files
+- CDN distribution pending Phase 5.6 update (currently serves legacy 388-preset packs)
 - GitHub Pages CDN at https://geeks-accelerator.github.io/butterchurn/cdn/
 - AlaskaButter demo site at https://alaskabutter.com
 
@@ -120,7 +121,7 @@ This file provides AI-optimized development context for Claude Code when working
 - `tools/validation/` - ✅ Taxonomy validation pipeline (analyze_frames.py, llm_validate.py, validate-taxonomy.js)
 - `test/fingerprint-test.html` - ✅ Working demo with new system
 - `test/validation-render.html` - ✅ Headless validation render page
-- `docs/cdn/presets/` - ✅ Updated CDN with all preset + fingerprint files
+- `docs/cdn/presets/` - 🚧 Pending update to 24K bundle (currently serves legacy 388-preset packs)
 
 ## ARCHITECTURE ESSENTIALS
 

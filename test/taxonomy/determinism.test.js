@@ -218,9 +218,9 @@ describe('Dual-pack fingerprint stability — alaskaButter', () => {
 describe('Dual-pack fingerprint stability — butterchurnPresetsAll', () => {
     const CANONICAL_PATH = path.join(REPO_ROOT, 'presets', 'full-collection', 'butterchurnPresetsAll.fingerprints.json');
 
-    test('butterchurnPresetsAll fingerprint count is stable (12,496)', () => {
+    test('butterchurnPresetsAll fingerprint count is stable (24,473)', () => {
         const db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
-        expect(Object.keys(db.presets).length).toBe(12496);
+        expect(Object.keys(db.presets).length).toBe(24473);
     });
 
     test('butterchurnPresetsAll every fingerprint has fingerprintAlgorithm = "2.2"', () => {
