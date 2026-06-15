@@ -1,6 +1,6 @@
 {
   "version": "2.2.2",
-  "generated": "2026-06-15T22:55:57.215Z",
+  "generated": "2026-06-15T23:23:06.897Z",
   "fingerprintAlgorithm": "2.2",
   "presets": {
     "11": {
@@ -910,7 +910,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.65,
+          "calm": 0.35,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.325,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.35
+        }
       }
     },
     "Aderrasi - Songflower (Moss Posy)": {
@@ -966,7 +981,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.7,
+          "calm": 0.30000000000000004,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.35,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.30000000000000004
+        }
       }
     },
     "Aderrasi - Storm of the Eye (Thunder) - mash0000 - quasi pseudo meta concentrics": {
@@ -3462,7 +3492,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "Krash + Illusion - Spiral Movement": {
@@ -3518,7 +3563,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "fast",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "martin + flexi - diamond cutter [prismaticvortex.com] - camille - i wish i wish i wish i was constrained": {
@@ -5343,7 +5403,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.9500000000000001,
+          "calm": 0.04999999999999993,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.47500000000000003,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.04999999999999993
+        }
       }
     },
     "sawtooth grin roam": {
@@ -5948,7 +6023,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "medium",
+        "moodAffinities": {
+          "energetic": 0.8,
+          "calm": 0.19999999999999996,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.4,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.19999999999999996
+        }
       }
     },
     "Unchained - Unified Drag 2": {
@@ -6004,7 +6094,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "medium",
+        "moodAffinities": {
+          "energetic": 0.8500000000000001,
+          "calm": 0.1499999999999999,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.42500000000000004,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.1499999999999999
+        }
       }
     },
     "yin - 191 - Temporal singularities": {
@@ -6060,7 +6165,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "Zylot - Paint Spill (Music Reactive Paint Mix)": {
@@ -7275,7 +7395,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.85,
+          "calm": 0.15000000000000002,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.425,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.15000000000000002
+        }
       }
     },
     "Aderrasi - Mother Of Pearl - mash0000 - how to piss off your eyes": {
@@ -7453,7 +7588,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "beta106i - Burning Form (Seething Mass) - mash0000 - fire paint easter egg internals": {
@@ -10437,7 +10587,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "slow",
+        "moodAffinities": {
+          "energetic": 0.6,
+          "calm": 0.4,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.3,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.4
+        }
       }
     },
     "Geiss - Reaction Diffusion 3 (Lichen Mix)": {
@@ -13238,7 +13403,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "Rovastar + Flexi - Hurricane Nightmare (Moebius Mix)": {
@@ -13660,7 +13840,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "cool",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.9,
+          "calm": 0.09999999999999998,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.45,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.09999999999999998
+        }
       }
     },
     "Rovastar - A Million Miles From Earth (Wormhole Mix)": {
@@ -13716,7 +13911,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "natural",
+        "colorProfile": "nature",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.95,
+          "calm": 0.050000000000000044,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.475,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.050000000000000044
+        }
       }
     },
     "Rovastar - Explosive Minds": {
@@ -13772,7 +13982,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.7999999999999999,
+          "calm": 0.20000000000000007,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.39999999999999997,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.20000000000000007
+        }
       }
     },
     "Rovastar - Trippy Sperm (Jelly)": {
@@ -14621,7 +14846,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "fast",
+        "moodAffinities": {
+          "energetic": 0.8,
+          "calm": 0.19999999999999996,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.4,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.19999999999999996
+        }
       }
     },
     "yin - 190 - Temporal fluctuations": {
@@ -14677,7 +14917,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.95,
+          "calm": 0.050000000000000044,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.475,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.050000000000000044
+        }
       }
     },
     "yin - 250 - Artificial poles of the continuum_Phat′s_Orbit_mix": {
@@ -16075,7 +16330,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.5499999999999999,
+          "calm": 0.45000000000000007,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.27499999999999997,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.45000000000000007
+        }
       }
     },
     "Aderrasi - Airhandler (Principle of Sharing)": {
@@ -16131,7 +16401,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.9,
+          "calm": 0.09999999999999998,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.45,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.09999999999999998
+        }
       }
     },
     "Aderrasi - Contortion (Escher′s Tunnel Mix)": {
@@ -16187,7 +16472,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "chaotic",
+        "moodAffinities": {
+          "energetic": 0.9500000000000001,
+          "calm": 0.04999999999999993,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.47500000000000003,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.04999999999999993
+        }
       }
     },
     "Aderrasi - Curse of the Mirror Emu": {
@@ -16243,7 +16543,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.9500000000000001,
+          "calm": 0.04999999999999993,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.47500000000000003,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.04999999999999993
+        }
       }
     },
     "baked - River of Illusion Dillusion [Bubble]": {
@@ -16543,7 +16858,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.19999999999999998,
+          "calm": 0.8,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.09999999999999999,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.8
+        }
       }
     },
     "cope + flexi - mother-of-whirl [no fnords were hurt]": {
@@ -19039,7 +19369,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.9,
+          "calm": 0.09999999999999998,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.45,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.09999999999999998
+        }
       }
     },
     "Krash & Rovastar - A Million Miles from Earth (Ripple Mix)": {
@@ -19095,7 +19440,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "natural",
+        "colorProfile": "nature",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "Krash + Illusion + Geiss - Spiral Movement (Reaction Diffusion mix)": {
@@ -19212,7 +19572,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "medium",
+        "moodAffinities": {
+          "energetic": 0.95,
+          "calm": 0.050000000000000044,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.475,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.050000000000000044
+        }
       }
     },
     "LuxXx - Fuck Your Code ii": {
@@ -20854,7 +21229,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.44999999999999996,
+          "calm": 0.55,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.22499999999999998,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.55
+        }
       }
     },
     "Phat_Zylot_Eo.S. spiral_Movements_Beatle": {
@@ -20910,7 +21300,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.5499999999999999,
+          "calm": 0.45000000000000007,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.27499999999999997,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.45000000000000007
+        }
       }
     },
     "Rovastar + Fvese - Mosaic Waves": {
@@ -20966,7 +21371,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.9,
+          "calm": 0.09999999999999998,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.45,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.09999999999999998
+        }
       }
     },
     "Rovastar + Geiss - Hyperspace - kaleidoscope": {
@@ -21144,7 +21564,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.9,
+          "calm": 0.09999999999999998,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.45,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.09999999999999998
+        }
       }
     },
     "Rozzor & Shreyas - Deeper Aesthetics": {
@@ -21444,7 +21879,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "cool",
+        "colorProfile": "cool",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "Telek - Sine Wave": {
@@ -21500,7 +21950,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.65,
+          "calm": 0.35,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.325,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.35
+        }
       }
     },
     "Unchained - All You Can Eat": {
@@ -21556,7 +22021,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "Unchained - Fuzzy Sciences": {
@@ -21612,7 +22092,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "medium",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "various artists - 1200774354134 - mash0000 - what the writer′s guild is doing with the extra money": {
@@ -21851,7 +22346,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "chaotic",
+        "moodAffinities": {
+          "energetic": 0.9500000000000001,
+          "calm": 0.04999999999999993,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.47500000000000003,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.04999999999999993
+        }
       }
     },
     "Aderrasi - Halls Of Centrifuge": {
@@ -21907,7 +22417,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "amandio c - feeling well 3": {
@@ -22512,7 +23037,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "slow",
+        "moodAffinities": {
+          "energetic": 0.44999999999999996,
+          "calm": 0.55,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.22499999999999998,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.55
+        }
       }
     },
     "Geiss - Eggs": {
@@ -22568,7 +23108,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "chaotic",
+        "moodAffinities": {
+          "energetic": 0.9,
+          "calm": 0.09999999999999998,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.45,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.09999999999999998
+        }
       }
     },
     "Geiss - El Cubismo": {
@@ -22624,7 +23179,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "chaotic",
+        "moodAffinities": {
+          "energetic": 0.8500000000000001,
+          "calm": 0.1499999999999999,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.42500000000000004,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.1499999999999999
+        }
       }
     },
     "Geiss - Hurricane": {
@@ -22680,7 +23250,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "chaotic",
+        "moodAffinities": {
+          "energetic": 0.65,
+          "calm": 0.35,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.325,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.35
+        }
       }
     },
     "Idiot - Marphets Surreal Dream (Hypnotic Spiral Mix)": {
@@ -22736,7 +23321,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "warm",
+        "colorProfile": "neutral",
+        "motionSpeed": "chaotic",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "iMuS and  Rovastar - The Shroomery (psilobellum)": {
@@ -22914,7 +23514,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.5499999999999999,
+          "calm": 0.45000000000000007,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.27499999999999997,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.45000000000000007
+        }
       }
     },
     "PieturP - triptrap_(getting_concrete_visions_through_a_diafragma_version)": {
@@ -23031,7 +23646,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "Rovastar & Loadus + Zylot - FractalDrop (Spark Machine v2.0)": {
@@ -23148,7 +23778,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.8,
+          "calm": 0.19999999999999996,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.4,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.19999999999999996
+        }
       }
     },
     "shifter - feathers (angel wings)": {
@@ -23204,7 +23849,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 0.7500000000000001,
+          "calm": 0.2499999999999999,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.37500000000000006,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0.2499999999999999
+        }
       }
     },
     "shifter - fractal grinder": {
@@ -23321,7 +23981,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "chaotic",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     },
     "TEcHNO & SandStorm - Psychodelic Highway": {
@@ -23438,7 +24113,22 @@
           "organic": 0.1
         },
         "visualStyleSource": "equation",
-        "visualStyle": "abstract"
+        "visualStyle": "abstract",
+        "dominantHue": "neutral",
+        "colorProfile": "neutral",
+        "motionSpeed": "static",
+        "moodAffinities": {
+          "energetic": 1,
+          "calm": 0,
+          "dark": 0.3,
+          "bright": 0.5,
+          "hypnotic": 0.4,
+          "aggressive": 0.5,
+          "mystical": 0.3,
+          "psychedelic": 0.2,
+          "dreamy": 0.3,
+          "meditative": 0
+        }
       }
     }
   },

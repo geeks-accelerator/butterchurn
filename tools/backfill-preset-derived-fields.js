@@ -104,6 +104,56 @@ function deriveColorFields(preset) {
     return { brightness, colorPaletteType, colorComplexity };
 }
 
+// Derive dominantHue from preset name/equations
+function deriveDominantHue(preset, name) {
+    const nameLower = (name || '').toLowerCase();
+    const frameEqs = (preset.frame_eqs_str || '').toLowerCase();
+    const allText = nameLower + ' ' + frameEqs;
+
+    if (/rainbow|spectrum|prism/i.test(allText)) return 'rainbow';
+    if (/fire|flame|lava|warm|red|orange|yellow|gold|amber/i.test(allText)) return 'warm';
+    if (/ice|cold|blue|cyan|aqua|ocean|water|cool/i.test(allText)) return 'cool';
+    if (/forest|tree|leaf|grass|earth|natural|nature/i.test(allText)) return 'natural';
+    return 'neutral';
+}
+
+// Derive colorProfile from preset
+function deriveColorProfile(preset, name) {
+    const nameLower = (name || '').toLowerCase();
+    const baseVals = preset.baseVals || {};
+
+    if (/vivid|vibrant|neon|glow|bright/i.test(nameLower)) return 'vivid';
+    if (/natural|nature|organic|earth/i.test(nameLower)) return 'nature';
+    if (/warm|fire|flame|red|orange|gold/i.test(nameLower)) return 'warm';
+    if (/cool|cold|ice|blue|cyan/i.test(nameLower)) return 'cool';
+
+    const gamma = baseVals.gamma ?? 1;
+    if (gamma > 1.3) return 'vivid';
+
+    return 'neutral';
+}
+
+// Derive motionSpeed from preset
+function deriveMotionSpeed(preset) {
+    const baseVals = preset.baseVals || {};
+    const zoom = baseVals.zoom ?? 1;
+    const rot = baseVals.rot ?? 0;
+    const warp = baseVals.warp ?? 0;
+    const zoomexp = baseVals.zoomexp ?? 1;
+
+    const zoomDelta = Math.abs(zoom - 1);
+    const rotSpeed = Math.abs(rot);
+    const warpAmount = Math.abs(warp);
+
+    const motionScore = zoomDelta * 2 + rotSpeed * 5 + warpAmount + (zoomexp - 1);
+
+    if (motionScore > 1.5) return 'chaotic';
+    if (motionScore > 0.8) return 'fast';
+    if (motionScore > 0.3) return 'medium';
+    if (motionScore > 0.05) return 'slow';
+    return 'static';
+}
+
 let updated = 0;
 let skipped = 0;
 
@@ -139,7 +189,26 @@ for (const [name, data] of Object.entries(fpDb.presets)) {
         changed = true;
     }
 
-    // Check and fix visualStyleScores
+    // Check and fix dominantHue
+    if (fp.dominantHue === undefined) {
+        fp.dominantHue = deriveDominantHue(preset, name);
+        changed = true;
+    }
+
+    // Check and fix colorProfile
+    if (fp.colorProfile === undefined) {
+        fp.colorProfile = deriveColorProfile(preset, name);
+        changed = true;
+    }
+
+    // Check and fix motionSpeed
+    if (fp.motionSpeed === undefined) {
+        fp.motionSpeed = deriveMotionSpeed(preset);
+        changed = true;
+    }
+
+    // Check and fix visualStyleScores (ensure all 9 keys)
+    const expectedStyleKeys = ['particle', 'fractal', 'geometric', 'fluid_organic', 'abstract', 'kaleidoscope', 'tunnel', 'waveform', 'organic'];
     if (!fp.visualStyleScores) {
         fp.visualStyleScores = {
             particle: 0.1,
@@ -151,6 +220,32 @@ for (const [name, data] of Object.entries(fpDb.presets)) {
             tunnel: 0.1,
             waveform: 0.1,
             organic: 0.1
+        };
+        changed = true;
+    } else {
+        // Ensure all 9 keys exist
+        for (const key of expectedStyleKeys) {
+            if (fp.visualStyleScores[key] === undefined) {
+                fp.visualStyleScores[key] = 0.1;
+                changed = true;
+            }
+        }
+    }
+
+    // Check and fix moodAffinities
+    if (!fp.moodAffinities) {
+        const energy = fp.energy ?? 0.5;
+        fp.moodAffinities = {
+            energetic: energy,
+            calm: 1 - energy,
+            dark: 0.3,
+            bright: 0.5,
+            hypnotic: 0.4,
+            aggressive: energy * 0.5,
+            mystical: 0.3,
+            psychedelic: 0.2,
+            dreamy: 0.3,
+            meditative: 1 - energy
         };
         changed = true;
     }
@@ -170,12 +265,20 @@ console.log(`[backfill-preset] Wrote ${fpPath}`);
 
 // Verify
 let missingWarmup = 0, missingOptimalBpm = 0, missingColorPalette = 0, missingStyleScores = 0;
+let missingDominantHue = 0, missingColorProfile = 0, missingMotionSpeed = 0;
+let missingOrganicKey = 0, missingMoodAffinities = 0;
+const expectedStyleKeys = ['particle', 'fractal', 'geometric', 'fluid_organic', 'abstract', 'kaleidoscope', 'tunnel', 'waveform', 'organic'];
 for (const data of Object.values(fpDb.presets)) {
     const fp = data.fingerprint || {};
     if (fp.warmupTime === undefined) missingWarmup++;
     if (typeof fp.optimalBpm !== 'object') missingOptimalBpm++;
     if (fp.colorPaletteType === undefined) missingColorPalette++;
     if (!fp.visualStyleScores) missingStyleScores++;
+    else if (expectedStyleKeys.some(k => fp.visualStyleScores[k] === undefined)) missingOrganicKey++;
+    if (fp.dominantHue === undefined) missingDominantHue++;
+    if (fp.colorProfile === undefined) missingColorProfile++;
+    if (fp.motionSpeed === undefined) missingMotionSpeed++;
+    if (!fp.moodAffinities) missingMoodAffinities++;
 }
 
 console.log('\nVerification:');
@@ -183,5 +286,17 @@ console.log('  Missing warmupTime:', missingWarmup);
 console.log('  Invalid optimalBpm:', missingOptimalBpm);
 console.log('  Missing colorPaletteType:', missingColorPalette);
 console.log('  Missing visualStyleScores:', missingStyleScores);
+console.log('  Missing visualStyleScores keys:', missingOrganicKey);
+console.log('  Missing dominantHue:', missingDominantHue);
+console.log('  Missing colorProfile:', missingColorProfile);
+console.log('  Missing motionSpeed:', missingMotionSpeed);
+console.log('  Missing moodAffinities:', missingMoodAffinities);
 
-console.log('\n✅ Backfill complete!');
+const totalMissing = missingWarmup + missingOptimalBpm + missingColorPalette + missingStyleScores +
+                     missingDominantHue + missingColorProfile + missingMotionSpeed +
+                     missingOrganicKey + missingMoodAffinities;
+if (totalMissing === 0) {
+    console.log('\n✅ Backfill complete! All fields populated.');
+} else {
+    console.log('\n⚠️  Backfill complete with ' + totalMissing + ' remaining issues.')
+}
