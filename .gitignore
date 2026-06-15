@@ -68,3 +68,4 @@ tools/.venv/
 # Preset import intermediates
 presets/imports/
 .venv/
+tools/milkdrop-preset-converter/

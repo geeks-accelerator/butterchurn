@@ -65,6 +65,11 @@ const ansorreFpPath = path.join(PROJECT_ROOT, 'presets/imports/ansorre.fingerpri
 const ansorreFp = JSON.parse(fs.readFileSync(ansorreFpPath, 'utf8'));
 console.log(`[merge-fp] Ansorre fingerprints: ${Object.keys(ansorreFp.presets).length}`);
 
+// COTC (Cream of the Crop) fingerprints
+const cotcFpPath = path.join(PROJECT_ROOT, 'presets/imports/cream-of-the-crop.fingerprints.json');
+const cotcFp = fs.existsSync(cotcFpPath) ? JSON.parse(fs.readFileSync(cotcFpPath, 'utf8')) : { presets: {} };
+console.log(`[merge-fp] COTC fingerprints: ${Object.keys(cotcFp.presets).length}`);
+
 let origTotal = 0;
 const origFps = [];
 for (const pack of ORIGINAL_PACKS) {
@@ -91,6 +96,13 @@ for (const fp of origFps) {
 
 // Then load ansorre fingerprints (won't overwrite originals)
 for (const [hash, data] of Object.entries(ansorreFp.presets)) {
+    if (!hashToFp.has(hash)) {
+        hashToFp.set(hash, data);
+    }
+}
+
+// Then load COTC fingerprints (won't overwrite previous)
+for (const [hash, data] of Object.entries(cotcFp.presets)) {
     if (!hashToFp.has(hash)) {
         hashToFp.set(hash, data);
     }
