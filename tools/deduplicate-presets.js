@@ -31,6 +31,8 @@ class PresetDeduplicator {
 
     /**
      * Load existing hashes from fingerprints file
+     * Uses the inner `hash` field (canonical generateContentHash output),
+     * NOT the DB keys which may be legacy.
      */
     async loadExistingHashes(fingerprintsPath) {
         console.log(`Loading existing fingerprints from: ${fingerprintsPath}`);
@@ -38,8 +40,10 @@ class PresetDeduplicator {
         const content = await fs.readFile(fingerprintsPath, 'utf8');
         const data = JSON.parse(content);
 
-        // Extract all hash IDs from the presets object
-        for (const hash of Object.keys(data.presets || {})) {
+        // Extract content hashes from the inner `hash` field (canonical algorithm)
+        // Fall back to DB key if inner hash is missing (legacy records)
+        for (const [dbKey, record] of Object.entries(data.presets || {})) {
+            const hash = record.fingerprint?.hash || dbKey;
             this.existingHashes.add(hash);
         }
 

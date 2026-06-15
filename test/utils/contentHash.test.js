@@ -235,4 +235,65 @@ describe('dedup/generator hash consistency', () => {
 
         expect(generateContentHash(preset1)).toBe(generateContentHash(preset2));
     });
+
+    test('flat warp string affects hash (N16 regression)', () => {
+        // Critical: deployed presets store warp/comp as flat strings
+        // This test ensures they're included in the hash
+        const preset1 = {
+            baseVals: { decay: 0.98 },
+            warp: ''  // empty warp
+        };
+        const preset2 = {
+            baseVals: { decay: 0.98 },
+            warp: 'ret = lerp(ret, tex2D(sampler_main, uv).xyz, 0.5);'
+        };
+        expect(generateContentHash(preset1)).not.toBe(generateContentHash(preset2));
+    });
+
+    test('flat comp string affects hash (N16 regression)', () => {
+        const preset1 = {
+            baseVals: { decay: 0.98 },
+            comp: ''
+        };
+        const preset2 = {
+            baseVals: { decay: 0.98 },
+            comp: 'ret = saturate(ret * 1.2);'
+        };
+        expect(generateContentHash(preset1)).not.toBe(generateContentHash(preset2));
+    });
+
+    test('handles all warp/comp format variations', () => {
+        const shaderCode = 'ret = tex2D(sampler_main, uv).xyz;';
+
+        // Format 1: _str suffix
+        const presetStr = { warp_eqs_str: shaderCode };
+        // Format 2: .eel property
+        const presetEel = { warp: { eel: shaderCode } };
+        // Format 3: flat string (deployed format)
+        const presetFlat = { warp: shaderCode };
+
+        // All three formats should produce the same hash
+        const hashStr = generateContentHash(presetStr);
+        const hashEel = generateContentHash(presetEel);
+        const hashFlat = generateContentHash(presetFlat);
+
+        expect(hashStr).toBe(hashEel);
+        expect(hashEel).toBe(hashFlat);
+    });
+
+    test('two presets differing only in warp hash differently', () => {
+        // This is the load-bearing test for N16
+        const basePreset = {
+            init_eqs_str: 'q1 = 0;',
+            frame_eqs_str: 'rot = 0.01;',
+            baseVals: { decay: 0.98, zoom: 1.0 },
+            shapes: [],
+            waves: []
+        };
+
+        const preset1 = { ...basePreset, warp: 'ret = tex2D(sampler_main, uv).xyz;' };
+        const preset2 = { ...basePreset, warp: 'ret = tex2D(sampler_main, uv * 2.0).xyz;' };
+
+        expect(generateContentHash(preset1)).not.toBe(generateContentHash(preset2));
+    });
 });
