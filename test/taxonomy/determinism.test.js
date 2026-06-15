@@ -23,6 +23,13 @@
 
 import { describe, test, expect } from '@jest/globals';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const REPO_ROOT = path.resolve(__dirname, '..', '..');
 import {
     backfillFingerprint,
     buildIndices,
@@ -167,14 +174,72 @@ describe('H3 — backfill derivation is deterministic across 100 iterations', ()
         //   1. Run with PRINT_DETERMINISM_SHA=1 to see the new SHA in the test output
         //   2. Verify the output diff is what you expected
         //   3. Paste the new hex below and document the change in the comment
-        // Updated: 2026-06-14 — initial pin against backfill + buildIndices output
+        // Updated: 2026-06-15 — rotated after CLIP moodAffinities re-derivation (Phase 1)
         //   for the 5 reference fingerprints inlined above.
-        const EXPECTED_SHA = '444eba0b88c598cb7c065d36819aa0ebf9a7716888d9e762b64c81f198cc3fad';
+        const EXPECTED_SHA = '42a0590943845feb243804a3e7fa69dec9f96f0ebf0a9be0496933b208eb498b';
         expect(actualSha).toBe(EXPECTED_SHA);
         // Log so a maintainer rotating the pin can see the value to copy.
         if (process.env.PRINT_DETERMINISM_SHA) {
             // eslint-disable-next-line no-console
             console.log('[determinism] reference SHA =', actualSha);
+        }
+    });
+});
+
+describe('Dual-pack fingerprint stability — alaskaButter', () => {
+    const ALASKA_PATH = path.join(REPO_ROOT, 'presets', 'alaska-butter', 'alaskaButter.fingerprints.json');
+
+    test('alaskaButter fingerprint count is stable (388)', () => {
+        const db = JSON.parse(fs.readFileSync(ALASKA_PATH, 'utf8'));
+        expect(Object.keys(db.presets).length).toBe(388);
+    });
+
+    test('alaskaButter every fingerprint has fingerprintAlgorithm = "2.2"', () => {
+        const db = JSON.parse(fs.readFileSync(ALASKA_PATH, 'utf8'));
+        for (const [hash, data] of Object.entries(db.presets)) {
+            expect(data.fingerprint.fingerprintAlgorithm).toBe('2.2');
+        }
+    });
+
+    test('alaskaButter fingerprints match bundled preset names', () => {
+        const db = JSON.parse(fs.readFileSync(ALASKA_PATH, 'utf8'));
+        const presetsPath = path.join(REPO_ROOT, 'presets', 'alaska-butter', 'alaskaButter.json');
+        const presets = JSON.parse(fs.readFileSync(presetsPath, 'utf8'));
+        const presetNames = new Set(Object.keys(presets));
+
+        for (const [hash, data] of Object.entries(db.presets)) {
+            for (const name of data.names || []) {
+                expect(presetNames.has(name)).toBe(true);
+            }
+        }
+    });
+});
+
+describe('Dual-pack fingerprint stability — butterchurnPresetsAll', () => {
+    const CANONICAL_PATH = path.join(REPO_ROOT, 'presets', 'full-collection', 'butterchurnPresetsAll.fingerprints.json');
+
+    test('butterchurnPresetsAll fingerprint count is stable (12,496)', () => {
+        const db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
+        expect(Object.keys(db.presets).length).toBe(12496);
+    });
+
+    test('butterchurnPresetsAll every fingerprint has fingerprintAlgorithm = "2.2"', () => {
+        const db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
+        for (const [hash, data] of Object.entries(db.presets)) {
+            expect(data.fingerprint.fingerprintAlgorithm).toBe('2.2');
+        }
+    });
+
+    test('butterchurnPresetsAll fingerprints match bundled preset names', () => {
+        const db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
+        const presetsPath = path.join(REPO_ROOT, 'presets', 'full-collection', 'butterchurnPresetsAll.json');
+        const presets = JSON.parse(fs.readFileSync(presetsPath, 'utf8'));
+        const presetNames = new Set(Object.keys(presets));
+
+        for (const [hash, data] of Object.entries(db.presets)) {
+            for (const name of data.names || []) {
+                expect(presetNames.has(name)).toBe(true);
+            }
         }
     });
 });

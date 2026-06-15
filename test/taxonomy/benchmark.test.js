@@ -3,9 +3,9 @@
  * benchmark on a synthetic 20K-preset database.
  *
  * Method:
- *   - Load alaska-butter (~495 presets) as the source corpus.
- *   - Clone every record 40× with hash-prefix mangling to produce a synthetic
- *     ~20K DB with diverse fingerprint shapes (every category still represented
+ *   - Load butterchurnPresetsAll (~12,461 presets) as the source corpus.
+ *   - Clone every record 2× with hash-prefix mangling to produce a synthetic
+ *     ~25K DB with diverse fingerprint shapes (every category still represented
  *     because the source has them).
  *   - Time HierarchicalMatcher.findMatches across multiple scenarios:
  *       * Cold scan (no categorical targets) — Stage 1 vacuous, Stage 2 scores
@@ -30,9 +30,9 @@ import { HierarchicalMatcher } from '../../src/taxonomy/hierarchicalMatcher.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
-const ALASKA_PATH = path.join(REPO_ROOT, 'presets', 'alaska-butter', 'alaskaButter.fingerprints.json');
+const CANONICAL_PATH = path.join(REPO_ROOT, 'presets', 'full-collection', 'butterchurnPresetsAll.fingerprints.json');
 
-const CLONE_FACTOR = 40; // ~495 × 40 ≈ 19,800 presets — close enough to 20K
+const CLONE_FACTOR = 2; // ~12,461 × 2 ≈ 24,922 presets — above 20K target
 
 // Acceptable per-switch latency on the benchmark machine. Generous: real
 // switches happen at ~1/sec under normal use, so even 100ms is fine UX-wise.
@@ -41,7 +41,7 @@ const CLONE_FACTOR = 40; // ~495 × 40 ≈ 19,800 presets — close enough to 20
 const LATENCY_CEILING_MS = 250;
 
 function buildSyntheticDb() {
-    const src = JSON.parse(fs.readFileSync(ALASKA_PATH, 'utf8'));
+    const src = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
     const presets = {};
     for (const [hash, data] of Object.entries(src.presets)) {
         for (let i = 0; i < CLONE_FACTOR; i++) {

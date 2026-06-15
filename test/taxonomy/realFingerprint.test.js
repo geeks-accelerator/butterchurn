@@ -24,14 +24,57 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 
-const ALASKA_BUTTER_PATH = path.join(
-    REPO_ROOT, 'presets', 'alaska-butter', 'alaskaButter.fingerprints.json'
-);
-const PRESETS_ALL_PATH = path.join(
+// Canonical pack (butterchurnPresetsAll) is the primary test target
+const CANONICAL_PATH = path.join(
     REPO_ROOT, 'presets', 'full-collection', 'butterchurnPresetsAll.fingerprints.json'
 );
 
 describe('P4.1 — fingerprint files carry v2.2 derived fields', () => {
+    test('butterchurnPresetsAll has energyLabel on every preset', () => {
+        const db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
+        const fingerprints = Object.values(db.presets).map(p => p.fingerprint);
+        const missing = fingerprints.filter(fp => fp.energyLabel === undefined);
+        expect(missing.length).toBe(0);
+    });
+
+    test('butterchurnPresetsAll has musicalResponsiveness on every preset', () => {
+        const db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
+        const fingerprints = Object.values(db.presets).map(p => p.fingerprint);
+        const missing = fingerprints.filter(fp => fp.musicalResponsiveness === undefined);
+        expect(missing.length).toBe(0);
+    });
+
+    test('butterchurnPresetsAll has reliabilityTier on every preset', () => {
+        const db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
+        const fingerprints = Object.values(db.presets).map(p => p.fingerprint);
+        const missing = fingerprints.filter(fp => fp.reliabilityTier === undefined);
+        expect(missing.length).toBe(0);
+    });
+
+    test('butterchurnPresetsAll moodAffinities values are numbers (not stringified)', () => {
+        const db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
+        const sample = Object.values(db.presets)[0].fingerprint;
+        const values = Object.values(sample.moodAffinities);
+        const allNumeric = values.every(v => typeof v === 'number');
+        expect(allNumeric).toBe(true);
+    });
+
+    test('butterchurnPresetsAll is v2.2 with all derived fields', () => {
+        const db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
+        expect(db.version).toMatch(/^2\.2/);
+        const fp = Object.values(db.presets)[0].fingerprint;
+        expect(fp.energyLabel).toBeDefined();
+        expect(fp.musicalResponsiveness).toBeDefined();
+        expect(fp.reliabilityTier).toBeDefined();
+        expect(fp.dominantHue).toBeDefined();
+    });
+});
+
+const ALASKA_BUTTER_PATH = path.join(
+    REPO_ROOT, 'presets', 'alaska-butter', 'alaskaButter.fingerprints.json'
+);
+
+describe('P4.1 — alaskaButter fingerprints carry v2.2 derived fields (dual-pack coverage)', () => {
     test('alaskaButter has energyLabel on every preset', () => {
         const db = JSON.parse(fs.readFileSync(ALASKA_BUTTER_PATH, 'utf8'));
         const fingerprints = Object.values(db.presets).map(p => p.fingerprint);
@@ -53,24 +96,9 @@ describe('P4.1 — fingerprint files carry v2.2 derived fields', () => {
         expect(missing.length).toBe(0);
     });
 
-    test('alaskaButter moodAffinities values are numbers (not stringified)', () => {
+    test('alaskaButter fingerprint count matches preset count (388)', () => {
         const db = JSON.parse(fs.readFileSync(ALASKA_BUTTER_PATH, 'utf8'));
-        const sample = Object.values(db.presets)[0].fingerprint;
-        const values = Object.values(sample.moodAffinities);
-        const allNumeric = values.every(v => typeof v === 'number');
-        expect(allNumeric).toBe(true);
-    });
-
-    test('butterchurnPresetsAll exists, is v2.2, has derived fields', () => {
-        // This file existed but was orphaned from PRESET_PACK_NAMES pre-P1.1a.
-        // Test verifies it stays loadable so the wiring fix remains effective.
-        const db = JSON.parse(fs.readFileSync(PRESETS_ALL_PATH, 'utf8'));
-        expect(db.version).toMatch(/^2\.2/);
-        const fp = Object.values(db.presets)[0].fingerprint;
-        expect(fp.energyLabel).toBeDefined();
-        expect(fp.musicalResponsiveness).toBeDefined();
-        expect(fp.reliabilityTier).toBeDefined();
-        expect(fp.dominantHue).toBeDefined();
+        expect(Object.keys(db.presets).length).toBe(388);
     });
 });
 
@@ -78,7 +106,7 @@ describe('P4.2 — Stage 1 categorical filter actually runs with realistic data'
     let db;
 
     beforeAll(() => {
-        db = JSON.parse(fs.readFileSync(ALASKA_BUTTER_PATH, 'utf8'));
+        db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
     });
 
     test('targeting visualStyle "particle" keeps it out of relaxedDimensions', () => {
@@ -94,7 +122,7 @@ describe('P4.2 — Stage 1 categorical filter actually runs with realistic data'
 
         const result = matcher.findMatches(target, { limit: 30 });
 
-        // With 495 alaska-butter presets, Stage 1 should comfortably find
+        // With 12,461 butterchurnPresetsAll presets, Stage 1 should comfortably find
         // >= 5 matches on visualStyle alone (plus the relaxation buffer).
         expect(result.matchDepth).toBeGreaterThanOrEqual(1);
         expect(result.relaxedDimensions).not.toContain('visualStyle');

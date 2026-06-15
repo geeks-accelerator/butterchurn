@@ -55,16 +55,15 @@ This file provides AI-optimized development context for Claude Code when working
   - **Determinism harness** (`test/taxonomy/determinism.test.js`): 5 reference fingerprints × 100 iterations + known-SHA pin — drift in derivation code fails CI as a single test, not a 20K-line diff
   - **Latency benchmark** (`test/taxonomy/benchmark.test.js`): worst-case p95 = 34 ms on 19,760 synthetic presets; §G1 memoization decision deferred indefinitely
 
-#### Data layer state (2026-06-14, Phase 1 COMPLETE)
+#### Data layer state (2026-06-15, Phase 1 COMPLETE)
 - **butterchurnPresetsAll:** 12,496 presets (388 original + 12,108 ansorre)
-- **alaskaButter:** 495 presets (original small pack, unchanged)
+- **alaskaButter:** 388 presets (curated demo pack from 6 original sources)
 - **Import artifacts:** `presets/imports/ansorre-unique.json`, `presets/imports/ansorre.fingerprints.json`, `presets/imports/frames/`
 
 #### Canonical packs
 - `PRESET_PACK_NAMES = ['butterchurnPresetsAll']` — single canonical pack (H1 retired the 7 legacy v1.0 packs)
-- `butterchurnPresetsAll.fingerprints.json` (12,461 matched, v2.2.0, `fingerprintAlgorithm: '2.2'`)
-- `alaskaButter.fingerprints.json` (495 presets, v2.2.0) — for `../alaskabutter/` demo site
-- `alaskaButter.fingerprints.json` (495 presets, v2.2.0) — separate loader path; backfilled to match `butterchurnPresetsAll`'s field set via `tools/backfill-fingerprint-derived-fields.mjs`
+- `butterchurnPresetsAll.fingerprints.json` (12,496 presets, v2.2.0, `fingerprintAlgorithm: '2.2'`)
+- `alaskaButter.fingerprints.json` (388 presets, v2.2.0) — for `../alaskabutter/` demo site; backfilled to match `butterchurnPresetsAll`'s field set via `tools/backfill-fingerprint-derived-fields.mjs`
 - **Indices** rebuilt under H2: both legacy 7-key buckets (`high / bass / calm / particle / fractal / geometric / organic`) AND new v2.2 categorical buckets (`energyLabel / visualStyle / musicalResponsiveness / reliabilityTier / dominantHue`). Every bucket sorted alphabetically by hash for byte-stable regenerations.
 - **`recentPresets` memory bumped to 100** (was 10) for the 20K scale-up — H4
 - One non-overlapping preset (`flexi + amandio c - organic12-3d-2.milk`) was dropped when v1.0 packs retired; will be picked back up in the 20K regen
@@ -90,7 +89,7 @@ This file provides AI-optimized development context for Claude Code when working
   - Organic mood caps (acoustic > electronic, aggressive ≤ 0.75)
   - BPM and energy threshold constants in selector
   - ColorProfile and visualStyle scoring in preset selection
-- Alaska Butter unified collection (495 presets, 388 unique after deduplication)
+- Alaska Butter curated collection (388 presets from 6 original packs after deduplication)
 - Individual preset pack support with 1:1 fingerprint mapping
 - FingerprintLoader + FingerprintAdapter system for modular preset loading
 - Moving Average crossover detection for scene-based preset switching
