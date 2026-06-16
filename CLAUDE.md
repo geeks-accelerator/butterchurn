@@ -35,7 +35,7 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Preset Expansion — Phases 1-4 COMPLETE, Phase 5-6 PENDING**
+**Phase: Preset Expansion — Phases 1-4 COMPLETE, Phase 5 PENDING, Phase 6.1-6.6 COMPLETE**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
@@ -64,6 +64,15 @@ This file provides AI-optimized development context for Claude Code when working
 - **reliabilityTier distribution:** stable 6,171 (28%) | finicky 9,754 (45%) | experimental 5,314 (25%) | rock_solid 448 (2%)
 - **Import artifacts:** `presets/imports/{ansorre,cream-of-the-crop,projectm-classic}.fingerprints.json`
 - **Git exclusions:** `butterchurnPresetsAll.js` and `.min.js` (166MB each) excluded from git; run `npm run build:presets` after clone
+
+#### Phase 6 Semantic Enrichment (2026-06-15, alaska-butter prototype complete)
+- **Pipeline:** `tools/semantic-enrichment/` — describe-presets.js → embed-descriptions.js → merge-semantic-data.js
+- **Models:** llama3.2-vision-11b (Ollama) + nomic-embed-text (768 dims)
+- **alaska-butter enrichment:** 376/388 presets with descriptions + embeddings (12 skipped: frame filename issues)
+- **Quality gates:** Retrieval 3.90/5 (PASSED), Cluster separation 0.0657 (FAILED — descriptions too formulaic)
+- **Matcher integration:** `src/taxonomy/embeddingScore.js`, 5% weight in Stage 2 scoring, graceful fallback when missing
+- **Tests:** 32 embedding tests added, 363 total passing
+- **Pending:** Phase 6.7 UX integration, Phase 6.8 butterchurnPresetsAll enrichment (~100+ hours compute)
 
 #### Canonical packs
 - `PRESET_PACK_NAMES = ['butterchurnPresetsAll']` — single canonical pack (H1 retired the 7 legacy v1.0 packs)

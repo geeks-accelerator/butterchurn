@@ -12,9 +12,11 @@
 
 import { tiersAllowedForDevice } from './reliability.js';
 import { VISUAL_STYLE_SIMILARITY } from './visualStyleSimilarity.js';
+import { computeEmbeddingScore } from './embeddingScore.js';
 import defaultConfig from '../config/taxonomyConfig.js';
 
 // Default weights sum to 1.0
+// Phase 6: Added embedding weight (0.05), reduced complexity/visualContinuity/styleContinuity to compensate
 const DEFAULT_WEIGHTS = {
   energy: 0.18,
   bass: 0.12,
@@ -22,10 +24,11 @@ const DEFAULT_WEIGHTS = {
   beat: 0.08,
   mood: 0.18,
   bpm: 0.12,
-  complexity: 0.10,
-  visualContinuity: 0.08,
-  styleContinuity: 0.05,
-  colorSynergy: 0.05
+  complexity: 0.08,       // was 0.10, freed 0.02
+  visualContinuity: 0.07, // was 0.08, freed 0.01
+  styleContinuity: 0.04,  // was 0.05, freed 0.01
+  colorSynergy: 0.04,     // was 0.05, freed 0.01
+  embedding: 0.05         // NEW: semantic similarity from description embeddings
 };
 
 export class HierarchicalMatcher {
@@ -54,7 +57,8 @@ export class HierarchicalMatcher {
       mood = null,
       detectedBpm = null,
       candidateHashes = null,
-      currentHash = null
+      currentHash = null,
+      targetEmbedding = null  // Phase 6: optional semantic embedding for query
     } = options;
 
     let candidates = candidateHashes ?? Object.keys(this.db.presets);
@@ -81,7 +85,7 @@ export class HierarchicalMatcher {
     // Stage 2: continuous scoring over Stage 1 survivors
     const scored = surviving.map(hash => ({
       hash,
-      score: this.scoreContinuous(this.fp(hash), target, mood, detectedBpm, currentFp)
+      score: this.scoreContinuous(this.fp(hash), target, mood, detectedBpm, currentFp, targetEmbedding)
     }));
     scored.sort((a, b) => b.score - a.score);
 
@@ -144,7 +148,7 @@ export class HierarchicalMatcher {
    * @param {Object|null} currentFp - Current preset fingerprint (for continuity)
    * @returns {number} Combined score in [0, 1]
    */
-  scoreContinuous(fp, target, mood = null, detectedBpm = null, currentFp = null) {
+  scoreContinuous(fp, target, mood = null, detectedBpm = null, currentFp = null, targetEmbedding = null) {
     if (!fp) return 0;
 
     // Defensive bass-field read: fingerprints have BOTH fp.bass and fp.bassEnergy
@@ -215,6 +219,10 @@ export class HierarchicalMatcher {
       }
     }
 
+    // D6 — Semantic embedding similarity (Phase 6)
+    // Score is 0 if either embedding is missing (graceful degradation)
+    const embeddingScore = computeEmbeddingScore(targetEmbedding, fp.embedding);
+
     const w = this.weights;
     return (
       w.energy * energyScore +
@@ -226,7 +234,8 @@ export class HierarchicalMatcher {
       w.complexity * complexityScore +
       w.visualContinuity * visualContinuityScore +
       w.styleContinuity * styleContinuityScore +
-      w.colorSynergy * colorSynergyScore
+      w.colorSynergy * colorSynergyScore +
+      w.embedding * embeddingScore
     );
   }
 
@@ -248,9 +257,9 @@ export class HierarchicalMatcher {
    * @returns {number} Composite score
    */
   scoreOne(hash, target, options = {}) {
-    const { mood = null, detectedBpm = null, currentHash = null } = options;
+    const { mood = null, detectedBpm = null, currentHash = null, targetEmbedding = null } = options;
     const currentFp = currentHash ? this.fp(currentHash) : null;
-    return this.scoreContinuous(this.fp(hash), target, mood, detectedBpm, currentFp);
+    return this.scoreContinuous(this.fp(hash), target, mood, detectedBpm, currentFp, targetEmbedding);
   }
 }
 

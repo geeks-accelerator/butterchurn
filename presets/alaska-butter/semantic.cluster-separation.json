@@ -1,0 +1,66 @@
+{
+  "version": "v1.0",
+  "testedAt": "2026-06-16T06:04:32.340Z",
+  "presetCount": 376,
+  "similarPairsCount": 50,
+  "randomPairsCount": 50,
+  "similarMean": 0.9715721868673374,
+  "similarStd": 0.0031287823813948594,
+  "randomMean": 0.9059101890168282,
+  "randomStd": 0.032439216371725955,
+  "separation": 0.06566199785050919,
+  "threshold": 0.15,
+  "passed": false,
+  "topSimilarPairs": [
+    {
+      "a": "AdamFx 2 Geiss, Zylot and Flexi - Reaction Diffusion 3 (Overload Mix 2) EATIT4 (BCCNJ4)",
+      "b": "Geiss - Skin Dots 9",
+      "similarity": 0.9854491848788599
+    },
+    {
+      "a": "Geiss - Skin Dots 9",
+      "b": "Telek - Sine Wave",
+      "similarity": 0.9777942189983672
+    },
+    {
+      "a": "_Mig_049",
+      "b": "flexi + nitorami - beat explorer (cn bc jelly 4)",
+      "similarity": 0.9773472099497048
+    },
+    {
+      "a": "Geiss - Reaction Diffusion (Relief Mix)",
+      "b": "stahlregen - old school, baby (spiral ornament)",
+      "similarity": 0.9768699909511964
+    },
+    {
+      "a": "AdamFx 2 Geiss, Zylot and Flexi - Reaction Diffusion 3 (Overload Mix 2) EATIT4 (BCCNJ4)",
+      "b": "Telek - Sine Wave",
+      "similarity": 0.9762273082989351
+    },
+    {
+      "a": "cope - strange attractor [flexis let it grow mix] (Jelly 5.56 [volume noise zoom-in])",
+      "b": "Rovastar-altarsofmadness(forgottenrea",
+      "similarity": 0.9754063864029885
+    },
+    {
+      "a": "flexi + bdrv - acid etching (jelly v5.5)",
+      "b": "baked - River of Illusion Dillusion [Bubble]",
+      "similarity": 0.9743893546760225
+    },
+    {
+      "a": "Rovastar + Che - Asylum Animations",
+      "b": "AdamFx 2 Geiss, Zylot and Flexi - Reaction Diffusion 3 (Overload Mix 2) EATIT4 (BCCNJ4)",
+      "similarity": 0.9742751423884715
+    },
+    {
+      "a": "Rovastar-altarsofmadness(forgottenrea",
+      "b": "Eo.S. - spark C_Phat_Jester_Mix_v2",
+      "similarity": 0.974200639303024
+    },
+    {
+      "a": "Rovastar-altarsofmadness(forgottenrea",
+      "b": "fed - slowfast 1.1",
+      "similarity": 0.9737793306634996
+    }
+  ]
+}

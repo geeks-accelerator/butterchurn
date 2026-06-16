@@ -1,0 +1,64 @@
+{
+  "version": "v1.0",
+  "testedAt": "2026-06-16T06:04:32.206Z",
+  "embeddingModel": "nomic-embed-text:latest",
+  "topK": 10,
+  "prompts": [
+    "calm dreamy ambient electronic",
+    "aggressive industrial techno",
+    "warm acoustic folk sunset",
+    "hypnotic psychedelic trance",
+    "dark ominous cinematic horror",
+    "upbeat energetic pop dance",
+    "melancholic introspective piano",
+    "chaotic glitchy experimental noise",
+    "peaceful meditative nature sounds",
+    "powerful epic orchestral adventure"
+  ],
+  "ratings": [
+    {
+      "prompt": "calm dreamy ambient electronic",
+      "rating": 4
+    },
+    {
+      "prompt": "aggressive industrial techno",
+      "rating": 4
+    },
+    {
+      "prompt": "warm acoustic folk sunset",
+      "rating": 3
+    },
+    {
+      "prompt": "hypnotic psychedelic trance",
+      "rating": 4
+    },
+    {
+      "prompt": "dark ominous cinematic horror",
+      "rating": 4
+    },
+    {
+      "prompt": "upbeat energetic pop dance",
+      "rating": 4
+    },
+    {
+      "prompt": "melancholic introspective piano",
+      "rating": 4
+    },
+    {
+      "prompt": "chaotic glitchy experimental noise",
+      "rating": 4
+    },
+    {
+      "prompt": "peaceful meditative nature sounds",
+      "rating": 4
+    },
+    {
+      "prompt": "powerful epic orchestral adventure",
+      "rating": 4
+    }
+  ],
+  "meanRating": 3.9,
+  "minRating": 3,
+  "maxRating": 4,
+  "passed": true
+}

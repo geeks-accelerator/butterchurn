@@ -66,6 +66,8 @@ yarn-error.log*
 
 # Phase 6: CLIP visual style classification artifacts
 tools/frames-*/
+# Phase 6: Semantic enrichment frame renders (regenerate via render-preset-frames.js)
+presets/*/frames/
 tools/*visual-styles*.json
 tools/test-presets*.json
 tools/combined-presets.json
