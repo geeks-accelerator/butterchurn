@@ -216,8 +216,66 @@ if (fs.existsSync(ansorrePath) && fs.existsSync(ansorreFpPath)) {
     console.log('  [skip] ansorre files not found');
 }
 
-// Step 3: Generate output files
-console.log('\n[build] Step 3: Generating output files...');
+// Step 3: Load Cream of the Crop presets
+console.log('\n[build] Step 3: Loading Cream of the Crop presets...');
+
+const cotcPath = path.join(PROJECT_ROOT, 'presets/imports/cream-of-the-crop.json');
+const cotcFpPath = path.join(PROJECT_ROOT, 'presets/imports/cream-of-the-crop.fingerprints.json');
+
+if (fs.existsSync(cotcPath) && fs.existsSync(cotcFpPath)) {
+    const cotc = JSON.parse(fs.readFileSync(cotcPath, 'utf8'));
+    const cotcFp = JSON.parse(fs.readFileSync(cotcFpPath, 'utf8'));
+
+    let cotcLoaded = 0;
+
+    // Build hash -> name mapping from fingerprints
+    const hashToName = {};
+    for (const [name, data] of Object.entries(cotcFp.presets)) {
+        if (data.fingerprint && data.fingerprint.contentHash) {
+            hashToName[data.fingerprint.contentHash] = name;
+        }
+    }
+
+    // Add each preset
+    for (const [name, preset] of Object.entries(cotc)) {
+        if (addPreset(name, preset, 'cotc')) {
+            cotcLoaded++;
+        }
+    }
+
+    console.log(`  Loaded: ${cotcLoaded} presets`);
+    console.log(`  Total COTC: ${cotcLoaded}`);
+} else {
+    console.log('  [skip] cream-of-the-crop files not found');
+}
+
+// Step 4: Load projectM Classic presets
+console.log('\n[build] Step 4: Loading projectM Classic presets...');
+
+const pmPath = path.join(PROJECT_ROOT, 'presets/imports/projectm-classic.json');
+const pmFpPath = path.join(PROJECT_ROOT, 'presets/imports/projectm-classic.fingerprints.json');
+
+if (fs.existsSync(pmPath) && fs.existsSync(pmFpPath)) {
+    const pm = JSON.parse(fs.readFileSync(pmPath, 'utf8'));
+    const pmFp = JSON.parse(fs.readFileSync(pmFpPath, 'utf8'));
+
+    let pmLoaded = 0;
+
+    // Add each preset
+    for (const [name, preset] of Object.entries(pm)) {
+        if (addPreset(name, preset, 'projectm')) {
+            pmLoaded++;
+        }
+    }
+
+    console.log(`  Loaded: ${pmLoaded} presets`);
+    console.log(`  Total projectM: ${pmLoaded}`);
+} else {
+    console.log('  [skip] projectm-classic files not found');
+}
+
+// Step 5: Generate output files
+console.log('\n[build] Step 5: Generating output files...');
 
 const outputDir = path.join(PROJECT_ROOT, 'presets/full-collection');
 const totalPresets = Object.keys(mergedPresets).length;
