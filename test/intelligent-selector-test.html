@@ -32,7 +32,8 @@
                     <div style="flex: 1; display: flex; align-items: center; gap: 15px;">
                         <h3 style="margin: 0;">🎨 Preset Pack</h3>
                         <select id="presetPackSelect" style="background: #111; color: #0f0; border: 1px solid #0f0; padding: 5px; font-family: inherit;">
-                            <option value="alaska-butter">Alaska Butter (359 unique)</option>
+                            <option value="butterchurnPresetsAll">All Presets (24,473)</option>
+                            <option value="alaska-butter">Alaska Butter (388)</option>
                             <option value="butterchurnPresets">Butterchurn Presets (88)</option>
                             <option value="butterchurnPresetsExtra">Butterchurn Presets Extra (133)</option>
                             <option value="butterchurnPresetsExtra2">Butterchurn Presets Extra2 (111)</option>
@@ -821,10 +822,11 @@
                 document.getElementById('testReactiveBtn').disabled = false;
                 document.getElementById('testCrowdBtn').disabled = false;
 
-                // Automatically load Alaska Butter pack to match the default dropdown selection
+                // Automatically load the default pack (first in dropdown) to match fingerprints
                 // This ensures the presets match the loaded fingerprints
                 setTimeout(() => {
-                    console.log('[INIT] Auto-loading Alaska Butter pack to match fingerprints...');
+                    const defaultPack = document.getElementById('presetPackSelect').value;
+                    console.log(`[INIT] Auto-loading ${defaultPack} pack to match fingerprints...`);
                     document.getElementById('presetPackSelect').dispatchEvent(new Event('change'));
                 }, 500);
 
