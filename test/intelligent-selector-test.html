@@ -388,7 +388,9 @@
     <!-- Load presets from CDN -->
     <!-- Load Alaska Butter first (primary preset pack) -->
     <script src="../presets/alaska-butter/alaskaButter.min.js"></script>
-    <!-- Load multiple preset packs for full collection -->
+    <!-- Load the unified preset pack (24,473 presets) -->
+    <script src="../presets/full-collection/butterchurnPresetsAll.min.js"></script>
+    <!-- Legacy individual packs (fallback) -->
     <script src="../presets/full-collection/butterchurnPresets.min.js"></script>
     <script src="../presets/full-collection/butterchurnPresetsExtra.min.js"></script>
     <script src="../presets/full-collection/butterchurnPresetsExtra2.min.js"></script>
@@ -403,10 +405,15 @@
                 console.error('butterchurn is not defined after load!');
                 console.log('window.butterchurn:', window.butterchurn);
                 console.log('window.Butterchurn:', window.Butterchurn);
-                // Check what's available on window
-                console.log('Available on window:', Object.keys(window).filter(k => k.toLowerCase().includes('butter')));
             } else {
                 console.log('butterchurn is available:', butterchurn);
+            }
+            // Check preset packs
+            console.log('Available preset packs on window:', Object.keys(window).filter(k => k.toLowerCase().includes('butterchurn') || k.toLowerCase().includes('preset')));
+            if (typeof butterchurnPresetsAll !== 'undefined') {
+                console.log('✓ butterchurnPresetsAll loaded:', Object.keys(butterchurnPresetsAll.getPresets()).length, 'presets');
+            } else {
+                console.error('✗ butterchurnPresetsAll NOT loaded');
             }
         });
     </script>
@@ -735,6 +742,12 @@
                 const allPresets = {};
 
                 // Add all available preset packs
+                // First try the unified butterchurnPresetsAll (24,473 presets)
+                if (typeof butterchurnPresetsAll !== 'undefined') {
+                    Object.assign(allPresets, butterchurnPresetsAll.getPresets());
+                    console.log('✓ Loaded butterchurnPresetsAll (unified pack)');
+                }
+                // Legacy individual packs (fallback)
                 if (typeof butterchurnPresets !== 'undefined') {
                     Object.assign(allPresets, butterchurnPresets.getPresets());
                     console.log('✓ Loaded butterchurnPresets');
