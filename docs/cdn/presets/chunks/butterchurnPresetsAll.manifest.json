@@ -1,0 +1,48 @@
+{
+  "version": "2.2.2",
+  "generated": "2026-06-16T02:22:59.314Z",
+  "totalPresets": 21687,
+  "chunkSize": 5000,
+  "chunks": [
+    {
+      "index": 0,
+      "file": "butterchurnPresetsAll.chunk-0.min.js",
+      "presetCount": 5000,
+      "sizeBytes": 25507273,
+      "firstPreset": "1",
+      "lastPreset": "Eo.S. and Zylot - Pointfield 9 (Hypnotic Void remex)"
+    },
+    {
+      "index": 1,
+      "file": "butterchurnPresetsAll.chunk-1.min.js",
+      "presetCount": 5000,
+      "sizeBytes": 18911603,
+      "firstPreset": "Eo.S. and Zylot - skylight (Stained Glass Majesty mix)",
+      "lastPreset": "Pithlit - Guilty (major Warp)"
+    },
+    {
+      "index": 2,
+      "file": "butterchurnPresetsAll.chunk-2.min.js",
+      "presetCount": 5000,
+      "sizeBytes": 41714387,
+      "firstPreset": "Pithlit - Guilty",
+      "lastPreset": "Fractal - Nested Spiral - Stahlregen + Flexi + Geiss - Spiral Beats (Fractal Mix)"
+    },
+    {
+      "index": 3,
+      "file": "butterchurnPresetsAll.chunk-3.min.js",
+      "presetCount": 5000,
+      "sizeBytes": 44863391,
+      "firstPreset": "Fractal - Nested Spiral - Stahlregen + flexi + Phat - Epileptic Spiral Beats",
+      "lastPreset": "milkdrop - Geiss - Warp Of Dali Bright"
+    },
+    {
+      "index": 4,
+      "file": "butterchurnPresetsAll.chunk-4.min.js",
+      "presetCount": 1687,
+      "sizeBytes": 9806406,
+      "firstPreset": "milkdrop - Geiss - Waterfall",
+      "lastPreset": "yin - yin - Beat Detective 007 demo"
+    }
+  ]
+}
