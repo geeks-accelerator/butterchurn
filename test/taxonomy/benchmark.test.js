@@ -3,7 +3,7 @@
  * benchmark on the 24K-preset database.
  *
  * Method:
- *   - Load butterchurnPresetsAll (24,473 presets) as the real corpus.
+ *   - Load butterchurnPresetsAll (21,687 presets) as the real corpus.
  *   - Clone factor = 1 (no synthetic scaling needed; real corpus exceeds 20K).
  *   - Time HierarchicalMatcher.findMatches across multiple scenarios:
  *       * Cold scan (no categorical targets) — Stage 1 vacuous, Stage 2 scores
@@ -30,7 +30,7 @@ const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const CANONICAL_PATH = path.join(REPO_ROOT, 'presets', 'full-collection', 'butterchurnPresetsAll.fingerprints.json');
 
-const CLONE_FACTOR = 1; // 24,473 real presets — above 20K target, no cloning needed
+const CLONE_FACTOR = 1; // 21,687 real presets — above 20K target, no cloning needed
 
 // Acceptable per-switch latency on the benchmark machine. Generous: real
 // switches happen at ~1/sec under normal use, so even 100ms is fine UX-wise.

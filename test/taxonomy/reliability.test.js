@@ -17,25 +17,27 @@ describe('reliability', () => {
         .toBe('stable');
     });
 
-    test('heavy pixel_eqs prevents rock_solid → stable', () => {
-      // heavyPixel blocks rock_solid tier, falls to stable
+    test('heavy pixel_eqs triggers finicky regardless of complexity (Pass 22 fix)', () => {
+      // Pass 22: heavyPixel always triggers finicky - this is a performance concern
       const longPixelEqs = 'a'.repeat(250);
       expect(deriveReliabilityTier({ complexity: 0.2, warmupTime: 0 }, { pixel_eqs_str: longPixelEqs }))
-        .toBe('stable');
-    });
-
-    test('heavy pixel_eqs with moderate complexity → finicky', () => {
-      // heavyPixel triggers finicky condition
-      const longPixelEqs = 'a'.repeat(250);
+        .toBe('finicky');
       expect(deriveReliabilityTier({ complexity: 0.55, warmupTime: 0 }, { pixel_eqs_str: longPixelEqs }))
         .toBe('finicky');
     });
 
-    test('high complexity with long warmup → finicky', () => {
-      // warmup > 2 triggers finicky regardless of complexity
+    test('moderate complexity with brief warmup (3) → stable (Pass 22 fix)', () => {
+      // Pass 22: warmup threshold raised from >2 to >5 for finicky
+      // warmup 3 + complexity < 0.7 + no heavyPixel → stable
       expect(deriveReliabilityTier({ complexity: 0.65, warmupTime: 3 }, {}))
+        .toBe('stable');
+    });
+
+    test('very long warmup (>5) → finicky', () => {
+      // Pass 22: warmup > 5 triggers finicky
+      expect(deriveReliabilityTier({ complexity: 0.65, warmupTime: 6 }, {}))
         .toBe('finicky');
-      expect(deriveReliabilityTier({ complexity: 0.85, warmupTime: 3 }, {}))
+      expect(deriveReliabilityTier({ complexity: 0.85, warmupTime: 6 }, {}))
         .toBe('finicky');
     });
 

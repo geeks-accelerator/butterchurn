@@ -105,8 +105,9 @@
     <script src="../dist/butterchurn.min.js"></script>
 
     <!-- Load preset packs -->
-    <!-- Unified preset pack (24,473 presets) -->
-    <script src="/presets/full-collection/butterchurnPresetsAll.min.js"></script>
+    <!-- Unified preset pack (21,687 presets) - chunked loader + monolithic fallback -->
+    <script src="/presets/full-collection/chunks/butterchurnPresetsAll.loader.js"></script>
+    <script src="/presets/full-collection/butterchurnPresetsAll.min.js" onerror="console.log('Monolithic bundle not found, using chunked loader')"></script>
     <!-- Legacy individual packs (fallback) -->
     <script src="/presets/full-collection/butterchurnPresets.min.js"></script>
     <script src="/presets/full-collection/butterchurnPresetsExtra.min.js"></script>
@@ -131,9 +132,27 @@
         window.visualizer = null;
         window.presetPacks = {};
 
+        // Load chunked presets if available
+        if (typeof butterchurnPresetsAllChunked !== 'undefined') {
+            log('Loading chunked presets...', 'info');
+            try {
+                const count = await butterchurnPresetsAllChunked.loadAll();
+                log(`Loaded ${count} presets from chunks`, 'success');
+                // Create compatibility shim
+                if (typeof butterchurnPresetsAll === 'undefined') {
+                    window.butterchurnPresetsAll = {
+                        getPresets: () => butterchurnPresetsAllChunked.getPresets(),
+                        getPresetList: () => butterchurnPresetsAllChunked.getPresetList()
+                    };
+                }
+            } catch (e) {
+                log(`Failed to load chunks: ${e.message}`, 'error');
+            }
+        }
+
         // Collect all loaded preset packs
         const packNames = [
-            'butterchurnPresetsAll',  // Unified pack (24,473 presets)
+            'butterchurnPresetsAll',  // Unified pack (21,687 presets)
             'butterchurnPresets',
             'butterchurnPresetsExtra',
             'butterchurnPresetsExtra2',

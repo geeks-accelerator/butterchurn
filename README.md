@@ -15,7 +15,8 @@ Butterchurn is an intelligent WebGL implementation of the Milkdrop Visualizer wi
 - **Community-driven** - Built on the extensive Milkdrop preset ecosystem with attribution preservation
 
 ### Key Capabilities
-- **388+ Unique Presets** - Alaska Butter collection combines 6 preset libraries with mathematical deduplication
+- **21,687 Unique Presets** - Full collection combines ansorre, Cream of the Crop, projectM, and original Butterchurn packs
+- **388 Curated Demo Presets** - Alaska Butter collection for lightweight deployments
 - **Individual Pack Support** - Access full-collection packs with 1:1 fingerprint mapping for targeted selection
 - **Intelligent Selection** - Real-time audio analysis drives preset switching using equation-based fingerprints
 - **Smooth Transitions** - Fixed blending system provides seamless crossfades (no more fade-to-black)
@@ -365,9 +366,17 @@ Each preset is analyzed by its mathematical equations to generate:
 - **Visual Style Scores**: CLIP confidence scores across 8 visual categories
 
 ### Preset Collections
-- **Alaska Butter**: 388 unique presets (deduplicated from all 6 packs)
-- **Full Collection**: Individual packs with 1:1 fingerprint mapping
-- **Total Available**: 553 presets before deduplication (160 duplicates removed)
+- **butterchurnPresetsAll**: 21,687 unique presets (deduplicated mega-collection)
+- **Alaska Butter**: 388 unique presets (curated demo collection from 6 original packs)
+- **Individual Packs**: Original packs with 1:1 fingerprint mapping for targeted selection
+
+#### Preset Sources (Full Collection)
+| Source | Presets | Description |
+|--------|---------|-------------|
+| ansorre collection | 12,108 | Community-curated presets with CLIP visual classification |
+| Cream of the Crop (COTC) | 6,876 | Best-of selections from the Milkdrop community |
+| projectM Classic | 2,315 | Classic projectM presets ported to Butterchurn |
+| Original Butterchurn | 388 | Deduplicated presets from 6 original preset packs |
 
 ### Troubleshooting Guide
 
@@ -481,8 +490,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
+### Core Development
 - **Ryan Geiss** for creating the original [MilkDrop](http://www.geisswerks.com/about_milkdrop.html)
 - **Nullsoft** for [Winamp](http://www.winamp.com/) and the visualization ecosystem
 - **Jordan Berg** for the original [Butterchurn](https://github.com/jberg/butterchurn) WebGL implementation
-- **Preset creators** including Flexi, Geiss, Martin, Rovastar, and hundreds of community contributors
 - **Performance optimization** insights from production streaming applications
+
+### Preset Collection Attribution
+- **ansorre** for curating the 12,108-preset collection with CLIP visual classifications
+- **Cream of the Crop (COTC)** community for the 6,876-preset best-of collection
+- **projectM** team for the 2,315 classic presets ported to the Butterchurn format
+- **Preset artists** including Flexi, Geiss, Martin, Rovastar, Aderrasi, Unchained, Cope, Shifter, and hundreds of community contributors who created the original Milkdrop presets

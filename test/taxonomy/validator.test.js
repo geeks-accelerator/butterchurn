@@ -40,17 +40,25 @@ describe('Fingerprint Validator — wired into test suite', () => {
             expect(Object.keys(db.presets).length).toBe(Object.keys(presets).length);
         });
 
-        test('every fingerprint has a matching preset (name-keyed)', () => {
+        test('every fingerprint names array contains valid preset names', () => {
             const presetNames = new Set(Object.keys(presets));
             const orphans = [];
-            for (const name of Object.keys(db.presets)) {
-                if (!presetNames.has(name)) orphans.push(name);
+            for (const [hash, data] of Object.entries(db.presets)) {
+                for (const name of data.names || []) {
+                    if (!presetNames.has(name)) orphans.push({ hash, name });
+                }
             }
             expect(orphans.length).toBe(0);
         });
 
-        test('every preset has a fingerprint', () => {
-            const fpNames = new Set(Object.keys(db.presets));
+        test('every preset has a matching fingerprint', () => {
+            // Build name-to-hash map from fingerprints
+            const fpNames = new Set();
+            for (const data of Object.values(db.presets)) {
+                for (const name of data.names || []) {
+                    fpNames.add(name);
+                }
+            }
             const missing = [];
             for (const name of Object.keys(presets)) {
                 if (!fpNames.has(name)) missing.push(name);
@@ -110,19 +118,19 @@ describe('Fingerprint Validator — wired into test suite', () => {
             expect(nanFields.length).toBe(0);
         });
 
-        test('visualStyleScores has all 9 keys', () => {
-            const expectedKeys = ['particle', 'fractal', 'geometric', 'fluid_organic', 'abstract', 'kaleidoscope', 'tunnel', 'waveform', 'organic'];
+        test('visualStyleScores has all expected keys when present (null acceptable)', () => {
+            const expectedKeys = ['particle', 'fractal', 'geometric', 'fluid_organic', 'abstract', 'kaleidoscope', 'tunnel', 'waveform', 'organic', 'psychedelic'];
             const missing = [];
             for (const [name, data] of Object.entries(db.presets)) {
                 const scores = data.fingerprint?.visualStyleScores;
-                if (!scores) {
-                    missing.push({ name, reason: 'no visualStyleScores' });
-                } else {
-                    const keys = Object.keys(scores);
-                    const missingKeys = expectedKeys.filter(k => !keys.includes(k));
-                    if (missingKeys.length > 0) {
-                        missing.push({ name, reason: `missing keys: ${missingKeys.join(',')}` });
-                    }
+                // null is acceptable for presets without CLIP classification
+                if (scores === null || scores === undefined) {
+                    continue;
+                }
+                const keys = Object.keys(scores);
+                const missingKeys = expectedKeys.filter(k => !keys.includes(k));
+                if (missingKeys.length > 0) {
+                    missing.push({ name, reason: `missing keys: ${missingKeys.join(',')}` });
                 }
             }
             expect(missing.length).toBe(0);

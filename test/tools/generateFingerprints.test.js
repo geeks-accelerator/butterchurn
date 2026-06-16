@@ -402,13 +402,13 @@ describe('Integration: Fingerprint File Quality', () => {
             const moods = sample.fingerprint.moodAffinities;
 
             // v2.2 mood vocabulary (10 fields)
-            expect(moods).toHaveProperty('energetic');
-            expect(moods).toHaveProperty('calm');
-            expect(moods).toHaveProperty('dark');
-            expect(moods).toHaveProperty('bright');
-            expect(moods).toHaveProperty('hypnotic');
             expect(moods).toHaveProperty('aggressive');
+            expect(moods).toHaveProperty('relaxed');
+            expect(moods).toHaveProperty('happy');
+            expect(moods).toHaveProperty('electronic');
+            expect(moods).toHaveProperty('acoustic');
             expect(moods).toHaveProperty('mystical');
+            expect(moods).toHaveProperty('hypnotic');
             expect(moods).toHaveProperty('psychedelic');
             expect(moods).toHaveProperty('dreamy');
             expect(moods).toHaveProperty('meditative');

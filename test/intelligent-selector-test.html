@@ -32,7 +32,7 @@
                     <div style="flex: 1; display: flex; align-items: center; gap: 15px;">
                         <h3 style="margin: 0;">🎨 Preset Pack</h3>
                         <select id="presetPackSelect" style="background: #111; color: #0f0; border: 1px solid #0f0; padding: 5px; font-family: inherit;">
-                            <option value="butterchurnPresetsAll">All Presets (24,473)</option>
+                            <option value="butterchurnPresetsAll">All Presets (21,687)</option>
                             <option value="alaska-butter">Alaska Butter (388)</option>
                             <option value="butterchurnPresets">Butterchurn Presets (88)</option>
                             <option value="butterchurnPresetsExtra">Butterchurn Presets Extra (133)</option>
@@ -389,8 +389,9 @@
     <!-- Load presets from CDN -->
     <!-- Load Alaska Butter first (primary preset pack) -->
     <script src="../presets/alaska-butter/alaskaButter.min.js"></script>
-    <!-- Load the unified preset pack (24,473 presets) -->
-    <script src="../presets/full-collection/butterchurnPresetsAll.min.js"></script>
+    <!-- Load the unified preset pack (21,687 presets) - try chunked loader first, fallback to monolithic -->
+    <script src="../presets/full-collection/chunks/butterchurnPresetsAll.loader.js"></script>
+    <script src="../presets/full-collection/butterchurnPresetsAll.min.js" onerror="console.log('Monolithic bundle not found, using chunked loader')"></script>
     <!-- Legacy individual packs (fallback) -->
     <script src="../presets/full-collection/butterchurnPresets.min.js"></script>
     <script src="../presets/full-collection/butterchurnPresetsExtra.min.js"></script>
@@ -400,7 +401,7 @@
 
     <script>
         // Wait for scripts to load
-        window.addEventListener('load', function() {
+        window.addEventListener('load', async function() {
             console.log('Page loaded, checking for butterchurn...');
             if (typeof butterchurn === 'undefined') {
                 console.error('butterchurn is not defined after load!');
@@ -409,6 +410,25 @@
             } else {
                 console.log('butterchurn is available:', butterchurn);
             }
+
+            // Check for chunked loader (preferred for CDN)
+            if (typeof butterchurnPresetsAllChunked !== 'undefined') {
+                console.log('✓ Chunked loader available, loading all chunks...');
+                try {
+                    const count = await butterchurnPresetsAllChunked.loadAll();
+                    console.log('✓ All chunks loaded:', count, 'presets');
+                    // Create compatibility shim for existing code
+                    if (typeof butterchurnPresetsAll === 'undefined') {
+                        window.butterchurnPresetsAll = {
+                            getPresets: () => butterchurnPresetsAllChunked.getPresets(),
+                            getPresetList: () => butterchurnPresetsAllChunked.getPresetList()
+                        };
+                    }
+                } catch (e) {
+                    console.error('Failed to load chunks:', e);
+                }
+            }
+
             // Check preset packs
             console.log('Available preset packs on window:', Object.keys(window).filter(k => k.toLowerCase().includes('butterchurn') || k.toLowerCase().includes('preset')));
             if (typeof butterchurnPresetsAll !== 'undefined') {
@@ -743,7 +763,7 @@
                 const allPresets = {};
 
                 // Add all available preset packs
-                // First try the unified butterchurnPresetsAll (24,473 presets)
+                // First try the unified butterchurnPresetsAll (21,687 presets)
                 if (typeof butterchurnPresetsAll !== 'undefined') {
                     Object.assign(allPresets, butterchurnPresetsAll.getPresets());
                     console.log('✓ Loaded butterchurnPresetsAll (unified pack)');

@@ -30,9 +30,12 @@ export function deriveReliabilityTier(fp, preset = {}) {
   const heavyPixel = pixelEqs.length > 200;
   const heavyComp = compEqs.length > 500;
 
+  // FIX (Pass 22): Removed complexity < 0.7 from finicky trigger - that's not
+  // "heavy pixel_eqs or long warmup", it's just "moderate complexity" which is
+  // acceptable. Expanded stable threshold to include moderate complexity presets.
   if (complexity < 0.3 && warmup === 0 && !heavyPixel) return 'rock_solid';
-  if (complexity < 0.5 && warmup <= 2 && !heavyComp) return 'stable';
-  if (complexity < 0.7 || warmup > 2 || heavyPixel) return 'finicky';
+  if (complexity < 0.7 && warmup <= 3 && !heavyPixel && !heavyComp) return 'stable';
+  if (heavyPixel || warmup > 5) return 'finicky';
   return 'experimental';
 }
 

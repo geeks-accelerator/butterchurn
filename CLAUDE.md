@@ -53,23 +53,24 @@ This file provides AI-optimized development context for Claude Code when working
   - **111 unit tests** for taxonomy modules; **284 total non-visual tests** — all green
   - **Validation pipeline** (`tools/validation/`): Python frame analysis, Claude Sonnet 4.6 vision validation, orchestrator
   - **Determinism harness** (`test/taxonomy/determinism.test.js`): 5 reference fingerprints × 100 iterations + known-SHA pin — drift in derivation code fails CI as a single test, not a 20K-line diff
-  - **Latency benchmark** (`test/taxonomy/benchmark.test.js`): worst-case p95 = 39 ms on 24,473 real presets; §G1 memoization decision deferred indefinitely
+  - **Latency benchmark** (`test/taxonomy/benchmark.test.js`): worst-case p95 = 39 ms on 21,687 real presets; §G1 memoization decision deferred indefinitely
 
-#### Data layer state (2026-06-15, Phases 1-4 COMPLETE, 100% field completeness)
-- **butterchurnPresetsAll:** 24,473 presets (388 original + 12,108 ansorre + 6,023 COTC + 5,954 projectM Classic)
+#### Data layer state (2026-06-15, Pass 22 alignment fix, 100% field completeness)
+- **butterchurnPresetsAll:** 21,687 presets (388 original + 12,108 ansorre + 6,876 COTC + 2,315 projectM Classic, after dedup)
 - **alaskaButter:** 388 presets (curated demo pack from 6 original sources)
-- **Field completeness:** 100% across all 14 validated fields (Pass 17)
-- **visualStyleSource:** 6,064 CLIP-classified (from Phase 1), 18,409 equation-derived
-- **visualStyle distribution:** abstract 8,459 | organic 6,104 | particle 5,118 | fractal 3,888 | fluid_organic 569 | geometric 215 | waveform 97 | tunnel 14 | kaleidoscope 9
+- **Field completeness:** 100% across all 14 validated fields
+- **visualStyleSource:** 6,064 CLIP-classified (from ansorre), 15,623 equation-derived
+- **visualStyle distribution:** organic 10,179 | fractal 6,863 | abstract 4,278 | particle 257 | psychedelic 110
+- **reliabilityTier distribution:** stable 6,171 (28%) | finicky 9,754 (45%) | experimental 5,314 (25%) | rock_solid 448 (2%)
 - **Import artifacts:** `presets/imports/{ansorre,cream-of-the-crop,projectm-classic}.fingerprints.json`
 - **Git exclusions:** `butterchurnPresetsAll.js` and `.min.js` (166MB each) excluded from git; run `npm run build:presets` after clone
 
 #### Canonical packs
 - `PRESET_PACK_NAMES = ['butterchurnPresetsAll']` — single canonical pack (H1 retired the 7 legacy v1.0 packs)
-- `butterchurnPresetsAll.fingerprints.json` (24,473 presets, v2.2.2, `fingerprintAlgorithm: '2.2'`, 100% field completeness)
+- `butterchurnPresetsAll.fingerprints.json` (21,687 presets, v2.2.2, `fingerprintAlgorithm: '2.2'`, 100% field completeness)
 - `alaskaButter.fingerprints.json` (388 presets, v2.2.2) — for `../alaskabutter/` demo site; synced from canonical
-- **Vocabulary source:** `src/utils/vocabulary.js` — single source of truth for all 7 categorical fields
-- **Indices** rebuilt: both legacy 7-key buckets (`high / bass / calm / particle / fractal / geometric / organic`) AND v2.2 categorical buckets (`energyLabel / visualStyle / musicalResponsiveness / reliabilityTier / dominantHue`). visualStyle now uses CLIP labels for 6,064 presets + equation fallback for 18,409.
+- **Vocabulary source:** `src/utils/vocabulary.js` — single source of truth for all categorical fields (10 visualStyle values including psychedelic)
+- **Indices** rebuilt: both legacy 7-key buckets (`high / bass / calm / particle / fractal / geometric / organic`) AND v2.2 categorical buckets (`energyLabel / visualStyle / musicalResponsiveness / reliabilityTier / dominantHue`). visualStyleSource: 6,064 CLIP + 15,623 equation.
 - **`recentPresets` memory bumped to 100** (was 10) for the 24K scale
 - **Phase 3 Intelligent Preset Selector Improvements:**
   - Meyda.js spectral audio analysis (2048-sample buffer)
@@ -173,11 +174,21 @@ npm run build:presets             # Generate butterchurnPresetsAll.js from JSON 
 npm run dev                       # Development build with watch
 npm run dev:v2                    # V2 bundle development
 npm run analyze                   # Lint + typecheck + GLSL validation
-npm run build:cdn                 # Build presets + core + update CDN files
+npm run build:cdn                 # Build presets + chunks + core + update CDN files
+npm run build:chunks              # Build chunked preset bundles (5 chunks, all <50MB)
 npm run deploy:cdn                # Deploy CDN to GitHub Pages
 ```
 
-**Note:** After cloning, run `npm run build:presets` to generate the large preset bundles (166MB each). These are excluded from git to stay under GitHub's 100MB limit.
+**Note:** After cloning, run `npm run build:presets` to generate the large preset bundles. For CDN deployment, use `npm run build:chunks` which splits into 5 chunks under GitHub's 100MB limit.
+
+**Chunked loader usage:**
+```html
+<script src="chunks/butterchurnPresetsAll.loader.js"></script>
+<script>
+  await butterchurnPresetsAllChunked.loadAll();
+  const presets = butterchurnPresetsAllChunked.getPresets();
+</script>
+```
 
 ### Test Commands
 ```bash

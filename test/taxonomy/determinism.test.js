@@ -174,9 +174,9 @@ describe('H3 — backfill derivation is deterministic across 100 iterations', ()
         //   1. Run with PRINT_DETERMINISM_SHA=1 to see the new SHA in the test output
         //   2. Verify the output diff is what you expected
         //   3. Paste the new hex below and document the change in the comment
-        // Updated: 2026-06-15 — rotated after CLIP moodAffinities re-derivation (Phase 1)
-        //   for the 5 reference fingerprints inlined above.
-        const EXPECTED_SHA = '42a0590943845feb243804a3e7fa69dec9f96f0ebf0a9be0496933b208eb498b';
+        // Updated: 2026-06-15 — Pass 22: rotated after reliabilityTier threshold fix
+        //   (removed complexity<0.7 from finicky trigger, raised warmup threshold to >5)
+        const EXPECTED_SHA = '46112c8455b41744acc7bbf09ec6757cb49b16323aec57964b0666e4324834ee';
         expect(actualSha).toBe(EXPECTED_SHA);
         // Log so a maintainer rotating the pin can see the value to copy.
         if (process.env.PRINT_DETERMINISM_SHA) {
@@ -218,9 +218,9 @@ describe('Dual-pack fingerprint stability — alaskaButter', () => {
 describe('Dual-pack fingerprint stability — butterchurnPresetsAll', () => {
     const CANONICAL_PATH = path.join(REPO_ROOT, 'presets', 'full-collection', 'butterchurnPresetsAll.fingerprints.json');
 
-    test('butterchurnPresetsAll fingerprint count is stable (24,473)', () => {
+    test('butterchurnPresetsAll fingerprint count is stable (21,687)', () => {
         const db = JSON.parse(fs.readFileSync(CANONICAL_PATH, 'utf8'));
-        expect(Object.keys(db.presets).length).toBe(24473);
+        expect(Object.keys(db.presets).length).toBe(21687);
     });
 
     test('butterchurnPresetsAll every fingerprint has fingerprintAlgorithm = "2.2"', () => {
