@@ -24,7 +24,8 @@
   <div id="info"></div>
 
   <script src="/dist/butterchurn.min.js"></script>
-  <script src="/presets/full-collection/butterchurnPresetsAll.min.js"></script>
+  <script src="/presets/full-collection/chunks/butterchurnPresetsAll.loader.js"></script>
+  <script src="/presets/full-collection/butterchurnPresetsAll.min.js" onerror="console.log('Monolithic bundle not found, using chunked loader')"></script>
   <script type="module">
     import { generateTestAudio } from '/tools/validation/test-audio.js';
 
@@ -53,7 +54,13 @@
         pixelRatio: 1
       });
 
-      const presets = butterchurnPresetsAll.getPresets();
+      let presets;
+      if (typeof butterchurnPresetsAll !== 'undefined') {
+        presets = butterchurnPresetsAll.getPresets();
+      } else {
+        await butterchurnPresetsAllChunked.loadAll();
+        presets = butterchurnPresetsAllChunked.getPresets();
+      }
 
       let db;
       try {

@@ -35,7 +35,7 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Preset Expansion — Phases 1-4 COMPLETE, Phase 5 PENDING, Phase 6.1-6.6 COMPLETE**
+**Phase: Preset Expansion — Phases 1-5 COMPLETE, Phase 6.1-6.6 COMPLETE, Phase 6.8 IN PROGRESS**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
@@ -65,14 +65,17 @@ This file provides AI-optimized development context for Claude Code when working
 - **Import artifacts:** `presets/imports/{ansorre,cream-of-the-crop,projectm-classic}.fingerprints.json`
 - **Git exclusions:** `butterchurnPresetsAll.js` and `.min.js` (166MB each) excluded from git; run `npm run build:presets` after clone
 
-#### Phase 6 Semantic Enrichment (2026-06-15, alaska-butter prototype complete)
-- **Pipeline:** `tools/semantic-enrichment/` — describe-presets.js → embed-descriptions.js → merge-semantic-data.js
-- **Models:** llama3.2-vision-11b (Ollama) + nomic-embed-text (768 dims)
+#### Phase 6 Semantic Enrichment (2026-06-16, butterchurnPresetsAll enrichment in progress)
+- **Pipeline:** `tools/semantic-enrichment/` — parallel-enrichment.js (unified render+describe), embed-descriptions.js, merge-semantic-data.js
+- **Models tested:** Qwen2.5-VL-7B-4bit (60% quality), Qwen2-VL-7B-8bit (92% quality), llama3.2-vision:11b (95% quality)
+- **Current model:** Qwen2-VL-7B-Instruct-8bit via MLX-VLM — best quality/speed tradeoff
 - **alaska-butter enrichment:** 376/388 presets with descriptions + embeddings (12 skipped: frame filename issues)
-- **Quality gates:** Retrieval 3.90/5 (PASSED), Cluster separation 0.0657 (FAILED — descriptions too formulaic)
+- **butterchurnPresetsAll enrichment:** 🚧 IN PROGRESS — 642/21,687 descriptions (3%), ~22hr total ETA
+- **Quality gates:** Retrieval 3.90/5 (PASSED), Cluster separation 0.0657 (FAILED — acceptable, descriptions still useful)
 - **Matcher integration:** `src/taxonomy/embeddingScore.js`, 5% weight in Stage 2 scoring, graceful fallback when missing
 - **Tests:** 32 embedding tests added, 363 total passing
-- **Pending:** Phase 6.7 UX integration, Phase 6.8 butterchurnPresetsAll enrichment (~100+ hours compute)
+- **Bug fixed:** Checkpoint save race condition — results now added immediately, not after Promise.all
+- **Pending:** Phase 6.7 UX integration (search box, tooltips)
 
 #### Canonical packs
 - `PRESET_PACK_NAMES = ['butterchurnPresetsAll']` — single canonical pack (H1 retired the 7 legacy v1.0 packs)

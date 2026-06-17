@@ -163,10 +163,16 @@ async function renderPresetFrames(presetPackPath, outputDir) {
                 continue;
             }
 
-            // Inject preset pack
+            // Inject only the presets for this batch (not the entire pack - it's too large)
+            const batchPresets = {};
+            for (const name of batch) {
+                if (presetPack[name]) {
+                    batchPresets[name] = presetPack[name];
+                }
+            }
             await page.evaluate((presets) => {
                 window.presetPack = presets;
-            }, presetPack);
+            }, batchPresets);
 
             for (const presetName of batch) {
                 try {

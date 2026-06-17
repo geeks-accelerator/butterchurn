@@ -29,7 +29,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
 const FRAME_SIZE = 512;
 const MLX_URL = 'http://localhost:8080';
-const MLX_MODEL = 'mlx-community/Qwen2.5-VL-7B-Instruct-4bit';
+const MLX_MODEL = 'mlx-community/Qwen2-VL-7B-Instruct-8bit';
 
 const SYSTEM_PROMPT = `You are a visual analyst describing music visualizer frames. Your descriptions will be used to create searchable embeddings, so be specific and vivid. Focus on what makes this visual unique.`;
 
@@ -337,6 +337,13 @@ Prerequisites:
             return mlxLimiter(async () => {
                 try {
                     const description = await describeFrame(renderResult.framePath);
+
+                    // Add result immediately so checkpoints have data
+                    results[preset.name] = {
+                        hash: preset.hash,
+                        description: description,
+                    };
+
                     processed++;
 
                     // Progress
