@@ -115,9 +115,20 @@ async function main() {
   let embOnlyCount = 0;
   let skippedCount = 0;
 
-  for (const [presetName, preset] of Object.entries(presets)) {
-    const desc = descriptions[presetName];
-    const emb = embeddings[presetName];
+  for (const [hashKey, preset] of Object.entries(presets)) {
+    // Fingerprints are keyed by hash, but descriptions/embeddings are keyed by preset name
+    // Try the hash key first, then try the preset's names array
+    let desc = descriptions[hashKey];
+    let emb = embeddings[hashKey];
+
+    // If not found by hash, try by preset name(s)
+    if (!desc && !emb && preset.names && preset.names.length > 0) {
+      for (const name of preset.names) {
+        if (!desc && descriptions[name]) desc = descriptions[name];
+        if (!emb && embeddings[name]) emb = embeddings[name];
+        if (desc && emb) break;
+      }
+    }
 
     if (!desc && !emb) {
       skippedCount++;
@@ -135,8 +146,9 @@ async function main() {
     }
 
     if (emb?.embedding) {
-      preset.fingerprint.semantic.embedding = emb.embedding;
-      preset.fingerprint.embedding = emb.embedding; // Also add at top level for matcher access
+      // Don't inline embeddings - they make the file too large
+      // Just mark that embedding exists; matcher loads from sidecar file
+      preset.fingerprint.semantic.hasEmbedding = true;
       embOnlyCount++;
     }
 

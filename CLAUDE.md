@@ -35,7 +35,7 @@ This file provides AI-optimized development context for Claude Code when working
 
 ## CURRENT PROJECT STATUS
 
-**Phase: Preset Expansion — Phases 1-5 COMPLETE, Phase 6.1-6.6 COMPLETE, Phase 6.8 IN PROGRESS**
+**Phase: Preset Expansion — Phases 1-5 COMPLETE, Phase 6.1-6.6 COMPLETE, Phase 6.8 PARTIAL (76.6%)**
 
 ### What's Working ✅
 - Phase 1 performance improvements (25-30% faster rendering)
@@ -65,17 +65,21 @@ This file provides AI-optimized development context for Claude Code when working
 - **Import artifacts:** `presets/imports/{ansorre,cream-of-the-crop,projectm-classic}.fingerprints.json`
 - **Git exclusions:** `butterchurnPresetsAll.js` and `.min.js` (166MB each) excluded from git; run `npm run build:presets` after clone
 
-#### Phase 6 Semantic Enrichment (2026-06-16, butterchurnPresetsAll enrichment in progress)
-- **Pipeline:** `tools/semantic-enrichment/` — parallel-enrichment.js (unified render+describe), embed-descriptions.js, merge-semantic-data.js
-- **Models tested:** Qwen2.5-VL-7B-4bit (60% quality), Qwen2-VL-7B-8bit (92% quality), llama3.2-vision:11b (95% quality)
-- **Current model:** Qwen2-VL-7B-Instruct-8bit via MLX-VLM — best quality/speed tradeoff
-- **alaska-butter enrichment:** 376/388 presets with descriptions + embeddings (12 skipped: frame filename issues)
-- **butterchurnPresetsAll enrichment:** 🚧 IN PROGRESS — 642/21,687 descriptions (3%), ~22hr total ETA
-- **Quality gates:** Retrieval 3.90/5 (PASSED), Cluster separation 0.0657 (FAILED — acceptable, descriptions still useful)
+#### Phase 6 Semantic Enrichment (2026-06-17, 76.6% coverage)
+- **Pipeline:** `tools/semantic-enrichment/` — gemini-enrichment.js, embed-descriptions.js, merge-semantic-data.js
+- **Production model:** Gemini 2.5 Flash (cloud) — 8-9 req/s until quota hit
+- **alaska-butter enrichment:** 376/388 presets with descriptions + embeddings
+- **butterchurnPresetsAll enrichment:** ✅ 16,623/21,687 descriptions (76.6%) — rate limited by Gemini quota
+- **Equation fix:** `tools/fix-malformed-equations.js` fixed 340 parser bugs, all 21,687 presets compile
+- **Frame rendering:** 21,686/21,687 presets rendered (106,355 PNGs)
+- **Embeddings:** 16,623 × 768-dim vectors via nomic-embed-text (sidecar file, 152MB)
+- **Fingerprints:** Descriptions inlined, `hasEmbedding: true` flag for sidecar lookup
+- **Quality gates:** Retrieval 3.90/5 (PASSED)
 - **Matcher integration:** `src/taxonomy/embeddingScore.js`, 5% weight in Stage 2 scoring, graceful fallback when missing
-- **Tests:** 32 embedding tests added, 363 total passing
-- **Bug fixed:** Checkpoint save race condition — results now added immediately, not after Promise.all
+- **Backfill tracking:** `docs/issues/2026-06-17-butterchurn-semantic-enrichment-backfill.md` (5,064 remaining)
+- **Video producer integration:** `presets/full-collection/curated-presets.json` (1,988 presets synced to video_effects)
 - **Pending:** Phase 6.7 UX integration (search box, tooltips)
+- **Pending:** Phase 7.2 verify director integration with expanded catalog
 
 #### Canonical packs
 - `PRESET_PACK_NAMES = ['butterchurnPresetsAll']` — single canonical pack (H1 retired the 7 legacy v1.0 packs)
@@ -119,7 +123,7 @@ This file provides AI-optimized development context for Claude Code when working
 
 ### What's Ready for Implementation 🚀
 - **Selector Optimizations** - Audio lookahead & reverse index scaling (see docs/plans/selector-optimization-improvements.md)
-- Phase 4: Machine learning-enhanced preset matching
+- **Phase 4: LLM-Enhanced Preset Selection** - Embeddings narrow candidates, LLM judges final pick (see ../docs/plans/2026-06-17-butterchurn-llm-preset-selection.md)
 - User preference learning and personalization
 
 ### Critical Files Status
