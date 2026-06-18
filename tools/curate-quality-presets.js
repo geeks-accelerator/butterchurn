@@ -127,7 +127,16 @@ function greedyCluster(items, similarityThreshold = 0.85) {
 
 // Extract author from preset name (e.g., "Geiss - Waterfall" -> "Geiss")
 function extractAuthor(name) {
-  const match = name.match(/^([^-]+)\s*-/);
+  // Prefer the real `authors` array from the source fingerprint when available;
+  // fall back to parsing the leading "X - Y" pattern from the name. The source
+  // butterchurnPresetsAll.fingerprints.json has authors on ~99% of records, so
+  // the regex path is now a last-resort safety net, not the primary signal.
+  const presetObj = typeof name === 'object' && name !== null ? name : null;
+  if (presetObj && Array.isArray(presetObj.authors) && presetObj.authors.length) {
+    return presetObj.authors[0].toLowerCase();
+  }
+  const nameStr = presetObj ? presetObj.name : name;
+  const match = (nameStr || '').match(/^([^-]+)\s*-/);
   return match ? match[1].trim().toLowerCase() : 'unknown';
 }
 
@@ -159,7 +168,7 @@ function pickFromCluster(cluster, maxPicks = 4) {
     for (const preset of sorted) {
       if (picks.includes(preset)) continue;
 
-      const author = extractAuthor(preset.name);
+      const author = extractAuthor(preset);
       const isNewAuthor = !usedAuthors.has(author);
       const energyDist = Math.abs(preset.energy - targetEnergy);
 
@@ -174,7 +183,7 @@ function pickFromCluster(cluster, maxPicks = 4) {
 
     if (bestCandidate) {
       picks.push(bestCandidate);
-      usedAuthors.add(extractAuthor(bestCandidate.name));
+      usedAuthors.add(extractAuthor(bestCandidate));
     }
   }
 
@@ -255,6 +264,7 @@ async function main() {
         hash,
         name,
         names: preset.names || [name],
+        authors: Array.isArray(preset.authors) ? preset.authors : [],
         reliabilityTier: fp.reliabilityTier || 'stable',
         visualStyle: fp.visualStyle || 'abstract',
         visualStyleSource: fp.visualStyleSource || 'equation',
@@ -446,6 +456,7 @@ async function main() {
         hash: p.hash,
         name: p.name,
         names: p.names,
+        authors: p.authors,
         visualStyle: p.visualStyle,
         energy: p.energy,
         complexity: p.complexity,
