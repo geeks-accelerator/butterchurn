@@ -42,6 +42,16 @@
 
 **Prevention**: Always validate source state before enabling blending transitions.
 
+### Waveform Vertex Buffer Overflow (RESOLVED)
+**File**: `src/rendering/waves/basicWaveform.js`, `src/rendering/renderer.js`
+**Impact**: WebGL errors and visual freezing at preset transitions
+
+**Problem**: Audio processor was bumped from 512 to 2048 samples (`numSamps`), but `BasicWaveform` vertex buffers remained hardcoded at 512. When waveforms tried to draw up to 2048 vertices, `drawArrays` raised `GL_INVALID_OPERATION: Vertex buffer is not big enough`.
+
+**Solution**: Plumb `numSamps` through renderer params; size `BasicWaveform` buffers from `opts.numSamps || 512`; add defensive clamp to prevent overflow.
+
+**Prevention**: When changing audio buffer sizes, grep for hardcoded buffer dimensions in all rendering code. See `docs/issues/2026-06-19-waveform-buffer-overflow-fix.md`.
+
 ## Regression Testing Protocol
 
 ### Visual Regression Tests
