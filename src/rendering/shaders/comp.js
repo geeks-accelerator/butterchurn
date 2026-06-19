@@ -190,6 +190,13 @@ export default class CompShader {
 
     fragShaderText = fragShaderText.replace(/texture2D/g, "texture");
     fragShaderText = fragShaderText.replace(/texture3D/g, "texture");
+    // Repair illegal `bvecN(X) && bvecN(Y)` from the Milkdrop→GLSL converter —
+    // in BOTH the header (helper-function defs) and the body, since presets put
+    // the broken math in either.
+    fragShaderHeaderText = ShaderUtils.fixVectorLogical(fragShaderHeaderText);
+    fragShaderText = ShaderUtils.fixVectorLogical(fragShaderText);
+    // Qualify bare `sampler2D sampler_NAME;` decls as uniform (before getUserSamplers).
+    fragShaderHeaderText = ShaderUtils.fixSamplerDecls(fragShaderHeaderText);
 
     this.userTextures = ShaderUtils.getUserSamplers(fragShaderHeaderText);
 
@@ -346,17 +353,27 @@ export default class CompShader {
 
       float PI = ${Math.PI};
 
+      // Milkdrop shader vars at GLOBAL scope so preset HELPER functions (injected
+      // below via fragShaderHeaderText) can reference them. The converter frequently
+      // emits helpers that use uv_orig/rad/ang/hue_shader; those fail with
+      // "undeclared identifier" if these live as main()-locals. Assigned in main().
+      vec2 uv;
+      vec2 uv_orig;
+      float rad;
+      float ang;
+      vec3 hue_shader;
+
       ${fragShaderHeaderText}
 
       void main(void) {
         vec3 ret;
-        vec2 uv = vUv;
-        vec2 uv_orig = vUv;
+        uv = vUv;
+        uv_orig = vUv;
         uv.y = 1.0 - uv.y;
         uv_orig.y = 1.0 - uv_orig.y;
-        float rad = length(uv - 0.5);
-        float ang = atan(uv.x - 0.5, uv.y - 0.5);
-        vec3 hue_shader = vColor.rgb;
+        rad = length(uv - 0.5);
+        ang = atan(uv.x - 0.5, uv.y - 0.5);
+        hue_shader = vColor.rgb;
 
         ${fragShaderText}
 
@@ -369,6 +386,16 @@ export default class CompShader {
     this.gl.attachShader(this.shaderProgram, vertShader);
     this.gl.attachShader(this.shaderProgram, fragShader);
     this.gl.linkProgram(this.shaderProgram);
+
+    // Surface broken preset GLSL instead of silently using an unlinked program
+    // (which spams "program not linked" / "index out of range" every frame).
+    this.linkErr = ShaderUtils.validateProgram(
+      this.gl,
+      this.shaderProgram,
+      [{ shader: vertShader, name: "vertex" }, { shader: fragShader, name: "fragment" }],
+      "comp"
+    );
+    this.linkOk = !this.linkErr;
 
     this.positionLocation = this.gl.getAttribLocation(
       this.shaderProgram,

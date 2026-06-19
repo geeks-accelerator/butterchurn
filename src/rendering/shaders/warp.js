@@ -165,6 +165,12 @@ export default class WarpShader {
 
     fragShaderText = fragShaderText.replace(/texture2D/g, "texture");
     fragShaderText = fragShaderText.replace(/texture3D/g, "texture");
+    // Repair illegal `bvecN(X) && bvecN(Y)` from the Milkdrop→GLSL converter —
+    // in BOTH the header (helper-function defs) and the body.
+    fragShaderHeaderText = ShaderUtils.fixVectorLogical(fragShaderHeaderText);
+    fragShaderText = ShaderUtils.fixVectorLogical(fragShaderText);
+    // Qualify bare `sampler2D sampler_NAME;` decls as uniform (before getUserSamplers).
+    fragShaderHeaderText = ShaderUtils.fixSamplerDecls(fragShaderHeaderText);
 
     this.userTextures = ShaderUtils.getUserSamplers(fragShaderHeaderText);
 
@@ -312,12 +318,17 @@ export default class WarpShader {
 
       float PI = ${Math.PI};
 
+      // rad/ang at GLOBAL scope so preset HELPER functions can reference them
+      // (uv_orig is already a global varying). Assigned in main().
+      float rad;
+      float ang;
+
       ${fragShaderHeaderText}
 
       void main(void) {
         vec3 ret;
-        float rad = length(uv_orig - 0.5);
-        float ang = atan(uv_orig.x - 0.5, uv_orig.y - 0.5);
+        rad = length(uv_orig - 0.5);
+        ang = atan(uv_orig.x - 0.5, uv_orig.y - 0.5);
 
         ${fragShaderText}
 
@@ -330,6 +341,15 @@ export default class WarpShader {
     this.gl.attachShader(this.shaderProgram, vertShader);
     this.gl.attachShader(this.shaderProgram, fragShader);
     this.gl.linkProgram(this.shaderProgram);
+
+    // Surface broken preset GLSL instead of silently using an unlinked program.
+    this.linkErr = ShaderUtils.validateProgram(
+      this.gl,
+      this.shaderProgram,
+      [{ shader: vertShader, name: "vertex" }, { shader: fragShader, name: "fragment" }],
+      "warp"
+    );
+    this.linkOk = !this.linkErr;
 
     this.positionLocation = this.gl.getAttribLocation(
       this.shaderProgram,

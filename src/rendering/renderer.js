@@ -329,6 +329,21 @@ export default class Renderer {
     this.warpShader.updateShader(warpText);
     this.compShader.updateShader(compText);
 
+    // Name the preset whose custom GLSL broke (the warp/comp validators logged the
+    // exact compile/link error above). Always on — a broken preset must never fail
+    // silently. `brokenShader` lets callers (host renderer) skip/blacklist it.
+    this.brokenShader = this.warpShader.linkOk === false || this.compShader.linkOk === false;
+    if (this.brokenShader) {
+      const which = [
+        this.warpShader.linkOk === false ? "warp" : null,
+        this.compShader.linkOk === false ? "comp" : null,
+      ].filter(Boolean).join("+");
+      // eslint-disable-next-line no-console
+      console.error(
+        `[Renderer] preset "${(this.preset && this.preset.desc) || "unknown"}" has BROKEN ${which} GLSL — it will render wrong/blank (see shader error above).`
+      );
+    }
+
     if (warpText.length === 0) {
       this.numBlurPasses = 0;
     } else {
