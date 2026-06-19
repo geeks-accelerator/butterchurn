@@ -5,7 +5,13 @@ export default class BasicWaveform {
   constructor(gl, opts = {}) {
     this.gl = gl;
 
-    const numAudioSamples = 512;
+    // Match the audio processor's sample count (audioProcessor.numSamps, bumped
+    // 512→2048). timeArrayL/R are undersampled to numSamps, so a basic waveform
+    // can have up to numSamps verts; buffers fixed at 512 overflowed on draw →
+    // "Vertex buffer is not big enough". Derive from params; 512 fallback keeps
+    // upstream behavior if the host doesn't plumb it.
+    const numAudioSamples = (opts && opts.numSamps) || 512;
+    this.numAudioSamples = numAudioSamples;
     this.positions = new Float32Array(numAudioSamples * 3);
     this.positions2 = new Float32Array(numAudioSamples * 3);
     this.oldPositions = new Float32Array(numAudioSamples * 3);
@@ -560,6 +566,11 @@ export default class BasicWaveform {
           }
         }
       }
+
+      // Defensive: never let the vertex count exceed the buffers (sized for
+      // numAudioSamples). With buffers sized to numSamps this is a no-op, but it
+      // guarantees drawArrays can't overflow regardless of preset/wave_mode.
+      if (this.numVert > this.numAudioSamples) this.numVert = this.numAudioSamples;
 
       for (let i = 0; i < this.numVert; i++) {
         this.positions[i * 3 + 1] = -this.positions[i * 3 + 1];
