@@ -105,6 +105,11 @@ export default class Renderer {
       mesh_height: this.mesh_height,
       aspectx: this.aspectx,
       aspecty: this.aspecty,
+      // The audio time arrays are undersampled to numSamps (bumped 512→2048).
+      // The waveform shaders must size their vertex buffers to match, or a
+      // 2048-point waveform overflows a 512 buffer → "Vertex buffer is not big
+      // enough" on drawArrays. Plumb it so the buffers track the audio.
+      numSamps: this.audio.numSamps,
     };
     this.noise = new Noise(gl);
     this.image = new ImageTextures(gl);
@@ -182,11 +187,13 @@ export default class Renderer {
   }
 
   loadPreset(preset, blendTime) {
-    console.log(
-      '[loadPreset] Current preset before switch:',
-      this.preset === this.blankPreset ? 'BLANK PRESET' : 'real preset'
-    );
-    console.log('[loadPreset] New preset has desc?', preset.desc ? `Yes: ${preset.desc}` : 'No');
+    if (this.debugMode) {
+      console.log(
+        '[loadPreset] Current preset before switch:',
+        this.preset === this.blankPreset ? 'BLANK PRESET' : 'real preset'
+      );
+      console.log('[loadPreset] New preset has desc?', preset.desc ? `Yes: ${preset.desc}` : 'No');
+    }
 
     // Check if preset is valid - allow explicit blank preset but warn about empty presets
     // Check both string and function versions since loadJSPreset converts strings to functions
@@ -194,7 +201,7 @@ export default class Renderer {
                         (preset.pixel_eqs_str || preset.pixel_eqs) ||
                         (preset.comp_eqs_str || preset.comp_eqs);
     const isEmptyPreset = !hasEquations;
-    if (isEmptyPreset && preset !== this.blankPreset) {
+    if (this.debugMode && isEmptyPreset && preset !== this.blankPreset) {
       console.warn('[loadPreset] WARNING: Preset appears to be empty (no equations). Loading anyway...', {
         name: preset.name || preset.desc || 'unknown',
         hasBaseVals: !!preset.baseVals,
@@ -218,27 +225,27 @@ export default class Renderer {
 
       const compatibility = this.compatibilityChecker.checkTransitionCompatibility(this.preset, preset);
 
-      // Log the analysis for debugging
-      const fromName = (this.preset && (this.preset.desc || this.preset.name)) || 'unknown';
-      const toName = (preset && (preset.desc || preset.name)) || 'unknown';
-
-      console.log('[Renderer] Preset compatibility check:', {
-        from: fromName,
-        to: toName,
-        result: compatibility.type,
-        originalBlendTime: blendTime,
-        recommendedDuration: compatibility.duration,
-        reason: compatibility.reason
-      });
+      // Log the analysis for debugging (gated — this fires on every preset switch)
+      if (this.debugMode) {
+        const fromName = (this.preset && (this.preset.desc || this.preset.name)) || 'unknown';
+        const toName = (preset && (preset.desc || preset.name)) || 'unknown';
+        console.log('[Renderer] Preset compatibility check:', {
+          from: fromName,
+          to: toName,
+          result: compatibility.type,
+          originalBlendTime: blendTime,
+          recommendedDuration: compatibility.duration,
+          reason: compatibility.reason
+        });
+      }
 
       // Override blend time based on compatibility
       if (compatibility.type === 'cut') {
         blendTime = 0;
-        console.warn('[Renderer] ⚠️ Using HARD CUT due to preset incompatibility:', compatibility.reason);
+        if (this.debugMode) console.warn('[Renderer] ⚠️ Using HARD CUT due to preset incompatibility:', compatibility.reason);
       } else if (compatibility.duration < blendTime) {
-        const oldBlendTime = blendTime;
         blendTime = compatibility.duration;
-        console.warn(`[Renderer] ⚠️ Reduced blend time from ${oldBlendTime}s to ${blendTime}s due to:`, compatibility.reason);
+        if (this.debugMode) console.warn('[Renderer] ⚠️ Reduced blend time due to:', compatibility.reason);
       }
 
       // Store transition type for blend pattern selection
@@ -288,6 +295,11 @@ export default class Renderer {
       mesh_height: this.mesh_height,
       aspectx: this.aspectx,
       aspecty: this.aspecty,
+      // The audio time arrays are undersampled to numSamps (bumped 512→2048).
+      // The waveform shaders must size their vertex buffers to match, or a
+      // 2048-point waveform overflows a 512 buffer → "Vertex buffer is not big
+      // enough" on drawArrays. Plumb it so the buffers track the audio.
+      numSamps: this.audio.numSamps,
     };
 
     if (preset.useWASM) {
@@ -390,6 +402,11 @@ export default class Renderer {
       mesh_height: this.mesh_height,
       aspectx: this.aspectx,
       aspecty: this.aspecty,
+      // The audio time arrays are undersampled to numSamps (bumped 512→2048).
+      // The waveform shaders must size their vertex buffers to match, or a
+      // 2048-point waveform overflows a 512 buffer → "Vertex buffer is not big
+      // enough" on drawArrays. Plumb it so the buffers track the audio.
+      numSamps: this.audio.numSamps,
     };
     this.presetEquationRunner.updateGlobals(params);
     this.prevPresetEquationRunner.updateGlobals(params);
@@ -980,7 +997,7 @@ export default class Renderer {
             brighten: 0, darken: 0, solarize: 0, invert: 0
           };
           const safeValue = defaults[key] !== undefined ? defaults[key] : 0;
-          console.warn(`[Renderer] Sanitizing ${key}: ${mdVSFrame[key]} -> ${safeValue}`);
+          if (this.debugMode) console.warn(`[Renderer] Sanitizing ${key}: ${mdVSFrame[key]} -> ${safeValue}`);
           mdVSFrame[key] = safeValue;
         }
       }
@@ -1033,7 +1050,7 @@ export default class Renderer {
               brighten: 0, darken: 0, solarize: 0, invert: 0
             };
             const safeValue = defaults[key] !== undefined ? defaults[key] : 0;
-            console.warn(`[Renderer] Sanitizing prev ${key}: ${this.prevMDVSFrame[key]} -> ${safeValue}`);
+            if (this.debugMode) console.warn(`[Renderer] Sanitizing prev ${key}: ${this.prevMDVSFrame[key]} -> ${safeValue}`);
             this.prevMDVSFrame[key] = safeValue;
           }
         }
@@ -1045,8 +1062,10 @@ export default class Renderer {
         true
       );
 
-      // Debug: Check if either frame has invalid values that could cause black screen
-      if (this.frameNum % 30 === 0) {
+      // Debug: Check if either frame has invalid values that could cause black
+      // screen. Gated — `wave_a <= 0` is NORMAL for shape/shader presets (no
+      // basic waveform), so this over-warns "zeroAlpha" and spammed production.
+      if (this.debugMode && this.frameNum % 30 === 0) {
         const checkFrame = (frame, name) => {
           const hasNaN = Object.values(frame).some(v => typeof v === 'number' && isNaN(v));
           const hasInfinity = Object.values(frame).some(v => typeof v === 'number' && !isFinite(v));
